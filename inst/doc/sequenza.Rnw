@@ -1,0 +1,62 @@
+%\VignetteIndexEntry{sequenza Vignette}
+%\VignetteDepends{sequenza}
+%\VignetteKeywords{LOH}
+%\VignetteKeywords{Heterogenity}
+%\VignetteKeywords{Cancer sequencing}
+%\VignettePackage{sequenza}
+
+\documentclass[12pt]{article}
+\usepackage{hyperref}
+\usepackage{subfigure}
+\usepackage{listings}
+
+\newcommand{\shellcmd}[1]{\\\indent\indent\texttt{\footnotesize\# #1}\\}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+
+\textwidth=6.2in
+\textheight=8.5in
+\oddsidemargin=0.2in
+\evensidemargin=0.2in
+\headheight=0in
+\headsep=0in
+
+\author{Francesco Favero\footnote{favero@cbs.dtu.dk}}
+
+\begin{document}
+\title{sequenza package vignette}
+\maketitle
+
+\tableofcontents
+
+\section{Abstract}
+Deep sequence of tumor DNA along with corresponding normal DNA can provide a rich picture of the mutations and aberrations that characterize the tumor. However, analysis of this data can be impeded by of tumor cellularity and heterogeneity and by unwieldy data. Here we describe the onco-seq-o-scope software system, which comprises a fast python-based pre-processor and an R-based analysis package. Onco-seq-o-scope enables the efficient estimation of tumor cellularity and ploidy, and generation of copy number, loss-of-heterozygosity, and mutation frequency profiles. 
+
+\section{Introduction}
+Nothing to show in \Rpackage{sequenza} package for now
+
+<<label=callVign, echo=TRUE, eval=FALSE>>=
+vignette("sequenza")
+@
+
+\section{Running external program}
+Create a GC-windows file:
+\shellcmd{
+abfreqtools.py GC-w 50 hg19.fa > hg19.gc50Base.txt.gz
+}
+
+Merging two pileup (from \texttt{samtools}) to obtainf alleles and mutation frequency.
+\shellcmd{
+abfreqtools.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pileup.gz -s 0001-met2.pileup.gz -q 20 -n 10 -o 0001-met1.allelesfreq.txt.gz
+}
+
+\newpage
+Random citation \cite{rsvgtipsdevice}
+
+
+%%%% bibliography
+\bibliographystyle{plain}
+\bibliography{sequenza}
+%%
+\end{document}
