@@ -1,4 +1,5 @@
 \name{find.breaks}
+\alias{find.breaks}
 \alias{segment.breaks}
 \title{Segmenting sequencing data using allele-specific copy number algorithm}
 
@@ -15,9 +16,9 @@ segment.breaks(abf.tab, breaks)
   \item{abf.baf}{An abfreq file containing only the heterozygous positions.}
   \item{abf.tab}{A complete abfreq file.}  
   \item{gamma}{\code{aspcf} parameter. Default 80.}
-  \item{gamma}{\code{aspcf} parameter. Default 80.}
-  \item{gamma}{\code{aspcf} parameter. Default 80.}
-  \item{gamma}{\code{aspcf} parameter. Default 80.}
+  \item{kmin}{\code{aspcf} parameter. Default 10.}
+  \item{baf.thres}{\code{aspcf} parameter. Default c(0, 0.5).}
+  \item{verbose}{\code{aspcf} parameter. Default FALSE.}
   \item{breaks}{breaks obtained with the function \code{find.breaks}.}
   \item{...}{Any parameters accepted from \code{aspcf}.}
 }

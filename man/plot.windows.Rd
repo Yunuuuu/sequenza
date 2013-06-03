@@ -1,4 +1,5 @@
 \name{plot.windows}
+\alias{plot.windows}
 \title{Plot the specified windowed chromosome.}
 
 \description{

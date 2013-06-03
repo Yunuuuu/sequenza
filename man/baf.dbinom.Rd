@@ -1,10 +1,10 @@
 \name{baf.dbinom}
 \alias{baf.dbinom}
-\alias{baf.dbpois}
+\alias{baf.dpois}
 \alias{mufreq.dbinom}
-\alias{mufreq.dbpois}
+\alias{mufreq.dpois}
 \alias{depth.ratio.dbinom}
-\alias{depth.ratio.dbpois}
+\alias{depth.ratio.dpois}
 
 \title{Binomial and Poisson distributions}
 
@@ -15,8 +15,8 @@
 \usage{
   baf.dbinom(baf, baf.model, depth.t)
   baf.dpois(baf, baf.model, depth.t)
-  depth.ratio.dbinom(depth.t, depth.n, depth.ratio, depth.ratio.model)
-  depth.ratio.dpois(depth.t, depth.n, depth.ratio, depth.ratio.model)
+  depth.ratio.dbinom(size, depth.ratio, depth.ratio.model)
+  depth.ratio.dpois(size, depth.ratio, depth.ratio.model)
   mufreq.dbinom(mufreq, mufreq.model, depth.t, seq.errors = 0.01)
   mufreq.dpois(mufreq, mufreq.model, depth.t, seq.errors = 0.01)
 
@@ -25,12 +25,13 @@
 \arguments{
   \item{baf}{The B-allele frequency in the tested position}
   \item{mufreq}{The mutation frequency in the tested position}
-  \item{depth.n}{The number of reads covering the tested position in the normal sample}
   \item{depth.t}{The number of reads covering the tested position in the tumor sample}
+  \item{size}{Generally is the sum of the number of reads covering the tested position in the reference and in the aberrant sample}
   \item{depth.ratio}{The adjusted sequencing depth ratio in the tested position}
   \item{baf.model}{A vector of the possibles values of B-allele frequency of the model}
   \item{mufreq.model}{A vector of the possibles values of mutation frequency of the model}
   \item{depth.ratio.model}{A vector of the possible values of depth ratio of the model}
+  \item{seq.errors}{An small decimal number to offset the "no mutation" condition to a number higher then 0. Default 0.01}
 }
 
 \details{

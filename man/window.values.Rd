@@ -1,4 +1,5 @@
-\name{windows.values}
+\name{window.values}
+\alias{window.values}
 \title{Transform the data on base-pair windows of a specified size}
 
 \description{

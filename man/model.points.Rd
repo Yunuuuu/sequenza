@@ -1,4 +1,5 @@
 \name{model.points}
+\alias{model.points}
 \title{Function to generate mutation frequency and depth ratio model point at given cellularity and DNA-content value.}
 
 \description{

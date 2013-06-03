@@ -1,4 +1,5 @@
 \name{cp.plot}
+\alias{cp.plot}
 \title{Plot log-likelihood for the tested values of cellularity and DNA-content}
 
 \description{

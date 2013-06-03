@@ -1,4 +1,5 @@
 \name{theoric.baf}
+\alias{theoric.baf}
 \alias{theoric.mufreq}
 \alias{theoric.depth.ratio}
 

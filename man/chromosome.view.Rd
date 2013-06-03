@@ -1,4 +1,5 @@
 \name{chromosome.view}
+\alias{chromosome.view}
 \title{Graphically represent multiple chromosomal features in parallel}
 
 \description{
@@ -20,6 +21,7 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL,
   \item{cellularity}{Value of the estimated \code{cellularity} parameter.}
   \item{dna.content}{Value of the estimated \code{dna.content} parameter.}
   \item{avg.depth.ratio}{The median value of depth ratio.}
+  \item{main}{Main title of the plot. Default "".}
 }
 
 \details{

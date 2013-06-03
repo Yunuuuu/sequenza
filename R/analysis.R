@@ -174,13 +174,35 @@ window.values <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
    results
 }
 
-get.ci <- function(mat) {
-   values <- sort(unique(mat[, 1]))
-   mat <- t(mapply(x = values, FUN = function(x ,mat) cbind(x, max(mat[mat[, 1] == x, 2])), MoreArgs = list(mat = mat)))
-   L.max <- which.max(mat[,2]) 
-   sum.all <- log1p(sum(exp(mat[-L.max, 2]-mat[L.max, 2]))) + mat[L.max, 2] 
+get.ci <- function(mat, interval = 0.95) {
+   incr.col <- function(x) {
+      for (i in 1:length(x)) {
+         if (i == 1) {
+            x[i] <- x[i]
+         } else {
+            x[i] <- x[i] + x[i - 1]
+         }
+      }
+      x
+   }
+   results  <- list()
+   values   <- sort(unique(mat[, 1]))
+   mat      <- t(mapply(x = values, FUN = function(x ,mat) cbind(x, max(mat[mat[, 1] == x, 2])), MoreArgs = list(mat = mat)))
+   L.max    <- which.max(mat[,2]) 
+   sum.all  <- log1p(sum(exp(mat[-L.max, 2]-mat[L.max, 2]))) + mat[L.max, 2] 
    exp.vals <- 2^(mat[, 2] - sum.all)
-   cbind(mat, expL = exp.vals)
+   values   <- cbind(mat[,1], expL = exp.vals)
+   val.95   <- sum(values[, 2]) * interval
+   sorted.v <- values[order(values[, 2], decreasing = TRUE),]
+   sorted.v <- cbind(sorted.v,incr.col(sorted.v[, 2]))
+   sorted.v <- sorted.v[sorted.v[,3] <= val.95, ]
+   up.v     <- max(sorted.v[,1])
+   low.v    <- min(sorted.v[,1]) 
+   max.l    <- sorted.v[1,1]
+   results$values  <- values
+   results$confint <- c(low.v,up.v)
+   results$max.l   <- max.l
+   results
 }
 
 # merge.baf.ratio <- function(baf.segments, ratio.segments) {

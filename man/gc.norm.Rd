@@ -1,4 +1,5 @@
 \name{gc.sample.stats}
+\alias{gc.sample.stats}
 \alias{gc.norm}
 
 \title{Correct the depth of coverage ratio value considering the biases derived from GC-contents.}
@@ -16,13 +17,14 @@ gc.norm(ratio, gc)
   \item{filename}{A file in the abfreq format.}
   \item{ratio}{A vector containing depth ratios}
   \item{gc}{A vector corresponding to \code{ratio} with the relative GC-content information}
+  \item{gz}{Boolean, indicating if the file is compressed as gzip file or not. Default TRUE.}
 }
 
 \details{
   The function \code{gc.sample.stats} reads the content of the whole file and compute the normalization.
   It returns a list containing three objects: \code{raw} and \code{adj}, containing respectively the quartiles information for each GC percentage provided of the raw and the normalized data, and \code{gc.value} containing the GC\% values. In order to normalize the data is possible to use the median of the raw data and the GC-content information for each point.
   
-  The function \code{gc.norm} uses vectors already loaded in the environment. For small systems is not recommended to load a the abf-file into memory. it returns a list containing two objects: \code{ratio} with the normalized depth.ratio values and \code{gc.value} containing the GC\% values
+  The function \code{gc.norm} uses vectors already loaded in the environment. For small systems is not recommended to load an entire abfreq file in memory. it returns a list containing two objects: \code{ratio} with the normalized depth.ratio values and \code{gc.value} containing the GC\% values
 }
 
 \examples{

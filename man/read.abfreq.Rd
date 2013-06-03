@@ -1,4 +1,5 @@
 \name{read.abfreq}
+\alias{read.abfreq}
 \alias{read.acgt}
 \title{Reading efficiently an abfreq or an acgt format file.}
 

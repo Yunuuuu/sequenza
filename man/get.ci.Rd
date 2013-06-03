@@ -1,25 +1,32 @@
-\name{read.mufreq}
-\alias{read.mufreq}
-\title{Reading a mufreq file in an efficient way}
+\name{get.ci}
+\alias{get.ci}
+\title{Compute the confidence intervals for CP matrix}
 
 \description{
-  Reading a mufreq file in an efficient way.
+  Compute the confidence intervals for CP matrix.
 }
 
 \usage{
-  read.mufreq(file, nrows = -1, gz = TRUE,...)
+   get.ci(mat, interval = 0.95)
+}
+\arguments{
+  \item{mat}{a matrix contain a column with parameter values (the first OR the second column from a CP matrix) and a column with the log-likelihood (the third column of a CP matrix).}
+  \item{interval}{The minimum confidence of interval in decimal. Default 0.95}
 }
 
-\arguments{
-  \item{file}{A mufreq file.}
+\value{
+  \item{values}{a matrix containing the parameter values with respective likelihood (ideal for plotting the likelihood function).}
+  \item{confint}{the confidence intervals}
+  \item{max.l}{The value wit maximum likelihood}
+  
 }
 
 \details{
-  \code{read.mufreq} uses read.delim to read in an efficient way the gzipped or uncompressed mufreq file.
+  
 }
 
 \seealso{
-  \code{read.delim},
+  \code{baf.model.fit}, \code{mufreq.model.fit}.
 }
 
 \examples{

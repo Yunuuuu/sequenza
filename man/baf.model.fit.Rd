@@ -1,5 +1,6 @@
 \name{baf.model.fit}
-\alias{cell.dna.content.fit.mc}
+\alias{baf.model.fit}
+\alias{mufreq.model.fit}
 \title{Model fitting using Bayesian inference}
 
 \description{
@@ -28,6 +29,8 @@
   \item{by.p}{Increment value to use to generate the vector of dna-contents to test. Default = 0.01}
   \item{avg.depth.ratio}{The median value of depth ratio}
   \item{mc.cores}{Number of core to use to compute the possible combinations. Default = 2}
+  \item{CNt.max}{Maximum number of possible copy number. default 7.}
+  \item{CNr}{Copy number status of the germline reference. Default 2.}
 }
 
 \value{

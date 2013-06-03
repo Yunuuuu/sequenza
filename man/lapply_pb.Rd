@@ -1,4 +1,5 @@
 \name{lapply_pb}
+\alias{lapply_pb}
 
 \title{A wrapper to use progress bar on multi core lapply function.}
 

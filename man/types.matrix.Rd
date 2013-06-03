@@ -1,4 +1,5 @@
 \name{types.matrix}
+\alias{types.matrix}
 \title{Crate a data.frame of types tags}
 
 \description{
