@@ -33,6 +33,11 @@ model.points <- function(cellularity = 0.5, dna.content = 1,
    cbind(mufreqs,depth.ratio)
 }
 
+# theoric.baf <- function(cellularity = 0.5, CNt = 2, B = 1){
+#    B.tot <- ((B * cellularity)  + (1 - cellularity)) / 
+#             ((CNt * cellularity) + 2*(1 - cellularity))
+#    B.tot
+# }
 
 theoric.baf <- function(CNr, CNt, cellularity) {
    alleles       <- seq(from = 1, to = CNt, by = 1)
@@ -43,7 +48,7 @@ theoric.baf <- function(CNr, CNt, cellularity) {
       }
       max.b.alleles
    }
-   fract.normal.alleles <- (1 - cellularity) / CNr
+   fract.normal.alleles <- (1 - cellularity)
    res                  <- list()
    for (i in 1:length(alleles)) {
       max.b.alleles <- max.b(alleles[i])
@@ -53,7 +58,7 @@ theoric.baf <- function(CNr, CNt, cellularity) {
       for (n in 1:length(decrements.b)) {
          A.i <- (max.a.alleles + decrements.b[n])
          B.i <- (max.b.alleles - decrements.b[n])
-         BAF <- fract.normal.alleles + (cellularity * B.i / alleles[i])
+         BAF <- (fract.normal.alleles + (cellularity * B.i)) / ((alleles[i] * cellularity) + (CNr * fract.normal.alleles))
          res[[i]][[n]] <- cbind(A = A.i, B = B.i, BAF = BAF, CNt = alleles[i])
       }
    }
