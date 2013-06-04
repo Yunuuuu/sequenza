@@ -9,6 +9,7 @@
 \usepackage{hyperref}
 \usepackage{subfigure}
 \usepackage{listings}
+\usepackage{float}
 
 \newcommand{\shellcmd}[1]{\\\indent\indent\texttt{\footnotesize\# #1}\\}
 \newcommand{\Rfunction}[1]{{\texttt{#1}}}
@@ -25,38 +26,412 @@
 \author{Francesco Favero\footnote{favero@cbs.dtu.dk}}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 \title{sequenza package vignette}
 \maketitle
 
 \tableofcontents
 
 \section{Abstract}
-Deep sequence of tumor DNA along with corresponding normal DNA can provide a rich picture of the mutations and aberrations that characterize the tumor. However, analysis of this data can be impeded by of tumor cellularity and heterogeneity and by unwieldy data. Here we describe the onco-seq-o-scope software system, which comprises a fast python-based pre-processor and an R-based analysis package. Onco-seq-o-scope enables the efficient estimation of tumor cellularity and ploidy, and generation of copy number, loss-of-heterozygosity, and mutation frequency profiles. 
-
-\section{Introduction}
-Nothing to show in \Rpackage{sequenza} package for now
-
-<<label=callVign, echo=TRUE, eval=FALSE>>=
-vignette("sequenza")
-@
+Deep sequence of tumor DNA along with corresponding normal DNA can provide a rich picture of the mutations and aberrations that characterize the tumor. However, analysis of this data can be impeded by of tumor cellularity and heterogeneity and by unwieldy data. Here we describe the \textit{sequenza} software system, which comprises a fast python-based pre-processor and an R-based analysis package. Sequenza enables the efficient estimation of tumor cellularity and ploidy, and generation of copy number, loss-of-heterozygosity, and mutation frequency profiles. 
 
 \section{Running external program}
 Create a GC-windows file:
 \shellcmd{
-abfreqtools.py GC-w 50 hg19.fa > hg19.gc50Base.txt.gz
+abfreqtools.py GC-windows -w 50 hg19.fa | gzip > hg19.gc50Base.txt.gz
 }
 
-Merging two pileup (from \texttt{samtools}) to obtainf alleles and mutation frequency.
+Merging two pileup (from \texttt{samtools}) to obtain alleles and mutation frequency.
 \shellcmd{
-abfreqtools.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pileup.gz -s 0001-met2.pileup.gz -q 20 -n 10 -o 0001-met1.allelesfreq.txt.gz
+abfreqtools.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pileup.gz -s 0001-met2.pileup.gz -q 20 -n 10 -o 0001-met2.abfreq.txt.gz
 }
 
-\newpage
-Random citation \cite{rsvgtipsdevice}
+\section{Loading sequenza package}
+
+<<label=loadLib, echo=TRUE>>=
+library("sequenza")
+@
+
+
+\section{Reading an \textit{abfreq} file}
+<<label=setFile, echo=TRUE>>=
+data.file <-  system.file("data","abf.data.abfreq.txt.gz",package="sequenza")
+@
+
+\subsection{Reading a single chromosome}
+<<label=readAfreqChr, echo=TRUE, eval=FALSE>>=
+abf.data <- read.abfreq(data.file,chr.name = "1")
+@
+
+\subsection{Reading entire file}
+<<label=readAfreq, echo=TRUE>>=
+abf.data <- read.abfreq(data.file)
+@
+
+\section{GC-normalization and noise reduction}
+<<label=goodReads, echo=TRUE>>=
+abf.data$good.s.reads <- abf.data$depth.sample * 
+                         abf.data$sample.reads.above.quality
+@
+
+Gather gc-content information from the entire file:
+<<label=depthRGCnormall, echo=TRUE, eval=FALSE>>=
+gc.stats <- gc.sample.stats(data.file)
+@
+
+<<label=depthRGCnorm, echo=TRUE, results=hide>>=
+gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
+                    gc = abf.data$GC.percent)
+@
+
+\subsection{Use the GC-content median information}
+
+<<label=useGCmedians, echo=TRUE>>=
+gc.vect  <- setNames(gc.stats$raw[,3], gc.stats$gc.values)
+
+abf.data$adjusted.ratio <- abf.data$depth.ratio / 
+                           gc.vect[as.character(abf.data$GC.percent)]                       
+@
+
+\subsection{Windowing depth ratios values.}
+<<label=depthWindowing, echo=TRUE, results=hide>>=
+abf.r.win <- windowValues(x = abf.data$adjusted.ratio,
+             positions = abf.data$n.base,
+             chromosomes = abf.data$chromosome,
+             window = 1e6, overlap = 5e5,
+             weight = abf.data$depth.normal)
+@
+
+\begin{figure}[H]
+      \centering
+<<label=plotDepthProfile,fig=TRUE,width=6,height=4>>=
+
+plotWindows(abf.r.win$windows[[1]], log2.plot = FALSE, 
+            ylab = "Depth ratio", xlab = "Base pairs", 
+            main = names(abf.r.win$windows)[1], las = 1, n.min = 1, 
+            ylim = c(0, 2))
+@
+      \caption{Depth ratio profile visualization over a single chromosome. }
+      \label{fig:SingleCNProfview}
+\end{figure}
+\subsection{Windowing B-allele frequencies values.}
+
+<<label=HetSepqring, echo=TRUE>>=
+abf.hom  <- abf.data$ref.zigosity == 'hom'
+abf.het  <- abf.data[!abf.hom, ]
+@
+
+<<label=BAFWindowing, echo=TRUE, results=hide>>=
+abf.b.win <- windowValues(x = abf.het$Bf,
+             positions = abf.het$n.base,
+             chromosomes = abf.het$chromosome,
+             window = 1e6, overlap = 5e5,
+             weight = round(x = abf.het$good.s.reads, digits = 0))
+@
+
+\begin{figure}[H]
+      \centering
+<<label=plotBAFProfile,fig=TRUE,width=6,height=4>>=
+plotWindows(abf.b.win$windows[[1]], ylim = c(0, 0.5), 
+           main = names(abf.r.win$windows)[1], xlab = "Base pairs",
+           ylab = "B allele frequency", n.min = 10)
+@
+      \caption{B-allele frequency profile visualization over a single chromosome.}
+      \label{fig:SingleBAFProfview}
+\end{figure}
+
+\section{Allele specific Segmentation}
+\subsection{Find breaks}
+<<label=ASCPF, echo=TRUE>>=
+breaks <- find.breaks(abf.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))
+head(breaks)
+@
+\subsection{Obtain the segment values}
+<<label=so.segs, echo=TRUE>>=
+seg.s1 <- segment.breaks(abf.data, breaks = breaks)
+@
+\section{Select mutations by mutation frequency}
+
+<<label=doF, echo=TRUE>>=
+mut.tab <- mutation.table(abf.data, mufreq.treshold = 0.15, 
+                          min.reads = 40, max.mut.types = 1,
+                          min.type.freq = 0.9, segments = seg.s1)
+@
+<<label=doF, echo=TRUE>>=
+mut.tab.no.seg <- mutation.table(abf.data, mufreq.treshold = 0.15, 
+                          min.reads = 40, max.mut.types = 1,
+                          min.type.freq = 0.9)
+@
+<<label=doF, echo=TRUE>>=
+dim(mut.tab)
+
+head(mut.tab)
+
+head(mut.tab.no.seg)
+@
+
+\section{Plot chromosome view with mutations, BAF, depth ratio and segments}
+\begin{figure}[H]
+      \centering
+<<label=3panelsPlot,fig=TRUE,width=6,height=6>>=
+
+chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win$windows[[1]], 
+                ratio.windows = abf.r.win$windows[[1]], min.N.ratio = 1,
+                segments = seg.s1, main = "TCGA-42-2591 chr 1")
+@ 
+      \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position.}
+      \label{fig:3panelsPlot}
+\end{figure}
+
+\section{Infer for cellularity and DNA-content}
+<<label=filterSegs, echo=TRUE>>=
+seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 5e6, ]
+@
+<<label=segsWeight, echo=TRUE>>=
+weights.seg  <- 200 + round((seg.filtered$end.pos - seg.filtered$start.pos)/1e6, 0)
+seg.filtered$Bf[seg.filtered$Bf>=0.4] <- 0.5
+@
+
+<<label=avg.depth.ratio>>=
+avg.depth.ratio <- mean(gc.stats$adj[,3])
+avg.depth.ratio
+@
+
+<<label=BAFmodelFIT, echo=TRUE, results=hide>>=
+CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
+                    weight.ratio = 300,
+                    weight.Bf = weights.seg,
+                    by.p = 0.1, by.c = 0.05, avg.depth.ratio = 1,
+                    cellularity.range = c(0.1,1), 
+                    dna.content.range = c(0.5,3), mc.cores=4)                   
+@
+<<label=ConfIntCP, echo=TRUE>>=
+head(CP)
+
+dna.c.cint <- get.ci(CP[,c(1,3)])
+dna.c.cint$confint
+dna.c.cint$max.l
+
+cellu.cint <- get.ci(CP[,c(2,3)])
+cellu.cint$confint
+cellu.cint$max.l
+@
+\begin{figure}[H]
+      \centering
+<<label=CPplot,fig=TRUE,width=6,height=6>>=
+cp.plot(CP)
+@ 
+      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-content. The color indicate the log-likelihood of the corresponding cellularity/DNA-content values.}
+      \label{fig:cpPlot}
+\end{figure}
+
+\begin{figure}[H]
+      \centering
+<<label=CPplotCI,fig=TRUE,width=6,height=6>>=
+par(mfrow = c(2,2))
+   cp.plot(CP)
+   plot(cellu.cint$values[,c(2,1)], ylab = "cellularity",
+        xlab = "likelihood", type = "l")
+   abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
+
+   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-content",
+        ylab = "likelihood", type = "l")
+   abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
+@ 
+      \caption{Plot of the log likelihood with respective cellularity and DNA-content probability distribution and confidence intervals.}
+      \label{fig:cpPlotCI}
+\end{figure}
+
+\section{Call for CNV and mutations using the estimated parameter}
+
+<<label=seParam, eval=TRUE>>=
+cellularity <- cellu.cint$max.l
+dna.content <- dna.c.cint$max.l
+@
+\subsection{Detect mutated alleles.}
+<<label=mmufBayes, eval=TRUE>>=
+mut.alleles <- mufreq.bayes(mufreq = mut.tab$F, depth.ratio = mut.tab$adjusted.ratio,
+                            cellularity = cellularity, dna.content = dna.content,
+                            avg.depth.ratio = 1)
+
+head(mut.alleles)
+head(cbind(mut.tab[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
+@
+
+\subsection{Detect Copy number variation.}
+<<label=bafBayes, eval=TRUE>>=
+cn.alleles <- baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
+                        cellularity = cellularity, dna.content = dna.content,
+                        avg.depth.ratio = 1)
+
+seg.s1.cn <- cbind(seg.s1, cn.alleles)
+head(seg.s1.cn)
+@
+
+\section{Visualize detected copy number}
+
+\begin{figure}[H]
+      \centering
+<<label=chrViewWithCP,fig=TRUE,width=6,height=6>>=
+
+chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win$windows[[1]], 
+                ratio.windows = abf.r.win$windows[[1]],  min.N.ratio = 1,
+                segments = seg.s1.cn, main = "TCGA-42-2591 chr 1",
+                cellularity = cellularity, dna.content = dna.content,
+                avg.depth.ratio = 1)
+@ 
+      \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted line indicate different copy number/allelic state. }
+      \label{fig:crhomViewWithCP}
+\end{figure}
+
+\section{Working with SNP array data}
+
+
+<<label=loadingFromCopynumber, eval=TRUE>>=
+data(BAF)
+data(logR)
+@
+\subsection{Windowing logR values.}
+<<label=logRWin, eval=TRUE, results=hide>>=
+snp.r.win <- windowValues(x = 2^logR$S2,
+             positions = logR$pos,
+             chromosomes = logR$chrs,
+             window = 1e6, overlap = 5e5)
+@
+\subsection{Windowing B-allele frequencies values.}
+<<label=BAFWin, eval=TRUE, results=hide>>=
+BAF.to05 <- BAF$S2
+BAF.to05[BAF.to05 >= 0.5] <- 1 - BAF.to05[BAF.to05 >= 0.5]
+snp.b.win <- windowValues(x = BAF$S1,
+             positions = BAF$pos,
+             chromosomes = BAF$chrs,
+             window = 1e6, overlap = 5e5)
+@
+\subsection{Chromosome view without mutation}
+\begin{figure}[H]
+      \centering
+<<label=chrViewNoMut, fig=TRUE, width=6, height=6>>=
+
+chromosome.view(baf.windows = snp.b.win$windows[[1]], 
+                ratio.windows = snp.r.win$windows[[1]],
+                 min.N.ratio = 1)
+@ 
+      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. }
+      \label{fig:crhomViewSNP}
+\end{figure}
+
+\subsection{Segmenting with the \textit{copynumber} package}
+<<label=copynumber, eval=TRUE>>=
+logR.wins  <- winsorize(logR, verbose = FALSE)
+allele.seg <- aspcf(logR.wins, BAF, verbose = FALSE)
+head(allele.seg)
+
+allele.seg <- allele.seg[allele.seg$sampleID == "S2", ]
+@
+
+\subsection{Using the Bayesian inference on segmented SNP arrays}
+<<label=adjustSegs, eval=TRUE>>=
+segs.BAF.to05 <- allele.seg$BAF.mean
+segs.BAF.to05[segs.BAF.to05 >= 0.5] <- 1 - segs.BAF.to05[segs.BAF.to05 >= 0.5]
+
+avg.unlogR <- 2^(mean(allele.seg$logR.mean))
+@
+
+<<label=CPforSNP, eval = TRUE, results=hide>>=
+CP.snp <- baf.model.fit(Bf = segs.BAF.to05[allele.seg$chrom == 1], depth.ratio = 2^(allele.seg$logR.mean[allele.seg$chrom == 1]), 
+                    weight.ratio = allele.seg$n.probes[allele.seg$chrom == 1],
+                    weight.Bf = allele.seg$n.probes[allele.seg$chrom == 1],
+                    by.p = 0.1, by.c = 0.05, avg.depth.ratio = avg.unlogR,
+                    cellularity.range = c(0.1,1), 
+                    dna.content.range = c(0.5,3), mc.cores=4)
+@
+<<label=getCPparamSNP, eval = TRUE>>=
+
+dna.c.cint <- get.ci(CP.snp[,c(1,3)])
+dna.c.cint$confint
+dna.c.cint$max.l
+
+cellu.cint <- get.ci(CP.snp[,c(2,3)])
+cellu.cint$confint
+cellu.cint$max.l
+
+cellularity <- cellu.cint$max.l
+dna.content <- dna.c.cint$max.l
+@
+%max.param = CP.snp[which.max(CP.snp[, 3]), ]
+%max.param
+
+%dna.content <- max.param[1]
+%cellularity <- max.param[2]
+%@
+
+\subsection{Cellularity and DNA-content plot for SNP array}
+\begin{figure}[H]
+      \centering
+<<label=CPplotSNP,fig=TRUE,width=6,height=6>>=
+cp.plot(CP.snp)
+@ 
+      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-content from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/DNA-content values.}
+      \label{fig:cpPlotSNP}
+\end{figure}
+
+\begin{figure}[H]
+      \centering
+<<label=CPplotCISNP,fig=TRUE,width=6,height=6>>=
+par(mfrow = c(2,2))
+   cp.plot(CP.snp)
+   plot(cellu.cint$values[,c(2,1)], ylab = "cellularity",
+        xlab = "likelihood", type = "l")
+   abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
+
+   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-content",
+        ylab = "likelihood", type = "l")
+   abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
+@ 
+      \caption{Plot of the log likelihood with respective cellularity and DNA-content probability distribution and confidence intervals.}
+      \label{fig:cpPlotCN}
+\end{figure}
+
+
+\subsection{Call for copy number variation using inferred parameters.}
+
+<<label=bafBayesSNP, eval=TRUE>>=
+snp.seg.cn <- baf.bayes(Bf = segs.BAF.to05, depth.ratio = 2^(allele.seg$logR.mean), 
+                        weight.ratio = allele.seg$n.probes,
+                        weight.Bf = allele.seg$n.probes,
+                        avg.depth.ratio = avg.unlogR,
+                        cellularity = cellularity,
+                        dna.content = dna.content, CNt.max = 10)
+
+segments.snp <- cbind(allele.seg[,c(2, 4, 5, 8, 7, 6)], snp.seg.cn)
+colnames(segments.snp) <- c("chromosome", "start.pos", "end.pos", "Bf","depth.ratio","N.BAF", "CNt", "A", "B", "L")
+segments.snp$Bf <- segs.BAF.to05
+segments.snp$depth.ratio <- 2^(allele.seg$logR.mean)
+@
+
+\subsection{Graphical representation of copy number with SNP arrays}
+
+\begin{figure}[H]
+      \centering
+<<label=chrViewNoMutCP, fig=TRUE, width=6, height=6>>=
+
+chromosome.view(baf.windows = snp.b.win$windows[[1]], 
+                ratio.windows = snp.r.win$windows[[1]],  min.N.ratio = 1,
+                segments = segments.snp[segments.snp$chromosome == "1", ],
+                cellularity = cellularity, dna.content = dna.content,
+                avg.depth.ratio = avg.unlogR)
+@ 
+      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Horizontal dotted line indicate different copy number/ allelic state. }
+      \label{fig:crhomViewNoMutCP}
+\end{figure}
+
+
+%\newpage
+%Random citation \cite{rsvgtipsdevice}
 
 
 %%%% bibliography
-\bibliographystyle{plain}
-\bibliography{sequenza}
+%\bibliographystyle{plain}
+%\bibliography{sequenza}
 %%
 \end{document}

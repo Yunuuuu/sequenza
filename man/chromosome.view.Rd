@@ -8,8 +8,8 @@
 }
 
 \usage{
-chromosome.view(baf.windows, ratio.windows, mut.tab = NULL,
-                segments = NULL, main = "", CNr = 2,
+chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL, 
+                min.N.baf = 1, min.N.ratio = 1e4, main = "", CNr = 2,
                 cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL)
 }
 
@@ -18,6 +18,8 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL,
   \item{ratio.windows}{Matrix containing the windowed depth ratios value for one chromosome.}
   \item{mut.tab}{If specified the mutation would be drawn in a top panel. \code{mut.tab} must be generated from the \code{mutation.table} command. Default NULL.}
   \item{segments}{If specified the segment for B-allele frequency and depth ratio would be displayed with a red line, and vertical dotted lines would be drawn corresponding to the breaks points. Default NULL.}
+  \item{min.N.baf}{Minimum amount of observations in a BAF window to be plotted. Default 1.}
+  \item{min.N.ratio}{Minimum amount of observations in a depth ratio window to be plotted. Default 1e4.}
   \item{CNr}{Copy number of the germline genome. Default = 2.}
   \item{cellularity}{Value of the estimated \code{cellularity} parameter.}
   \item{dna.content}{Value of the estimated \code{dna.content} parameter.}

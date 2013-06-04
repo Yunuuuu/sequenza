@@ -69,6 +69,8 @@ gc.norm <- function (ratio, gc) {
       setTxtProgressBar(pb, ii)
    }
    cat("\n")
+   gc.stats$raw <- do.call(rbind, gc.stats$raw)
+   gc.stats$adj <- do.call(rbind, gc.stats$adj)   
    gc.stats$gc.values <- gc.values
    gc.stats$ratio <- ratio
    gc.stats

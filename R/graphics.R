@@ -67,8 +67,8 @@ plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
    }
    x.min        <- abf.window[1, 1]
    x.max        <- abf.window[nrow(abf.window), 2]
-   y.min        <- min(abf.window[, 4])
-   y.max        <- max(abf.window[, 5])
+   y.min        <- min(abf.window[, 4], na.rm = TRUE)
+   y.max        <- max(abf.window[, 5], na.rm = TRUE)
    if (add == FALSE) { 
       if (!is.null(xlim) & !is.null(ylim)) {
          plot(xlim = xlim, ylim = ylim, type = "n", x = NULL, ...)
@@ -122,8 +122,8 @@ mutation.colors <- function(mut.type = NULL, l.pos = "topright") {
    }
 }
 
-chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL,
-                            segments = NULL, main = "", CNr = 2,
+chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
+                            min.N.baf = 1, min.N.ratio = 1e4, main = "", CNr = 2,
                             cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL) {
    if (is.null(segments)) {
       data.model <- NULL
@@ -172,8 +172,9 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL,
 
    }
 
-   plotWindows(baf.windows, ylim = c(0, 0.5),
-                     ylab = "B allele frequency", xlim = xlim, las = 1)
+   plotWindows(baf.windows, ylab = "B allele frequency", 
+               xlim = xlim, ylim = c(0, 0.5), las = 1,
+               n.min = min.N.baf)
    if (!is.null(segments)){
       abline(v = segments$end.pos, lwd = 0.7, lty = 2)
       segments(x0 = segments$start.pos, y0 = segments$Bf, x1=segments$end.pos, y1 = segments$Bf, col = "red", lwd = 3)
@@ -185,7 +186,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL,
       }
    }
    plotWindows(ratio.windows, ylab = "depth ratio", 
-                      las = 1, n.min = 1e4, ylim = c(0, 2))
+               las = 1, n.min = min.N.ratio, ylim = c(0, 2))
    if (!is.null(segments)){
       abline(v = segments$end.pos, lwd = 0.7, lty = 2)
       segments(x0 = segments$start.pos, y0 = segments$depth.ratio, x1=segments$end.pos, y1 = segments$depth.ratio, col = "red", lwd = 3)
