@@ -1,13 +1,13 @@
-\name{plot.windows}
-\alias{plot.windows}
+\name{plotWindows}
+\alias{plotWindows}
 \title{Plot the specified windowed chromosome.}
 
 \description{
-  \code{plot.windows} is a wrapper to easily plot a specified chromosome included in the list object returned by the function \code{windows.value}.
+  \code{plotWindows} is a wrapper to easily plot a specified chromosome included in the list object returned by the function \code{windows.value}.
 }
 
 \usage{
-plot.windows(abf.window, m.lty = 1, m.lwd = 3,
+plotWindows(abf.window, m.lty = 1, m.lwd = 3,
              m.col = "black", q.bg = "lightblue", log2.plot = FALSE,
              n.min = 1, xlim = NULL, ylim = NULL, add = FALSE, ...)
 }
@@ -34,7 +34,7 @@ plot.windows(abf.window, m.lty = 1, m.lwd = 3,
 
 # Use windows of 1Mb on a sample 
 
-# abf.ratio <- window.values(x = round(abf.data$adjusted.ratio, 3),
+# abf.ratio <- windowValues(x = round(abf.data$adjusted.ratio, 3),
 #                           positions = abf.data$n.base,
 #                           chromosomes = abf.data$chromosome, window = 1e6,
 #                           overlap = 5e5, weight = abf.data$depth.normal, start.coord = 1)
@@ -43,13 +43,13 @@ plot.windows(abf.window, m.lty = 1, m.lwd = 3,
 # Plot the first of the resulting chromosome 
 #
 
-# plot.windows(abf.ratio$ windows[[1]], ylab = "Depth ratio", xlab = "Bp", 
+# plotWindows(abf.ratio$ windows[[1]], ylab = "Depth ratio", xlab = "Bp", 
 #              main = "Chromosome 1", las =1, n.min = 1e4, ylim = c(0, 2))
 
 # Plot all the chromosome:
 
 # for (i in 1:lenght(abf.ratio)) {
-#    plot.windows(abf.ratio$ windows[[i]], ylab = "Depth ratio", xlab = "Bp", 
+#    plotWindows(abf.ratio$ windows[[i]], ylab = "Depth ratio", xlab = "Bp", 
 #                 main = [i], las =1, n.min = 1e4, ylim = c(0, 2))
 # }
 }

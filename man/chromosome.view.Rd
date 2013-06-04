@@ -1,5 +1,6 @@
 \name{chromosome.view}
 \alias{chromosome.view}
+
 \title{Graphically represent multiple chromosomal features in parallel}
 
 \description{
@@ -29,7 +30,7 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL,
 }
 
 \seealso{
-  \code{window.values}, \code{plot.windows}, \code{mutation.table}, \code{find.breaks}.
+  \code{windowValues}, \code{plot.windows}, \code{mutation.table}, \code{find.breaks}.
 }
 
 \examples{

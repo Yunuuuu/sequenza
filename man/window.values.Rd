@@ -1,5 +1,5 @@
-\name{window.values}
-\alias{window.values}
+\name{windowValues}
+\alias{windowValues}
 \title{Transform the data on base-pair windows of a specified size}
 
 \description{
@@ -7,7 +7,7 @@
 }
 
 \usage{
-window.values(x, positions, chromosomes, window = 1e6, overlap = 0,
+windowValues(x, positions, chromosomes, window = 1e6, overlap = 0,
               weight = rep.int( x = 1, times = length(x)), start.coord = NULL)}
 
 \arguments{
@@ -21,7 +21,7 @@ window.values(x, positions, chromosomes, window = 1e6, overlap = 0,
 }
 
 \details{
-  Sequencing data, even exome seq. produce a big amount of data difficult to be handled by graphic representation. Also, especially sample analyzed with older machines and with low or middle depth of coverage (20x to 70x), value like depth of reads er position have a lot of variation. Using \code{window.values} it is possible to reduce the both the amount of data and the noise, in order to easily store and graphically represents chromosome by chromosome, or chunks of chromosomes.
+  Sequencing data, even exome seq. produce a big amount of data difficult to be handled by graphic representation. Also, especially sample analyzed with older machines and with low or middle depth of coverage (20x to 70x), value like depth of reads er position have a lot of variation. Using \code{windowValues} it is possible to reduce the both the amount of data and the noise, in order to easily store and graphically represents chromosome by chromosome, or chunks of chromosomes.
 }
 
 \seealso{
@@ -31,13 +31,13 @@ window.values(x, positions, chromosomes, window = 1e6, overlap = 0,
 \examples{
 
 # 1Mb windows with 500kb of overlap of depth ratio
-#abf.ratio <- window.values(x = round(abf.data$adjusted.ratio, 3),
+#abf.ratio <- windowValues(x = round(abf.data$adjusted.ratio, 3),
 #                           positions = abf.data$n.base,
 #                           chromosomes = abf.data$chromosome, window = 1e6,
 #                           weight = abf.data$depth.normal, start.coord = 1, overlap = 5e5)
 
 # 1Mb windows with 500kb of overlap of B-allele frequency
-#abf.bafs  <- window.values(x = abf.het$Bf,
+#abf.bafs  <- windowValues(x = abf.het$Bf,
 #                           positions = abf.het$n.base,
 #                           chromosomes = abf.het$chromosome, window = 1e6,
 #                           weight = round(x = abf.het$good.s.reads, digits = 0),

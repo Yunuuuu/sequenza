@@ -98,7 +98,7 @@ gc.sample.stats <- function (filename, gz = TRUE) {
    gc.stats
 }
 
-window.values <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
+windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
                           weight = rep.int( x = 1, times = length(x)), start.coord = NULL) {
    chr.list         <- unique(chromosomes)
    results          <- list()

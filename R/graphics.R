@@ -59,7 +59,7 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table[,3], na.
 #    bxplot(d.list, names = gc.values, ...)
 # }
 
-plot.windows <- function(abf.window, m.lty = 1, m.lwd = 3,
+plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
                          m.col = "black", q.bg = "lightblue", log2.plot = FALSE,
                          n.min = 1, xlim = NULL, ylim = NULL, add = FALSE, ...) {
    if (log2.plot == TRUE) {
@@ -172,7 +172,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL,
 
    }
 
-   plot.windows(baf.windows, ylim = c(0, 0.5),
+   plotWindows(baf.windows, ylim = c(0, 0.5),
                      ylab = "B allele frequency", xlim = xlim, las = 1)
    if (!is.null(segments)){
       abline(v = segments$end.pos, lwd = 0.7, lty = 2)
@@ -184,7 +184,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL,
          }
       }
    }
-   plot.windows(ratio.windows, ylab = "depth ratio", 
+   plotWindows(ratio.windows, ylab = "depth ratio", 
                       las = 1, n.min = 1e4, ylim = c(0, 2))
    if (!is.null(segments)){
       abline(v = segments$end.pos, lwd = 0.7, lty = 2)

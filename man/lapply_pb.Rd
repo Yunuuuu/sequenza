@@ -8,7 +8,7 @@
 }
 
 \usage{
-  lapply_pb(X, FUN, mc.cores = 2, ...
+  lapply_pb(X, FUN, mc.cores = 2, ...)
 }
 
 \arguments{

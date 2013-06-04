@@ -17,13 +17,13 @@ lapply_pb <- function(X, FUN, mc.cores = 2, ...) {
     res
 }
 
-round2.max <- function(x) {
-  max.x  <- ceiling(x)
-  diff.x <- max.x - x
-    if (diff.x == 0.5) {
-       ceiling(x)       
-    } else{
-       round(x)
-    }
-}
+# round2.max <- function(x) {
+#   max.x  <- ceiling(x)
+#   diff.x <- max.x - x
+#     if (diff.x == 0.5) {
+#        ceiling(x)       
+#     } else{
+#        round(x)
+#     }
+# }
 
