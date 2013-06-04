@@ -188,8 +188,8 @@ chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win$windows[[1]],
 seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 5e6, ]
 @
 <<label=segsWeight, echo=TRUE>>=
-weights.seg  <- 200 + round((seg.filtered$end.pos - seg.filtered$start.pos)/1e6, 0)
-seg.filtered$Bf[seg.filtered$Bf>=0.4] <- 0.5
+weights.seg  <- round((seg.filtered$end.pos - seg.filtered$start.pos) / 1e6, 0)
+seg.filtered$Bf[seg.filtered$Bf >= 0.4] <- 0.5
 @
 
 <<label=avg.depth.ratio>>=
@@ -199,7 +199,7 @@ avg.depth.ratio
 
 <<label=BAFmodelFIT, echo=TRUE, results=hide>>=
 CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
-                    weight.ratio = 300,
+                    weight.ratio = weights.seg,
                     weight.Bf = weights.seg,
                     by.p = 0.1, by.c = 0.05, avg.depth.ratio = 1,
                     cellularity.range = c(0.1,1), 
@@ -302,7 +302,7 @@ snp.r.win <- windowValues(x = 2^logR$S2,
 <<label=BAFWin, eval=TRUE, results=hide>>=
 BAF.to05 <- BAF$S2
 BAF.to05[BAF.to05 >= 0.5] <- 1 - BAF.to05[BAF.to05 >= 0.5]
-snp.b.win <- windowValues(x = BAF$S1,
+snp.b.win <- windowValues(x = BAF.to05,
              positions = BAF$pos,
              chromosomes = BAF$chrs,
              window = 1e6, overlap = 5e5)
@@ -331,38 +331,43 @@ allele.seg <- allele.seg[allele.seg$sampleID == "S2", ]
 
 \subsection{Using the Bayesian inference on segmented SNP arrays}
 <<label=adjustSegs, eval=TRUE>>=
-segs.BAF.to05 <- allele.seg$BAF.mean
-segs.BAF.to05[segs.BAF.to05 >= 0.5] <- 1 - segs.BAF.to05[segs.BAF.to05 >= 0.5]
 
-avg.unlogR <- 2^(mean(allele.seg$logR.mean))
+fake.abf <- data.frame(chromosome = BAF$chrs, n.base = BAF$pos,
+                 Bf = BAF.to05, adjusted.ratio = 2^logR$S2,
+                 good.s.reads = 1, depth.sample = 1,
+                 ref.zigosity = 'het')
+
+segmented.snp <- segment.breaks(abf.tab = fake.abf, breaks = allele.seg[, c(2, 4, 5)])
+
+avg.unlogR <- mean(segmented.snp$depth.ratio)
 @
 
 <<label=CPforSNP, eval = TRUE, results=hide>>=
-CP.snp <- baf.model.fit(Bf = segs.BAF.to05[allele.seg$chrom == 1], depth.ratio = 2^(allele.seg$logR.mean[allele.seg$chrom == 1]), 
-                    weight.ratio = allele.seg$n.probes[allele.seg$chrom == 1],
-                    weight.Bf = allele.seg$n.probes[allele.seg$chrom == 1],
+CP.snp <- baf.model.fit(Bf = segmented.snp$Bf, depth.ratio = segmented.snp$depth.ratio, 
+                    weight.ratio = segmented.snp$N.BAF,
+                    weight.Bf = segmented.snp$N.ratio,
                     by.p = 0.1, by.c = 0.05, avg.depth.ratio = avg.unlogR,
                     cellularity.range = c(0.1,1), 
                     dna.content.range = c(0.5,3), mc.cores=4)
 @
 <<label=getCPparamSNP, eval = TRUE>>=
+max.param = CP.snp[which.max(CP.snp[, 3]), ]
+max.param
 
-dna.c.cint <- get.ci(CP.snp[,c(1,3)])
-dna.c.cint$confint
-dna.c.cint$max.l
-
-cellu.cint <- get.ci(CP.snp[,c(2,3)])
-cellu.cint$confint
-cellu.cint$max.l
-
-cellularity <- cellu.cint$max.l
-dna.content <- dna.c.cint$max.l
+dna.content <- max.param[1]
+cellularity <- max.param[2]
 @
-%max.param = CP.snp[which.max(CP.snp[, 3]), ]
-%max.param
 
-%dna.content <- max.param[1]
-%cellularity <- max.param[2]
+%dna.c.cint <- get.ci(CP.snp[,c(1,3)])
+%dna.c.cint$confint
+%dna.c.cint$max.l
+
+%cellu.cint <- get.ci(CP.snp[,c(2,3)])
+%cellu.cint$confint
+%cellu.cint$max.l
+
+%cellularity <- cellu.cint$max.l
+%dna.content <- dna.c.cint$max.l
 %@
 
 \subsection{Cellularity and DNA-content plot for SNP array}
@@ -375,54 +380,64 @@ cp.plot(CP.snp)
       \label{fig:cpPlotSNP}
 \end{figure}
 
-\begin{figure}[H]
-      \centering
-<<label=CPplotCISNP,fig=TRUE,width=6,height=6>>=
-par(mfrow = c(2,2))
-   cp.plot(CP.snp)
-   plot(cellu.cint$values[,c(2,1)], ylab = "cellularity",
-        xlab = "likelihood", type = "l")
-   abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
-
-   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-content",
-        ylab = "likelihood", type = "l")
-   abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
-@ 
-      \caption{Plot of the log likelihood with respective cellularity and DNA-content probability distribution and confidence intervals.}
-      \label{fig:cpPlotCN}
-\end{figure}
+%\begin{figure}[H]
+%      \centering
+%<<label=CPplotCISNP,fig=TRUE,width=6,height=6>>=
+%par(mfrow = c(2,2))
+%   cp.plot(CP.snp)
+%   plot(cellu.cint$values[,c(2,1)], ylab = "cellularity",
+%        xlab = "likelihood", type = "l")
+%   abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
+%
+%   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-content",
+%        ylab = "likelihood", type = "l")
+%   abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
+%@ 
+%      \caption{Plot of the log likelihood with respective cellularity and DNA-content probability distribution and confidence intervals.}
+%      \label{fig:cpPlotCN}
+%\end{figure}
 
 
 \subsection{Call for copy number variation using inferred parameters.}
 
 <<label=bafBayesSNP, eval=TRUE>>=
-snp.seg.cn <- baf.bayes(Bf = segs.BAF.to05, depth.ratio = 2^(allele.seg$logR.mean), 
-                        weight.ratio = allele.seg$n.probes,
-                        weight.Bf = allele.seg$n.probes,
+snp.seg.cn <- baf.bayes(Bf = segmented.snp$Bf, depth.ratio = segmented.snp$depth.ratio, 
+                        weight.ratio = segmented.snp$N.ratio,
+                        weight.Bf = segmented.snp$N.BAF,
                         avg.depth.ratio = avg.unlogR,
                         cellularity = cellularity,
                         dna.content = dna.content, CNt.max = 10)
 
-segments.snp <- cbind(allele.seg[,c(2, 4, 5, 8, 7, 6)], snp.seg.cn)
-colnames(segments.snp) <- c("chromosome", "start.pos", "end.pos", "Bf","depth.ratio","N.BAF", "CNt", "A", "B", "L")
-segments.snp$Bf <- segs.BAF.to05
-segments.snp$depth.ratio <- 2^(allele.seg$logR.mean)
+segmented.snp <- cbind(segmented.snp, snp.seg.cn)
 @
 
 \subsection{Graphical representation of copy number with SNP arrays}
 
 \begin{figure}[H]
       \centering
-<<label=chrViewNoMutCP, fig=TRUE, width=6, height=6>>=
+<<label=chrViewNoMutCP1, fig=TRUE, width=6, height=6>>=
 
 chromosome.view(baf.windows = snp.b.win$windows[[1]], 
                 ratio.windows = snp.r.win$windows[[1]],  min.N.ratio = 1,
-                segments = segments.snp[segments.snp$chromosome == "1", ],
+                segments = segmented.snp[segmented.snp$chromosome == "1", ],
                 cellularity = cellularity, dna.content = dna.content,
-                avg.depth.ratio = avg.unlogR)
-@ 
-      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Horizontal dotted line indicate different copy number/ allelic state. }
-      \label{fig:crhomViewNoMutCP}
+                avg.depth.ratio = avg.unlogR, main = "1")
+@
+      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allelic state. }
+      \label{fig:crhomViewNoMutCP1}
+\end{figure}
+
+\begin{figure}[H]
+      \centering
+<<label=chrViewNoMutCP16, fig=TRUE, width=6, height=6>>=
+chromosome.view(baf.windows = snp.b.win$windows[[16]], 
+                ratio.windows = snp.r.win$windows[[16]],  min.N.ratio = 1,
+                segments = segmented.snp[segmented.snp$chromosome == "16", ],
+                cellularity = cellularity, dna.content = dna.content,
+                avg.depth.ratio = avg.unlogR, main = "16")
+@
+      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allelic state. }
+      \label{fig:crhomViewNoMutCP16}
 \end{figure}
 
 
@@ -435,3 +450,5 @@ chromosome.view(baf.windows = snp.b.win$windows[[1]],
 %\bibliography{sequenza}
 %%
 \end{document}
+
+                

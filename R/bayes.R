@@ -113,9 +113,13 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
       score.b    <- baf.dbinom(baf = mat[x,]$Bf, depth.t = mat[x,]$weight.Bf, test.baf)
 
       priors <- rep(1,length(score.b))
+      priors.cn <- priors
+      ## Some small priors on the diploid status
+      priors.cn[model.pts$CNt == 2]  <- 5
       priors <- priors/sum(priors)
-      
-      score.r    <- score.r * priors
+      priors.cn <- priors.cn/sum(priors.cn)
+
+      score.r    <- score.r * priors.cn
       score.b    <- score.b * priors
 
       post.model <- score.r * score.b
