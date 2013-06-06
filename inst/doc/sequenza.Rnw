@@ -142,6 +142,7 @@ plotWindows(abf.b.win$windows[[1]], ylim = c(0, 0.5),
 
 \section{Allele specific Segmentation}
 \subsection{Find breaks}
+To find breaks we use the Allele specific segmentation algorithm used in the copynumber package \cite{BMCcopynumber}.
 <<label=ASCPF, echo=TRUE>>=
 breaks <- find.breaks(abf.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))
 head(breaks)
@@ -442,13 +443,11 @@ chromosome.view(baf.windows = snp.b.win$windows[[16]],
 
 
 %\newpage
-%Random citation \cite{rsvgtipsdevice}
-
 
 %%%% bibliography
-%\bibliographystyle{plain}
-%\bibliography{sequenza}
-%%
+\bibliographystyle{plain}
+\bibliography{sequenza}
+
 \end{document}
 
                 
