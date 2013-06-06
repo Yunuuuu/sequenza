@@ -1,7 +1,7 @@
 Package: sequenza
 Title:   A tool to exhaustively analize cancer sequencing.
 Description: Exhaustive analyze of aberrant NGS data - purity and ploidy estimation, mutation and copy number detection and quantification, detection of mono-allelic expression and allelic/subclonal mutation classification -
-Version: 0.0.3
+Version: 0.0.4
 Date: 2013-06-04
 Author: Francesco Favero
 Maintainer: Francesco Favero <favero@cbs.dtu.dk>
