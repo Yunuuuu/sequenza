@@ -133,7 +133,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                data.model <- NULL
                } else {
             data.model     <- list()
-            CNt.max        <- max(segments$CNt, na.rm = TRUE)
+            CNt.max        <- max(segments$CNt, na.rm = TRUE) + 1
             CNt.min        <- 0
             data.model$baf <- theoric.baf(CNr = 2, CNt = CNt.max, cellularity = cellularity)
             types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)

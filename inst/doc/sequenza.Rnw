@@ -380,22 +380,22 @@ cp.plot(CP.snp)
       \label{fig:cpPlotSNP}
 \end{figure}
 
-%\begin{figure}[H]
-%      \centering
-%<<label=CPplotCISNP,fig=TRUE,width=6,height=6>>=
-%par(mfrow = c(2,2))
-%   cp.plot(CP.snp)
-%   plot(cellu.cint$values[,c(2,1)], ylab = "cellularity",
-%        xlab = "likelihood", type = "l")
-%   abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
-%
-%   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-content",
-%        ylab = "likelihood", type = "l")
-%   abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
-%@ 
-%      \caption{Plot of the log likelihood with respective cellularity and DNA-content probability distribution and confidence intervals.}
-%      \label{fig:cpPlotCN}
-%\end{figure}
+\begin{figure}[H]
+      \centering
+<<label=CPplotCISNP,fig=TRUE,width=6,height=6>>=
+par(mfrow = c(2,2))
+   cp.plot(CP.snp)
+   plot(cellu.cint$values[,c(2,1)], ylab = "cellularity",
+        xlab = "likelihood", type = "l")
+   abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
+
+   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-content",
+        ylab = "likelihood", type = "l")
+   abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
+@ 
+      \caption{Plot of the log likelihood with respective cellularity and DNA-content probability distribution and confidence intervals.}
+      \label{fig:cpPlotCN}
+\end{figure}
 
 
 \subsection{Call for copy number variation using inferred parameters.}

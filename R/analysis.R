@@ -193,6 +193,7 @@ get.ci <- function(mat, interval = 0.95) {
    L.max    <- which.max(mat[,2]) 
    sum.all  <- log1p(sum(exp(mat[-L.max, 2]-mat[L.max, 2]))) + mat[L.max, 2] 
    exp.vals <- 2^(mat[, 2] - sum.all)
+   exp.vals[is.infinite(exp.vals)] <- 0
    values   <- cbind(mat[,1], expL = exp.vals)
    val.95   <- sum(values[, 2]) * interval
    sorted.v <- values[order(values[, 2], decreasing = TRUE),]
