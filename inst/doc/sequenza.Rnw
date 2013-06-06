@@ -59,12 +59,12 @@ data.file <-  system.file("data","abf.data.abfreq.txt.gz",package="sequenza")
 @
 
 \subsection{Reading a single chromosome}
-<<label=readAfreqChr, echo=TRUE, eval=FALSE>>=
+<<label=readAfreqChr, echo=TRUE>>=
 abf.data <- read.abfreq(data.file,chr.name = "1")
 @
 
 \subsection{Reading entire file}
-<<label=readAfreq, echo=TRUE>>=
+<<label=readAfreq, echo=TRUE, eval=FALSE>>=
 abf.data <- read.abfreq(data.file)
 @
 

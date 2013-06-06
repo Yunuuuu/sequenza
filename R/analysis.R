@@ -5,13 +5,13 @@ read.abfreq <- function (file, nrows = -1, fast = TRUE, gz = TRUE,
   if(fast && nrows == -1) {
     if(gz) {
        if (!is.null(chr.name)) {
-          wc <- system(paste(paste('zgrep -cP "^', chr.name, '\t"', sep = ''), file, sep = ' '), intern = TRUE)
+          wc <- system(paste(paste('zgrep -c "^', chr.name, '\t"', sep = ''), file, sep = ' '), intern = TRUE)
        } else {
           wc <- system(paste('gunzip -c', file, '| wc'), intern = TRUE)
        }
     } else {
        if (!is.null(chr.name)) {
-          wc <- system(paste(paste('grep -cP "^', chr.name, '\t"', sep = ''), file, sep = ' '), intern = TRUE)
+          wc <- system(paste(paste('grep -c "^', chr.name, '\t"', sep = ''), file, sep = ' '), intern = TRUE)
        } else {
           wc <- system(paste('wc', file), intern = TRUE)
        }
@@ -25,13 +25,13 @@ read.abfreq <- function (file, nrows = -1, fast = TRUE, gz = TRUE,
   }
    if (!is.null(chr.name)) {
       if (gz) {
-            grep.part <- paste("zgrep -P '^", chr.name, "\t'", sep = "")
+            grep.part <- paste("zgrep '^", chr.name, "\t'", sep = "")
          } else {
-            grep.part <- paste("grep -P '^", chr.name, "\t'", sep = "")
+            grep.part <- paste("grep '^", chr.name, "\t'", sep = "")
          }
       abf.data   <- read.delim(pipe(paste(grep.part, file, sep = " ")), nrows = nrows, colClasses = colClasses, ...)
-      head       <- strsplit(readLines(file, 1, encoding = "UTF-8"), split="\t")
-      names(abf.data) <- head[[1]]
+      head       <- colnames(read.table(file, header = TRUE, nrow = 1 ))
+      colnames(abf.data) <- head
       abf.data
    } else { 
       read.delim(file, nrows = nrows, colClasses = colClasses, ...)
@@ -79,9 +79,9 @@ gc.norm <- function (ratio, gc) {
 gc.sample.stats <- function (filename, gz = TRUE) {
    cat.command = paste("cat", filename, sep = " ")
    if (gz == TRUE) {
-      cat.command = paste("zcat", filename, sep = " ")
+      cat.command = paste("gzcat", filename, sep = " ")
    }
-   gc.data   <- read.table(pipe(paste(cat.command, "| gawk '{print $6,$10}'", sep = " ")), header = TRUE)
+   gc.data   <- read.table(pipe(paste(cat.command, "| awk '{print $6,$10}'", sep = " ")), header = TRUE)
    gc.values   <- sort(unique(gc.data$GC.percent))
    gc.stats  <- list()
    pb        <- txtProgressBar(min = 1, max = length(gc.values), style = 3)
