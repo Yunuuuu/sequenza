@@ -79,7 +79,7 @@ gc.norm <- function (ratio, gc) {
 gc.sample.stats <- function (filename, gz = TRUE) {
    cat.command = paste("cat", filename, sep = " ")
    if (gz == TRUE) {
-      cat.command = paste("gzcat", filename, sep = " ")
+      cat.command = paste("gunzip -c", filename, sep = " ")
    }
    gc.data   <- read.table(pipe(paste(cat.command, "| awk '{print $6,$10}'", sep = " ")), header = TRUE)
    gc.values   <- sort(unique(gc.data$GC.percent))
