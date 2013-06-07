@@ -190,20 +190,24 @@ get.ci <- function(mat, interval = 0.95) {
    results  <- list()
    values   <- sort(unique(mat[, 1]))
    mat      <- t(mapply(x = values, FUN = function(x ,mat) cbind(x, max(mat[mat[, 1] == x, 2])), MoreArgs = list(mat = mat)))
-   L.max    <- which.max(mat[,2]) 
+   L.max    <- which.max(mat[, 2]) 
    sum.all  <- log1p(sum(exp(mat[-L.max, 2]-mat[L.max, 2]))) + mat[L.max, 2] 
    exp.vals <- 2^(mat[, 2] - sum.all)
    exp.vals[is.infinite(exp.vals)] <- 0
-   values   <- cbind(mat[,1], expL = exp.vals)
-   val.95   <- sum(values[, 2]) * interval
-   sorted.v <- values[order(values[, 2], decreasing = TRUE),]
-   sorted.v <- cbind(sorted.v,incr.col(sorted.v[, 2]))
-   sorted.v <- sorted.v[sorted.v[,3] <= val.95, ]
-   up.v     <- max(sorted.v[,1])
-   low.v    <- min(sorted.v[,1]) 
-   max.l    <- sorted.v[1,1]
+   values   <- cbind(mat[, 1], expL = exp.vals)
+   val.95   <- quantile(values[, 2], prob = interval)
+   values.s <- values[values[, 2] >= val.95, ]
+   if (is.null(dim(values.s))) {
+      up.v  <- values.s[1]
+      low.v <- values.s[1]
+      max.l <- values.s[1]
+   } else {
+      up.v     <- max(values.s[, 1])
+      low.v    <- min(values.s[, 1]) 
+      max.l    <- values[which.max(values[, 2]), 1]
+   }
    results$values  <- values
-   results$confint <- c(low.v,up.v)
+   results$confint <- c(low.v, up.v)
    results$max.l   <- max.l
    results
 }
