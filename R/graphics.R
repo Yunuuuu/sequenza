@@ -131,13 +131,18 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
          if ("CNt" %in% colnames(segments)) {
             if (length(c(cellularity, dna.content, avg.depth.ratio)) != 3) {
                data.model <- NULL
+            } else {
+               data.model     <- list()
+               CNt.max        <- max(segments$CNt, na.rm = TRUE) + 1
+               CNt.min        <- 0
+               data.model$baf <- theoric.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
+               if (CNr == 2) {
+                  data.model$baf <- rbind(c(0,0,0.5,0), data.model$baf)
                } else {
-            data.model     <- list()
-            CNt.max        <- max(segments$CNt, na.rm = TRUE) + 1
-            CNt.min        <- 0
-            data.model$baf <- theoric.baf(CNr = 2, CNt = CNt.max, cellularity = cellularity)
-            types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
-            data.model$muf <- cbind(types, model.points(cellularity = cellularity, dna.content = dna.content,
+                  data.model$baf <- rbind(c(0,0,1,0), data.model$baf)                  
+               }   
+               types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
+               data.model$muf <- cbind(types, model.points(cellularity = cellularity, dna.content = dna.content,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
             }
          } else {
