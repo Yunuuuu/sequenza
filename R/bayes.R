@@ -98,7 +98,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
       model.baf          <- as.data.frame(rbind(c(0,0,0.5,0), model.baf))
    }
    # B-allele freq are never 0.5, always smaller. work around on this bias
-   model.baf$BAF[model.baf$BAF == 0.5] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$weight.Bf, na.rm = T), probs = .75)
+   #model.baf$BAF[model.baf$BAF == 0.5] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$weight.Bf, na.rm = T), probs = .75)
    model.pts          <- merge(model.baf, model.d.ratio)
    # model.pts          <- cbind(baf.type = apply(model.pts[, 1:3], 1, FUN = function(x) paste(x, collapse = "_")),
    #                             model.pts[, 4:5])
@@ -115,7 +115,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
       priors <- rep(1,length(score.b))
       priors.cn <- priors
       ## Some small priors on the diploid status
-      #priors.cn[model.pts$CNt == 2]  <- 3
+      priors.cn[model.pts$CNt == 2]  <- 3
       priors <- priors/sum(priors)
       priors.cn <- priors.cn/sum(priors.cn)
 
