@@ -75,11 +75,11 @@ abf.data$good.s.reads <- abf.data$depth.sample *
 @
 
 Gather gc-content information from the entire file:
-<<label=depthRGCnormall, echo=TRUE, eval=FALSE>>=
+<<label=depthRGCnormall, echo=TRUE, results=hide>>=
 gc.stats <- gc.sample.stats(data.file)
 @
 
-<<label=depthRGCnorm, echo=TRUE, results=hide>>=
+<<label=depthRGCnorm, echo=TRUE, eval=FALSE>>=
 gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)
 @
