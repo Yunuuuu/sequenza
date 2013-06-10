@@ -85,7 +85,8 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.dept
 
 baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio,
                       weight.Bf = 100, weight.ratio = 100, CNt.min = 0,
-                      CNt.max = 7, CNr = 2) {
+                      CNt.max = 7, CNr = 2, priors.labels = CNt.min:CNt.max,
+                      priors.values = 1) {
    
    mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
                             weight.Bf = weight.Bf, weight.ratio = weight.ratio)
@@ -95,7 +96,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
    model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])
    model.baf          <- theoric.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
    if(CNt.min == 0) {
-      model.baf          <- as.data.frame(rbind(c(0,0,0.5,0), model.baf))
+      model.baf          <- as.data.frame(rbind(c(0, 0, 1/CNr, 0), model.baf))
    }
    # B-allele freq are never 0.5, always smaller. work around on this bias
    #model.baf$BAF[model.baf$BAF == 0.5] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$weight.Bf, na.rm = T), probs = .75)
@@ -103,24 +104,24 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
    # model.pts          <- cbind(baf.type = apply(model.pts[, 1:3], 1, FUN = function(x) paste(x, collapse = "_")),
    #                             model.pts[, 4:5])
    rows.x             <- 1:nrow(mufreq.tab)
-
-   bayes.fit <- function (x, mat, model.pts) {
-
+   
+   priors.tags <- data.frame(label = priors.labels, value = priors.values)
+   
+   priors <- rep(1, nrow(model.pts))
+   for (i in 1:length(priors.labels)) {
+      priors[model.pts$CNt == priors.tags$label[i]] <- priors.tags$value[i]
+   }
+   priors <- priors / sum(priors)
+   
+   bayes.fit <- function (x, mat, model.pts, priors) {
       test.ratio <- model.pts$depth.ratio
       test.baf   <- model.pts$BAF
       min.offset <- 1e-323
       score.r    <- depth.ratio.dbinom(size = mat[x,]$weight.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
       score.b    <- baf.dbinom(baf = mat[x,]$Bf, depth.t = mat[x,]$weight.Bf, test.baf)
-
-      priors <- rep(1,length(score.b))
-      priors.cn <- priors
-      ## Some small priors on the diploid status
-      priors.cn[model.pts$CNt == 2]  <- 3
-      priors <- priors/sum(priors)
-      priors.cn <- priors.cn/sum(priors.cn)
-
-      score.r    <- score.r * priors.cn
-      score.b    <- score.b * priors
+      
+      score.r    <- score.r * priors
+      score.b    <- score.b
 
       post.model <- score.r * score.b
 
@@ -142,7 +143,9 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
       
    }
    bafs.L           <- mapply(FUN = bayes.fit, rows.x,
-                         MoreArgs = list(mat = mufreq.tab, model.pts = model.pts),
+                         MoreArgs = list(mat = mufreq.tab, 
+                                         model.pts = model.pts,
+                                         priors = priors),
                                          SIMPLIFY = FALSE)
    bafs.L           <- do.call(rbind, bafs.L)
    colnames(bafs.L) <- c("CNt", "A", "B", "L")
@@ -198,7 +201,7 @@ mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 10, weight.rat
 baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
                           cellularity.range = c(0.3,1), dna.content.range = c(0.7,4),
                           by.c = 0.01, by.p = 0.01, avg.depth.ratio, mc.cores = 2,
-                          CNt.max = 7, CNr = 2) {
+                          CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3) {
 
    require(parallel)
    c.range <- seq( from = min(cellularity.range), to = max(cellularity.range), by = by.c)
@@ -212,14 +215,19 @@ baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
                     SIMPLIFY = FALSE)
    C.P   <-  do.call(rbind, C.P)
    
-   fit.cp <- function(x, C.P. = C.P, Bf. = Bf, depth.ratio. = depth.ratio, weight.Bf. = weight.Bf, weight.ratio. = weight.ratio,
-                      avg.depth.ratio. = avg.depth.ratio, CNt.min. = 0, CNt.max. = CNt.max, CNr. = CNr) {
+   fit.cp <- function(x, C.P. = C.P, Bf. = Bf, depth.ratio. = depth.ratio,
+                      weight.Bf. = weight.Bf, weight.ratio. = weight.ratio,
+                      avg.depth.ratio. = avg.depth.ratio, CNt.min. = 0, 
+                      CNt.max. = CNt.max, CNr. = CNr, priors.labels. = priors.labels,
+                      priors.values. = priors.values) {
       dna.content <- C.P.[x, 1]
       cellularity <- C.P.[x, 2]
-      L.model <- baf.bayes(Bf = Bf., depth.ratio = depth.ratio., weight.Bf = weight.Bf., weight.ratio = weight.ratio.,
+      L.model <- baf.bayes(Bf = Bf., depth.ratio = depth.ratio., 
+                           weight.Bf = weight.Bf., weight.ratio = weight.ratio.,
                            cellularity = cellularity, dna.content = dna.content,
                            avg.depth.ratio = avg.depth.ratio., CNt.min = CNt.min., 
-                           CNt.max = CNt.max., CNr = CNr.)
+                           CNt.max = CNt.max., CNr = CNr., priors.labels = priors.labels.,
+                           priors.values = priors.values.)
       L.sum <- sum(L.model[,4])
       c(dna.content,  cellularity, L.sum)  
    }
