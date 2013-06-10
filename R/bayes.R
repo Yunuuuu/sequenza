@@ -84,7 +84,7 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.dept
 }
 
 baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio,
-                      weight.Bf = 10, weight.ratio = 10, CNt.min = 0,
+                      weight.Bf = 100, weight.ratio = 100, CNt.min = 0,
                       CNt.max = 7, CNr = 2) {
    
    mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
