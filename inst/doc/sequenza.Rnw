@@ -412,7 +412,7 @@ snp.seg.cn <- baf.bayes(Bf = segmented.snp$Bf,
 
 segmented.snp <- cbind(segmented.snp, snp.seg.cn)
 
-segmented.snp[segmented.snp$chromosome == 1, ]
+head(segmented.snp[segmented.snp$chromosome == 1, ])
 @
 
 \subsection{Graphical representation of copy number with SNP arrays}
