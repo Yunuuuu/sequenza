@@ -9,7 +9,8 @@
 
 \usage{
   baf.bayes(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio,
-            weight.Bf = 10, weight.ratio = 10, CNt.min = 0, CNt.max = 7, CNr = 2)
+            weight.Bf = 10, weight.ratio = 10, CNt.min = 0, CNt.max = 7, CNr = 2,
+            priors.labels = CNt.min:CNt.max, priors.values = 1)
   mufreq.bayes(mufreq, depth.ratio, cellularity, dna.content, avg.depth.ratio,
             weight.mufreq = 10, weight.ratio = 10, CNt.min = 1, CNt.max = 7, CNr = 2)
 }
@@ -27,6 +28,8 @@
   \item{CNt.min}{Minimum copy number to consider in the model. Default = 0}
   \item{CNt.max}{Maximum copy number to consider in the model. Default = 7}
   \item{CNr}{Copy number of the germline genome. Default = 2}
+  \item{priors.labels}{Label for the copy number state priors.}
+  \item{priors.values}{Value for the copynumber state priors. Default priors is 1 for every copy number state.}
 }
 
 \value{

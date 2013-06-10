@@ -13,7 +13,7 @@
                    by.p = 0.01, mc.cores = 2, CNt.max = 7, CNr = 2)
   baf.model.fit(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10, cellularity.range = c(0.3,1),
                 dna.content.range = c(0.7,4), by.c = 0.01, by.p = 0.01, avg.depth.ratio,
-                mc.cores = 2, CNt.max = 7, CNr = 2)
+                mc.cores = 2, CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3)
 }
 
 \arguments{
@@ -31,6 +31,8 @@
   \item{mc.cores}{Number of core to use to compute the possible combinations. Default = 2}
   \item{CNt.max}{Maximum number of possible copy number. default 7.}
   \item{CNr}{Copy number status of the germline reference. Default 2.}
+  \item{priors.labels}{Label for the copy number state priors.}
+  \item{priors.values}{Value for the copynumber state priors. By default there is a increased priors on the diploid status.}
 }
 
 \value{
