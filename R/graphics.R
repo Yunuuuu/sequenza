@@ -12,7 +12,7 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table[,3], na.
       end       <- as.numeric(cp.row.mat[n] - 1)
       color.mat <- rbind(color.mat, cp.table[, 3][seq(from = start[1], to = end[1], by = 1)])
    }
-   colorgram(x=unique(x = cp.table[, 1]), y = unique(cp.table[, 2]), z = color.mat, zlab = "log-likelihood"
+   colorgram(x=unique(x = cp.table[, 1]), y = unique(cp.table[, 2]), z = color.mat, zlab = "log-likelihood",
              colFn = jet, las = 1, xlab= "DNA-content", ylab = "cellularity", map = map, outlier = outlier, ...)
    L.max <- cp.table[which.max(cp.table[, 3]),]
    points(x = L.max[1], y = L.max[2], pch = 18)
