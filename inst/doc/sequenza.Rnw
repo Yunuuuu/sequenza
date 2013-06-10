@@ -294,14 +294,14 @@ data(logR)
 @
 \subsection{Windowing logR values.}
 <<label=logRWin, eval=TRUE, results=hide>>=
-snp.r.win <- windowValues(x = 2^logR$S2,
+snp.r.win <- windowValues(x = 2^logR$S1,
              positions = logR$pos,
              chromosomes = logR$chrs,
              window = 1e6, overlap = 5e5)
 @
 \subsection{Windowing B-allele frequencies values.}
 <<label=BAFWin, eval=TRUE, results=hide>>=
-BAF.to05 <- BAF$S2
+BAF.to05 <- BAF$S1
 BAF.to05[BAF.to05 >= 0.5] <- 1 - BAF.to05[BAF.to05 >= 0.5]
 snp.b.win <- windowValues(x = BAF.to05,
              positions = BAF$pos,
@@ -327,14 +327,14 @@ logR.wins  <- winsorize(logR, verbose = FALSE)
 allele.seg <- aspcf(logR.wins, BAF, verbose = FALSE)
 head(allele.seg)
 
-allele.seg <- allele.seg[allele.seg$sampleID == "S2", ]
+allele.seg <- allele.seg[allele.seg$sampleID == "S1", ]
 @
 
 \subsection{Using the Bayesian inference on segmented SNP arrays}
 <<label=adjustSegs, eval=TRUE>>=
 
 fake.abf <- data.frame(chromosome = BAF$chrs, n.base = BAF$pos,
-                 Bf = BAF.to05, adjusted.ratio = 2^logR$S2,
+                 Bf = BAF.to05, adjusted.ratio = 2^logR$S1,
                  good.s.reads = 1, depth.sample = 1,
                  ref.zigosity = 'het')
 
@@ -352,24 +352,25 @@ CP.snp <- baf.model.fit(Bf = segmented.snp$Bf, depth.ratio = segmented.snp$depth
                     dna.content.range = c(0.5,3), mc.cores=4)
 @
 <<label=getCPparamSNP, eval = TRUE>>=
-max.param = CP.snp[which.max(CP.snp[, 3]), ]
-max.param
+dna.c.cint <- get.ci(CP.snp[,c(1,3)])
+dna.c.cint$confint
+dna.c.cint$max.l
 
-dna.content <- max.param[1]
-cellularity <- max.param[2]
+cellu.cint <- get.ci(CP.snp[,c(2,3)])
+cellu.cint$confint
+cellu.cint$max.l
+
+cellularity <- cellu.cint$max.l
+dna.content <- dna.c.cint$max.l
 @
 
-%dna.c.cint <- get.ci(CP.snp[,c(1,3)])
-%dna.c.cint$confint
-%dna.c.cint$max.l
+%max.param = CP.snp[which.max(CP.snp[, 3]), ]
+%max.param
 
-%cellu.cint <- get.ci(CP.snp[,c(2,3)])
-%cellu.cint$confint
-%cellu.cint$max.l
-
-%cellularity <- cellu.cint$max.l
-%dna.content <- dna.c.cint$max.l
+%dna.content <- max.param[1]
+%cellularity <- max.param[2]
 %@
+
 
 \subsection{Cellularity and DNA-content plot for SNP array}
 \begin{figure}[H]
