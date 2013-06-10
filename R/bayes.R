@@ -125,9 +125,21 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
       post.model <- score.r * score.b
 
       post.model[post.model == 0] <- min.offset
-      max.lik <-  which.max(post.model)
-      max.post <- c(as.numeric(model.pts[max.lik,1:3]), log2(post.model[max.lik]))
+      #max.lik <-  which.max(post.model)
+      #max.post <- c(as.numeric(model.pts[max.lik,1:3]), log2(post.model[max.lik]))
+      #max.post
+      
+      res.cn     <- model.pts$CNt[which.max(score.r)]
+      idx.pts    <- model.pts$CNt == res.cn
+      model.lik  <- cbind(model.pts[idx.pts, 1:3], log2(post.model[idx.pts]))
+      if (is.null(dim(model.lik))) {
+         max.post <- model.lik
+      } else {
+         max.post   <- model.lik[which.max(model.lik[,4]),]
+      }
+      
       max.post
+      
    }
    bafs.L           <- mapply(FUN = bayes.fit, rows.x,
                          MoreArgs = list(mat = mufreq.tab, model.pts = model.pts),
