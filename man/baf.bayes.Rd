@@ -12,7 +12,8 @@
             weight.Bf = 100, weight.ratio = 100, CNt.min = 0, CNt.max = 7, CNr = 2,
             priors.labels = CNt.min:CNt.max, priors.values = 1)
   mufreq.bayes(mufreq, depth.ratio, cellularity, dna.content, avg.depth.ratio,
-            weight.mufreq = 10, weight.ratio = 10, CNt.min = 1, CNt.max = 7, CNr = 2)
+            weight.mufreq = 10, weight.ratio = 10, CNt.min = 1, CNt.max = 7, CNr = 2,
+            priors.labels = CNt.min:CNt.max, priors.values = 1)
 }
 
 \arguments{
