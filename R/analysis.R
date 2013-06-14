@@ -256,7 +256,7 @@ mut.fractions <- function(AB.sample, Af) {
 
 mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, max.mut.types = 3,
                            min.type.freq = 0.9, segments = NULL) {
-   hom.filt    <- abf.tab$ref.zigosity == 'hom'
+   hom.filt    <- abf.tab$ref.zygosity == 'hom'
    abf.tab     <- abf.tab[hom.filt, ]
    reads.filt  <- abf.tab$good.s.reads >= min.reads
    abf.tab     <- abf.tab[reads.filt, ]
@@ -303,7 +303,7 @@ segment.breaks <- function(abf.tab, breaks) {
    for (i in 1:nrow(breaks)) {
       # pos.filt <- abf.tab$chromosome == breaks$chrom[i] & abf.tab$n.base >= breaks$start.pos[i] & abf.tab$n.base <= breaks$end.pos[i]
       data.i  <- abf.tab[abf.tab$chromosome == breaks$chrom[i] & abf.tab$n.base >= breaks$start.pos[i] & abf.tab$n.base <= breaks$end.pos[i], ]
-      het.i   <- data.i[data.i$ref.zigosity == 'het',]
+      het.i   <- data.i[data.i$ref.zygosity == 'het',]
       Bf.i    <- weighted.mean(x = het.i$Bf, w = sqrt(het.i$good.s.reads))
       ratio.i <- weighted.mean(x = data.i$adjusted.ratio, w = sqrt(data.i$depth.sample))
       segments[[i]] <- data.frame(chromosome  = breaks$chrom[i],
@@ -328,7 +328,7 @@ segment.breaks <- function(abf.tab, breaks) {
 #       }
 #       end.i = breaks[i]
 #       pos.filter.i <- x$n.base >= start.i & x$n.base <= end.i
-#       het.filter.i <- pos.filter.i & x$ref.zigosity == 'het'
+#       het.filter.i <- pos.filter.i & x$ref.zygosity == 'het'
 #       start.j <- min(x$n.base[pos.filter.i])
 #       # Bf.i    <- median(rep(x$Bf[het.filter.i], 
 #       #                 times = round( x$depth.sample[het.filter.i] * x$sample.reads.above.quality[het.filter.i], 0)))

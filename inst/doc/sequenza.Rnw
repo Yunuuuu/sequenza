@@ -117,7 +117,7 @@ plotWindows(abf.r.win$windows[[1]], log2.plot = FALSE,
 \subsection{Windowing B-allele frequencies values.}
 
 <<label=HetSepqring, echo=TRUE>>=
-abf.hom  <- abf.data$ref.zigosity == 'hom'
+abf.hom  <- abf.data$ref.zygosity == 'hom'
 abf.het  <- abf.data[!abf.hom, ]
 @
 
@@ -336,7 +336,7 @@ allele.seg <- allele.seg[allele.seg$sampleID == "S1", ]
 fake.abf <- data.frame(chromosome = BAF$chrs, n.base = BAF$pos,
                  Bf = BAF.to05, adjusted.ratio = 2^logR$S1,
                  good.s.reads = 1, depth.sample = 1,
-                 ref.zigosity = 'het')
+                 ref.zygosity = 'het')
 
 segmented.snp <- segment.breaks(abf.tab = fake.abf, breaks = allele.seg[, c(2, 4, 5)])
 avg.unlogR    <- mean(segmented.snp$depth.ratio)

@@ -43,7 +43,7 @@ The remaining 10 columns contains the following information:
 6  \tab \code{depth.ratio} \tab ratio of \code{depth.sample} and \code{depth.normal};\cr    
 7  \tab \code{Af} \tab A-allele frequency observed in the aberrant sample;\cr
 8  \tab \code{Bf} \tab B-allele frequency observed in the aberrant sample;\cr
-9  \tab \code{ref.zigosity} \tab zigosity of the reference sample at the position. AA it "hom", AB and BA are indicate with "het";\cr
+9  \tab \code{ref.zygosity} \tab zigosity of the reference sample at the position. AA it "hom", AB and BA are indicate with "het";\cr
 10  \tab \code{GC.percent} \tab genomic GC-content percent at the specific position ;\cr
 11  \tab \code{sample.reads.above.quality} \tab percentage (in decimal) of reads that passed the quality threshold (threshold specified in the pre-processing software);\cr
 12  \tab \code{AB.germline} \tab base of pairs found in the germline genome;\cr
