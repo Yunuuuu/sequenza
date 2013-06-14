@@ -35,7 +35,7 @@ depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model) {
 }
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.depth.ratio,
-                         weight.mufreq = 10, weight.ratio = 10, CNt.min = 1, CNt.max = 7, 
+                         weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, 
                          CNr = 2, priors.labels = CNt.min:CNt.max, priors.values = 1) {
 
    mufreq.tab <- data.frame(F = mufreq, ratio = depth.ratio,
@@ -168,7 +168,7 @@ shannon.types <- function(types.mat) {
    -sum(tab.types)
 }
 
-mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 10, weight.ratio = 10, avg.depth.ratio,
+mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 100, weight.ratio = 100, avg.depth.ratio,
                              cellularity.range = c(0.3,0.8), dna.content.range = c(0.5,4),
                              by.c = 0.01, by.p = 0.01, mc.cores = 2, CNt.max = 7, CNr = 2,
                              priors.labels = 2, priors.values = 3) {
