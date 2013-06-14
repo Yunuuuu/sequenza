@@ -35,8 +35,8 @@ depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model) {
 }
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.depth.ratio,
-                         weight.mufreq = 10, weight.ratio = 10,
-                         CNt.min = 1, CNt.max = 7, CNr = 2) {
+                         weight.mufreq = 10, weight.ratio = 10, CNt.min = 1, CNt.max = 7, 
+                         CNr = 2, priors.labels = CNt.min:CNt.max, priors.values = 1) {
 
    mufreq.tab <- data.frame(F = mufreq, ratio = depth.ratio,
                             weight.mufreq = weight.mufreq, weight.ratio = weight.ratio)
@@ -44,18 +44,24 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.dept
    mufreq.depth.ratio <- cbind(types, model.points(cellularity = cellularity, dna.content = dna.content,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
    rows.x             <- 1:nrow(mufreq.tab)
-   bayes.fit <- function (x, mat, model.pts) {
+   
+   priors.tags <- data.frame(label = priors.labels, value = priors.values)
+   
+   priors <- rep(1, nrow(mufreq.depth.ratio))
+   for (i in 1:length(priors.labels)) {
+      priors[mufreq.depth.ratio$CNt == priors.tags$label[i]] <- priors.tags$value[i]
+   }
+   priors <- priors / sum(priors)   
+   
+   bayes.fit <- function (x, mat, model.pts, priors) {
       test.ratio <- model.pts$depth.ratio
       test.mufrq <- model.pts$mufreqs
       min.offset <- 1e-323
       score.r    <- depth.ratio.dbinom(size = mat[x,]$weight.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
       score.m    <- mufreq.dbinom(mufreq = mat[x,]$F, depth.t = mat[x,]$weight.mufreq, test.mufrq)
       
-      priors <- rep(1, length(score.r))
-      priors <- priors/sum(priors)
-
       score.r    <- score.r * priors
-      score.m    <- score.m * priors
+      score.m    <- score.m
 
       post.model <- score.r * score.m
 
@@ -76,7 +82,9 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.dept
       max.post
    }
    types.L           <- mapply(FUN = bayes.fit, rows.x,
-                         MoreArgs = list(mat = mufreq.tab, model.pts = mufreq.depth.ratio),
+                         MoreArgs = list(mat = mufreq.tab,
+                                         model.pts = mufreq.depth.ratio,
+                                         priors = priors),
                                          SIMPLIFY = FALSE)
    types.L           <- do.call(rbind, types.L)
    colnames(types.L) <- c("CNr","CNt","Mt", "L")
@@ -162,7 +170,8 @@ shannon.types <- function(types.mat) {
 
 mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 10, weight.ratio = 10, avg.depth.ratio,
                              cellularity.range = c(0.3,0.8), dna.content.range = c(0.5,4),
-                             by.c = 0.01, by.p = 0.01, mc.cores = 2, CNt.max = 7, CNr = 2) {
+                             by.c = 0.01, by.p = 0.01, mc.cores = 2, CNt.max = 7, CNr = 2,
+                             priors.labels = 2, priors.values = 3) {
    require(parallel)
 
    no.mut  <- 1
@@ -181,12 +190,14 @@ mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 10, weight.rat
 
    fit.cp <- function(x, C.P. = C.P, mufreq. = mufreq, depth.ratio. = depth.ratio,
                       weight.mufreq. = weight.mufreq, weight.ratio. = weight.ratio, 
-                      avg.depth.ratio. = avg.depth.ratio, CNt.min. = 1, CNt.max. = CNt.max, CNr. = CNr) {
+                      avg.depth.ratio. = avg.depth.ratio, CNt.min. = 1, CNt.max. = CNt.max, CNr. = CNr,
+                      priors.labels. = priors.labels, priors.values. = priors.values) {
       dna.content. <- C.P.[x, 1]
       cellularity. <- C.P.[x, 2]
       L.model <- mufreq.bayes(mufreq = mufreq., depth.ratio = depth.ratio., weight.mufreq = weight.mufreq., 
                               weight.ratio = weight.ratio., cellularity = cellularity., dna.content = dna.content.,
-                              avg.depth.ratio = avg.depth.ratio., CNt.min = CNt.min., CNt.max = CNt.max., CNr = CNr.)
+                              avg.depth.ratio = avg.depth.ratio., CNt.min = CNt.min., CNt.max = CNt.max., CNr = CNr.,
+                              priors.labels = priors.labels., priors.values = priors.values.)
       L.sum <- sum(L.model[,4])
       c(dna.content.,  cellularity., L.sum)  
    }

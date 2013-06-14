@@ -123,7 +123,7 @@ mutation.colors <- function(mut.type = NULL, l.pos = "topright") {
 }
 
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
-                            min.N.baf = 1, min.N.ratio = 1e4, main = "", CNr = 2,
+                            min.N.baf = 1, min.N.ratio = 1e4, main = "", vlines = FALSE, CNr = 2,
                             cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL) {
    if (is.null(segments)) {
       data.model <- NULL
@@ -166,7 +166,9 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
            ylim = c(min(mut.tab$F, na.rm = TRUE), 1), xlim = xlim)
       mutation.colors()
       if (!is.null(segments)){
-         abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+         if (vlines) {
+            abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+         }   
          if (!is.null(data.model)) {
             for (i in 1:nrow(segments)) {
                 segments(x0 = segments$start.pos[i], x1 = segments$end.pos[i], 
@@ -181,7 +183,9 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                xlim = xlim, ylim = c(0, 0.5), las = 1,
                n.min = min.N.baf)
    if (!is.null(segments)){
-      abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+      if (vlines) {
+         abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+      }
       segments(x0 = segments$start.pos, y0 = segments$Bf, x1=segments$end.pos, y1 = segments$Bf, col = "red", lwd = 3)
       if (!is.null(data.model)) {
          for (i in 1:nrow(segments)) {
@@ -193,7 +197,9 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
    plotWindows(ratio.windows, ylab = "depth ratio", 
                las = 1, n.min = min.N.ratio, ylim = c(0, 2))
    if (!is.null(segments)){
-      abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+      if (vlines) {
+         abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+      }   
       segments(x0 = segments$start.pos, y0 = segments$depth.ratio, x1=segments$end.pos, y1 = segments$depth.ratio, col = "red", lwd = 3)
       if (!is.null(data.model)) {
          ratios.theoric <- unique(data.model$muf[,c('CNt', 'depth.ratio')])
@@ -210,4 +216,16 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
    mtext("Base Pairs 1e+06", 1, outer = TRUE, cex = par("cex.main"), line = 3)
 
    mtext(at = seq(xlim[1], xlim[2], by = 1e7), text = round(seq(xlim[1]/1e6, xlim[2]/1e6, by = 10), 0), side = 1, cex = 0.6)
+}
+
+genome.view <- function(baf.windows, ratio.windows, segments = NULL, main = "", 
+                            min.N.baf = 1, min.N.ratio = 1e4, CNr = rep(2, length(ratio.windows)),
+                            cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL) {
+   chr.metrics <- list()
+   for (i in 1:length(ratio.windows)) {
+      chr.metrics[[i]] <- range(ratio.windows$windows[[i]]$mean, na.rm = TRUE)
+   }
+   chr.metrics <- do.call(rbind, chr.metrics)
+   x0 <- chr.metrics[1,1]
+   
 }

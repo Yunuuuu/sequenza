@@ -9,7 +9,7 @@
 
 \usage{
 chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL, 
-                min.N.baf = 1, min.N.ratio = 1e4, main = "", CNr = 2,
+                min.N.baf = 1, min.N.ratio = 1e4, main = "", CNr = 2, vlines = FALSE,
                 cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL)
 }
 
@@ -21,6 +21,7 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
   \item{min.N.baf}{Minimum amount of observations in a BAF window to be plotted. Default 1.}
   \item{min.N.ratio}{Minimum amount of observations in a depth ratio window to be plotted. Default 1e4.}
   \item{CNr}{Copy number of the germline genome. Default = 2.}
+  \item{vlines}{Boolean if TRUE the plot would include dotted vertical lines corresponding to breaks. Default FALSE.}
   \item{cellularity}{Value of the estimated \code{cellularity} parameter.}
   \item{dna.content}{Value of the estimated \code{dna.content} parameter.}
   \item{avg.depth.ratio}{The median value of depth ratio.}
