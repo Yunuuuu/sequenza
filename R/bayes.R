@@ -94,7 +94,7 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.dept
 baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio,
                       weight.Bf = 100, weight.ratio = 100, CNt.min = 0,
                       CNt.max = 7, CNr = 2, priors.labels = CNt.min:CNt.max,
-                      priors.values = 1) {
+                      priors.values = 1, ratio.priority = FALSE) {
    
    mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
                             weight.Bf = weight.Bf, weight.ratio = weight.ratio)
@@ -122,7 +122,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
    }
    priors <- priors / sum(priors)
    
-   bayes.fit <- function (x, mat, model.pts, priors) {
+   bayes.fit <- function (x, mat, model.pts, priors, ratio.priority) {
       test.ratio <- model.pts$depth.ratio
       test.baf   <- model.pts$BAF
       min.offset <- 1e-323
@@ -135,26 +135,26 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
       post.model <- score.r * score.b
 
       post.model[post.model == 0] <- min.offset
-      #max.lik <-  which.max(post.model)
-      #max.post <- c(as.numeric(model.pts[max.lik,1:3]), log2(post.model[max.lik]))
-      #max.post
-      
-      res.cn     <- model.pts$CNt[which.max(score.r)]
-      idx.pts    <- model.pts$CNt == res.cn
-      model.lik  <- cbind(model.pts[idx.pts, 1:3], log2(post.model[idx.pts]))
-      if (is.null(dim(model.lik))) {
-         max.post <- model.lik
-      } else {
-         max.post   <- model.lik[which.max(model.lik[,4]),]
+      if (ratio.priority == FALSE) {
+         max.lik <-  which.max(post.model)
+         max.post <- c(as.numeric(model.pts[max.lik,1:3]), log2(post.model[max.lik]))
+      } else {      
+         res.cn     <- model.pts$CNt[which.max(score.r)]
+         idx.pts    <- model.pts$CNt == res.cn
+         model.lik  <- cbind(model.pts[idx.pts, 1:3], log2(post.model[idx.pts]))
+         if (is.null(dim(model.lik))) {
+            max.post <- model.lik
+         } else {
+            max.post   <- model.lik[which.max(model.lik[,4]),]
+         }
       }
-      
       max.post
-      
    }
    bafs.L           <- mapply(FUN = bayes.fit, rows.x,
                          MoreArgs = list(mat = mufreq.tab, 
                                          model.pts = model.pts,
-                                         priors = priors),
+                                         priors = priors,
+                                         ratio.priority = ratio.priority),
                                          SIMPLIFY = FALSE)
    bafs.L           <- do.call(rbind, bafs.L)
    colnames(bafs.L) <- c("CNt", "A", "B", "L")
@@ -213,7 +213,8 @@ mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 10, weight.rat
 baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
                           cellularity.range = c(0.3,1), dna.content.range = c(0.7,4),
                           by.c = 0.01, by.p = 0.01, avg.depth.ratio, mc.cores = 2,
-                          CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3) {
+                          CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3,
+                          ratio.priority = TRUE) {
 
    require(parallel)
    c.range <- seq( from = min(cellularity.range), to = max(cellularity.range), by = by.c)
@@ -231,7 +232,7 @@ baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
                       weight.Bf. = weight.Bf, weight.ratio. = weight.ratio,
                       avg.depth.ratio. = avg.depth.ratio, CNt.min. = 0, 
                       CNt.max. = CNt.max, CNr. = CNr, priors.labels. = priors.labels,
-                      priors.values. = priors.values) {
+                      priors.values. = priors.values, ratio.priority. = ratio.priority) {
       dna.content <- C.P.[x, 1]
       cellularity <- C.P.[x, 2]
       L.model <- baf.bayes(Bf = Bf., depth.ratio = depth.ratio., 
@@ -239,7 +240,7 @@ baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
                            cellularity = cellularity, dna.content = dna.content,
                            avg.depth.ratio = avg.depth.ratio., CNt.min = CNt.min., 
                            CNt.max = CNt.max., CNr = CNr., priors.labels = priors.labels.,
-                           priors.values = priors.values.)
+                           priors.values = priors.values., ratio.priority = ratio.priority.)
       L.sum <- sum(L.model[,4])
       c(dna.content,  cellularity, L.sum)  
    }
