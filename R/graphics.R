@@ -208,7 +208,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                   x1 = rep(max(segments$end.pos, na.rm = TRUE), times = nrow(ratios.theoric)), 
                   y0 = ratios.theoric$depth.ratio, lwd = 0.4, lty = "24")
          text(x = rep(min(segments$start.pos, na.rm =TRUE), times = nrow(ratios.theoric)),
-              y = ratios.theoric$depth.ratio, labels = ratios.theoric$CNt, adj = c(0, -0.5), cex = 0.8)
+              y = ratios.theoric$depth.ratio, labels = ratios.theoric$CNt, pos = 2, offset = 0.5, cex = 0.8)
          
       }
    }
