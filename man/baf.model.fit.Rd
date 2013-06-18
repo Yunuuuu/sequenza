@@ -12,7 +12,7 @@
                    cellularity.range = c(0.3,0.8), dna.content.range = c(0.5,4), by.c = 0.01, 
                    by.p = 0.01, mc.cores = 2, CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3)
   baf.model.fit(Bf, depth.ratio, weight.Bf = 100, weight.ratio = 100, cellularity.range = c(0.3,1),
-                dna.content.range = c(0.7,4), by.c = 0.01, by.p = 0.01, avg.depth.ratio,
+                dna.content.range = c(0.7,4), by.c = 0.01, by.p = 0.01, avg.depth.ratio, skew.baf = 0.95,
                 mc.cores = 2, CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3, ratio.priority = TRUE)
 }
 
@@ -34,6 +34,7 @@
   \item{priors.labels}{Label for the copy number state priors.}
   \item{priors.values}{Value for the copynumber state priors. By default there is a increased priors on the diploid status.}
    \item{ratio.priority}{Boolean, if true only the depth ratio would be considered to determine the copy number state, while the Bf value would select the numbers of B-allele. Default TRUE.}
+   \item{skew.baf}{The observed B-allele frequency often doen not converge to the 0.5 frequency, for normal diploid position. This argument indicate the value of the percentile of all the observed B-allele frequency to skew the theoric value below 0.5. Default 0.95}
 }
 
 \value{

@@ -10,7 +10,7 @@
 \usage{
   baf.bayes(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio,
             weight.Bf = 100, weight.ratio = 100, CNt.min = 0, CNt.max = 7, CNr = 2,
-            priors.labels = CNt.min:CNt.max, priors.values = 1, ratio.priority = FALSE)
+            priors.labels = CNt.min:CNt.max, priors.values = 1, ratio.priority = FALSE, skew.baf = 0.95)
   mufreq.bayes(mufreq, depth.ratio, cellularity, dna.content, avg.depth.ratio,
             weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, CNr = 2,
             priors.labels = CNt.min:CNt.max, priors.values = 1)
@@ -32,6 +32,7 @@
   \item{priors.labels}{Label for the copy number state priors.}
   \item{priors.values}{Value for the copynumber state priors. Default priors is 1 for every copy number state.}
   \item{ratio.priority}{Boolean, if true only the depth ratio would be considered to determine the copy number state, while the Bf value would select the numbers of B-allele. Default FALSE.}
+  \item{skew.baf}{The observed B-allele frequency often doen not converge to the 0.5 frequency, for normal diploid position. This argument indicate the value of the percentile of all the observed B-allele frequency to skew the theoric value below 0.5. Default 0.95}
 }
 
 \value{
