@@ -13,7 +13,7 @@
                    by.p = 0.01, mc.cores = 2, CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3)
   baf.model.fit(Bf, depth.ratio, weight.Bf = 100, weight.ratio = 100, cellularity.range = c(0.3,1),
                 dna.content.range = c(0.7,4), by.c = 0.01, by.p = 0.01, avg.depth.ratio, skew.baf = 0.95,
-                mc.cores = 2, CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3, ratio.priority = TRUE)
+                mc.cores = 2, CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3, ratio.priority = FALSE)
 }
 
 \arguments{
