@@ -33,7 +33,7 @@
   \item{CNr}{Copy number status of the germline reference. Default 2.}
   \item{priors.labels}{Label for the copy number state priors.}
   \item{priors.values}{Value for the copynumber state priors. By default there is a increased priors on the diploid status.}
-   \item{ratio.priority}{Boolean, if true only the depth ratio would be considered to determine the copy number state, while the Bf value would select the numbers of B-allele. Default TRUE.}
+   \item{ratio.priority}{Boolean, if true only the depth ratio would be considered to determine the copy number state, while the Bf value would select the numbers of B-allele. Default FALSE.}
    \item{skew.baf}{The observed B-allele frequency often doen not converge to the 0.5 frequency, for normal diploid position. This argument indicate the value of the percentile of all the observed B-allele frequency to skew the theoric value below 0.5. Default 0.95}
 }
 
