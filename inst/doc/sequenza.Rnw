@@ -189,8 +189,7 @@ chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win$windows[[1]],
 seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 5e6, ]
 @
 <<label=segsWeight, echo=TRUE>>=
-weights.seg  <- 100 + round((seg.filtered$end.pos - seg.filtered$start.pos) / 1e6, 0)
-seg.filtered$Bf[seg.filtered$Bf >= 0.4] <- 0.5
+weights.seg  <- 150 + round((seg.filtered$end.pos - seg.filtered$start.pos) / 1e6, 0)
 @
 
 <<label=avg.depth.ratio>>=
@@ -340,17 +339,18 @@ fake.abf <- data.frame(chromosome = BAF$chrs, n.base = BAF$pos,
 
 segmented.snp <- segment.breaks(abf.tab = fake.abf, breaks = allele.seg[, c(2, 4, 5)])
 avg.unlogR    <- mean(segmented.snp$depth.ratio)
-weights.snp   <- 100 + round((segmented.snp$end.pos - segmented.snp$start.pos)/1e6 , 0)
-
+weights.snp   <- 150 + round((segmented.snp$end.pos - segmented.snp$start.pos)/1e6 , 0)
+filter.size   <- (segmented.snp$end.pos - segmented.snp$start.pos) >= 3e6
 @
 
 <<label=CPforSNP, eval = TRUE, results=hide>>=
-CP.snp <- baf.model.fit(Bf = segmented.snp$Bf, depth.ratio = segmented.snp$depth.ratio, 
-                    weight.ratio = weights.snp,
-                    weight.Bf = weights.snp,
-                    by.p = 0.1, by.c = 0.05, avg.depth.ratio = avg.unlogR,
-                    cellularity.range = c(0.1,1), 
-                    dna.content.range = c(0.5,3), mc.cores=4)
+CP.snp <- baf.model.fit(Bf = segmented.snp$Bf[filter.size],
+                        depth.ratio = segmented.snp$depth.ratio[filter.size], 
+                        weight.ratio = weights.snp[filter.size],
+                        weight.Bf = weights.snp[filter.size],
+                        by.p = 0.1, by.c = 0.05, avg.depth.ratio = avg.unlogR,
+                        cellularity.range = c(0.1,1), ratio.priority = FALSE,
+                        dna.content.range = c(0.5,3), mc.cores=4)
 @
 <<label=getCPparamSNP, eval = TRUE>>=
 dna.c.cint <- get.ci(CP.snp[,c(1,3)])
