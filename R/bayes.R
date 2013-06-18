@@ -94,7 +94,7 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.dept
 baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio,
                       weight.Bf = 100, weight.ratio = 100, CNt.min = 0,
                       CNt.max = 7, CNr = 2, priors.labels = CNt.min:CNt.max,
-                      priors.values = 1, ratio.priority = FALSE) {
+                      priors.values = 1, ratio.priority = FALSE, skew.baf = 0.95) {
    
    mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
                             weight.Bf = weight.Bf, weight.ratio = weight.ratio)
@@ -108,7 +108,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
    }
    # B-allele freq are never 0.5, always smaller. work around on this bias
    model.baf$BAF[model.baf$BAF == 0.5] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$weight.Bf),
-                                                   na.rm = TRUE, probs = .75)
+                                                   na.rm = TRUE, probs = skew.baf)
    model.pts          <- merge(model.baf, model.d.ratio)
    # model.pts          <- cbind(baf.type = apply(model.pts[, 1:3], 1, FUN = function(x) paste(x, collapse = "_")),
    #                             model.pts[, 4:5])
@@ -213,8 +213,8 @@ mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 100, weight.ra
 baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
                           cellularity.range = c(0.3,1), dna.content.range = c(0.7,4),
                           by.c = 0.01, by.p = 0.01, avg.depth.ratio, mc.cores = 2,
-                          CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3,
-                          ratio.priority = TRUE) {
+                          CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 2,
+                          ratio.priority = FALSE, skew.baf = 0.95) {
 
    require(parallel)
    c.range <- seq( from = min(cellularity.range), to = max(cellularity.range), by = by.c)
@@ -230,7 +230,7 @@ baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
    
    fit.cp <- function(x, C.P. = C.P, Bf. = Bf, depth.ratio. = depth.ratio,
                       weight.Bf. = weight.Bf, weight.ratio. = weight.ratio,
-                      avg.depth.ratio. = avg.depth.ratio, CNt.min. = 0, 
+                      avg.depth.ratio. = avg.depth.ratio, CNt.min. = 0, skew.baf. = skew.baf, 
                       CNt.max. = CNt.max, CNr. = CNr, priors.labels. = priors.labels,
                       priors.values. = priors.values, ratio.priority. = ratio.priority) {
       dna.content <- C.P.[x, 1]
@@ -238,7 +238,7 @@ baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
       L.model <- baf.bayes(Bf = Bf., depth.ratio = depth.ratio., 
                            weight.Bf = weight.Bf., weight.ratio = weight.ratio.,
                            cellularity = cellularity, dna.content = dna.content,
-                           avg.depth.ratio = avg.depth.ratio., CNt.min = CNt.min., 
+                           avg.depth.ratio = avg.depth.ratio., CNt.min = CNt.min., skew.baf = skew.baf.,
                            CNt.max = CNt.max., CNr = CNr., priors.labels = priors.labels.,
                            priors.values = priors.values., ratio.priority = ratio.priority.)
       L.sum <- sum(L.model[,4])
