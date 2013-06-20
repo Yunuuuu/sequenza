@@ -62,9 +62,9 @@ gc.norm <- function (ratio, gc) {
    for (ii in 1:length(gc.values)) {
       selected        <- gc == gc.values[ii]
       ratio.values    <-  ratio[selected]
-      gc.stats$raw[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75))
+      gc.stats$raw[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
       ratio.values    <- ratio.values / median(ratio.values)
-      gc.stats$adj[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75))
+      gc.stats$adj[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
       ratio[selected] <- ratio.values
       setTxtProgressBar(pb, ii)
    }
@@ -88,9 +88,9 @@ gc.sample.stats <- function (filename, gz = TRUE) {
    for (ii in 1:length(gc.values)) {
       selected        <- gc.data$GC.percent == gc.values[ii]
       ratio.values    <- gc.data$depth.ratio[selected]
-      gc.stats$raw[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75))
+      gc.stats$raw[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
       ratio.values    <- ratio.values / median(ratio.values)
-      gc.stats$adj[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75))
+      gc.stats$adj[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
       setTxtProgressBar(pb, ii)
    }
    cat("\n")
@@ -139,9 +139,9 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
          if (overlap <= 0) {
             selected <- pos.i >= beam.coords[n] & pos.i < beam.coords[n + 1] 
             # rat.i.quartiles <- quantile(x = rep.int(x = rat.i[selected], times = wgt.i[selected]),
-            #                             probs = c(0.25, 0.5, 0.75))
-            rat.i.quartiles <- quantile(x = rat.i[selected], probs = c(0.25, 0.75))
-            rat.i.mean      <- weighted.mean(x = rat.i[selected], w = wgt.i[selected])            
+            #                             probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
+            rat.i.quartiles <- quantile(x = rat.i[selected], probs = c(0.25, 0.75), na.rm = TRUE)
+            rat.i.mean      <- weighted.mean(x = rat.i[selected], w = wgt.i[selected], na.rm = TRUE)            
             results$windows[[i]][[n]] <- c(start = beam.coords[n],
                                            end = beam.coords[n + 1], mean = rat.i.mean,
                                            q = rat.i.quartiles[1], q = rat.i.quartiles[2],
@@ -154,9 +154,9 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
             }
             selected <- pos.i >= beam.coords[n] & pos.i < beam.coords[next.coord]
             # rat.i.quartiles <- quantile(x = rep.int(x = rat.i[selected], times = wgt.i[selected]),
-            #                             probs = c(0.25, 0.5, 0.75))
-            rat.i.quartiles <- quantile(x = rat.i[selected], probs = c(0.25, 0.75))
-            rat.i.mean      <- weighted.mean(x = rat.i[selected], w = wgt.i[selected])            
+            #                             probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
+            rat.i.quartiles <- quantile(x = rat.i[selected], probs = c(0.25, 0.75), na.rm = TRUE)
+            rat.i.mean      <- weighted.mean(x = rat.i[selected], w = wgt.i[selected], na.rm = TRUE)
             results$windows[[i]][[n]] <- c(start = beam.coords[n],
                                             end = beam.coords[next.coord], mean = rat.i.mean,
                                             q = rat.i.quartiles[1], q = rat.i.quartiles[2],
@@ -195,7 +195,7 @@ get.ci <- function(mat, interval = 0.95) {
    exp.vals <- 2^(mat[, 2] - sum.all)
    exp.vals[is.infinite(exp.vals)] <- 0
    values   <- cbind(mat[, 1], expL = exp.vals)
-   val.95   <- quantile(values[, 2], prob = interval)
+   val.95   <- quantile(values[, 2], prob = interval, na.rm = TRUE)
    values.s <- values[values[, 2] >= val.95, ]
    if (is.null(dim(values.s))) {
       up.v  <- values.s[1]
@@ -304,8 +304,8 @@ segment.breaks <- function(abf.tab, breaks) {
       # pos.filt <- abf.tab$chromosome == breaks$chrom[i] & abf.tab$n.base >= breaks$start.pos[i] & abf.tab$n.base <= breaks$end.pos[i]
       data.i  <- abf.tab[abf.tab$chromosome == breaks$chrom[i] & abf.tab$n.base >= breaks$start.pos[i] & abf.tab$n.base <= breaks$end.pos[i], ]
       het.i   <- data.i[data.i$ref.zygosity == 'het',]
-      Bf.i    <- weighted.mean(x = het.i$Bf, w = sqrt(het.i$good.s.reads))
-      ratio.i <- weighted.mean(x = data.i$adjusted.ratio, w = sqrt(data.i$depth.sample))
+      Bf.i    <- weighted.mean(x = het.i$Bf, w = sqrt(het.i$good.s.reads), na.rm = TRUE)
+      ratio.i <- weighted.mean(x = data.i$adjusted.ratio, w = sqrt(data.i$depth.sample), na.rm = TRUE)
       segments[[i]] <- data.frame(chromosome  = breaks$chrom[i],
                                   start.pos   = breaks$start.pos[i],
                                   end.pos     = breaks$end.pos[i],
