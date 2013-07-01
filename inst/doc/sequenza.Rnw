@@ -201,9 +201,9 @@ avg.depth.ratio
 CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
                     weight.ratio = weights.seg,
                     weight.Bf = weights.seg,
-                    by.p = 0.1, by.c = 0.05, avg.depth.ratio = 1,
+                    by.p = 0.05, by.c = 0.01, avg.depth.ratio = 1,
                     cellularity.range = c(0.1,1), 
-                    dna.content.range = c(0.5,3), mc.cores=4)                   
+                    dna.content.range = c(0.5,3), mc.cores = 4)                   
 @
 <<label=ConfIntCP, echo=TRUE>>=
 head(CP)
@@ -287,25 +287,49 @@ chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win$windows[[1]],
 \section{Working with SNP array data}
 
 
+
+\subsection{Preparing the data}
 <<label=loadingFromCopynumber, eval=TRUE>>=
 data(BAF)
 data(logR)
 @
+
+<<label=SNPdataPrep, eval=TRUE>>=
+sample.i <- data.frame(chromosome = BAF$chrs, n.base = BAF$pos, 
+                      Bf = BAF$S1, adjusted.ratio = logR$S1,
+                      depth.sample = 1, good.s.reads = 1,
+                      ref.zygosity = 'hom', stringsAsFactors = FALSE)
+@
+\subsubsection{Correcting logR with a normal sample, or with the mean logR value}
+Without a reference sample (normal germline sample) we can try to divide for the mean value. It would be correct to use the germline logR.
+<<label=logRMeansub, eval=TRUE>>=
+sample.i$adjusted.ratio <- 2^(sample.i$adjusted.ratio)
+sample.i$adjusted.ratio <- sample.i$adjusted.ratio / mean(sample.i$adjusted.ratio)
+@
+\subsubsection{Retrive the homozygous position}
+It should be available a germline sample to get the heterozygours SNP, doing in the same sample it's a risk if the sample is pure. A treshold around 0.25 or 0.35 can be picked to subset the heterozygous position on the germline.
+In the example we are lowering the treshold while taking the SNP from the same aberrant sample.
+<<label=hetFind, eval=TRUE>>=
+het.lim <- 0.2
+is.het <- sample.i$Bf >= het.lim & sample.i$Bf <= 1 - het.lim
+sample.i$ref.zygosity[is.het] <- 'het'
+sample.i$Bf[sample.i$Bf >= 0.5] <- 1 - sample.i$Bf[sample.i$Bf >= 0.5]
+sample.het.i <- sample.i[is.het, ]
+@
 \subsection{Windowing logR values.}
 <<label=logRWin, eval=TRUE, results=hide>>=
-snp.r.win <- windowValues(x = 2^logR$S1,
-             positions = logR$pos,
-             chromosomes = logR$chrs,
-             window = 1e6, overlap = 5e5)
+ 
+snp.r.win <- windowValues(x = sample.i$adjusted.ratio,
+                          positions = sample.i$n.base,
+                          chromosomes = sample.i$chromosome,
+                          window = 1e6, overlap = 5e5)
 @
 \subsection{Windowing B-allele frequencies values.}
 <<label=BAFWin, eval=TRUE, results=hide>>=
-BAF.to05 <- BAF$S1
-BAF.to05[BAF.to05 >= 0.5] <- 1 - BAF.to05[BAF.to05 >= 0.5]
-snp.b.win <- windowValues(x = BAF.to05,
-             positions = BAF$pos,
-             chromosomes = BAF$chrs,
-             window = 1e6, overlap = 5e5)
+snp.b.win <- windowValues(x = sample.het.i$Bf,
+                          positions = sample.het.i$n.base,
+                          chromosomes = sample.het.i$chromosome,
+                          window = 1e6, overlap = 5e5)
 @
 \subsection{Chromosome view without mutation}
 \begin{figure}[H]
@@ -322,35 +346,27 @@ chromosome.view(baf.windows = snp.b.win$windows[[1]],
 
 \subsection{Segmenting with the \textit{copynumber} package}
 <<label=copynumber, eval=TRUE>>=
-logR.wins  <- winsorize(logR, verbose = FALSE)
-allele.seg <- aspcf(logR.wins, BAF, verbose = FALSE)
-head(allele.seg)
-
-allele.seg <- allele.seg[allele.seg$sampleID == "S1", ]
+breaks <- find.breaks(sample.het.i, gamma = 40, kmin = 20, baf.thres = c(0, 0.5))
+seg.i  <- segment.breaks(sample.i, breaks = breaks)
 @
 
 \subsection{Using the Bayesian inference on segmented SNP arrays}
 <<label=adjustSegs, eval=TRUE>>=
 
-fake.abf <- data.frame(chromosome = BAF$chrs, n.base = BAF$pos,
-                 Bf = BAF.to05, adjusted.ratio = 2^logR$S1,
-                 good.s.reads = 1, depth.sample = 1,
-                 ref.zygosity = 'het')
-
-segmented.snp <- segment.breaks(abf.tab = fake.abf, breaks = allele.seg[, c(2, 4, 5)])
-avg.unlogR    <- mean(segmented.snp$depth.ratio)
-weights.snp   <- 150 + round((segmented.snp$end.pos - segmented.snp$start.pos)/1e6 , 0)
-filter.size   <- (segmented.snp$end.pos - segmented.snp$start.pos) >= 3e6
+weights.snp   <- 150 + round((seg.i$end.pos - seg.i$start.pos)/1e6 , 0)
+filter.size   <- (seg.i$end.pos - seg.i$start.pos) >= 3e6
 @
 
 <<label=CPforSNP, eval = TRUE, results=hide>>=
-CP.snp <- baf.model.fit(Bf = segmented.snp$Bf[filter.size],
-                        depth.ratio = segmented.snp$depth.ratio[filter.size], 
+avg.unlogR <- mean(sample.i$adjusted.ratio, na.rm = TRUE)
+CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
+                        depth.ratio = seg.i$depth.ratio[filter.size], 
                         weight.ratio = weights.snp[filter.size],
                         weight.Bf = weights.snp[filter.size],
-                        by.p = 0.1, by.c = 0.05, avg.depth.ratio = avg.unlogR,
+                        by.p = 0.05, by.c = 0.01, avg.depth.ratio = avg.unlogR,
                         cellularity.range = c(0.1,1), ratio.priority = FALSE,
-                        dna.content.range = c(0.5,3), mc.cores=4)
+                        dna.content.range = c(0.5,3), mc.cores = 4,
+                        priors.labels = 2, priors.values = 1)
 @
 <<label=getCPparamSNP, eval = TRUE>>=
 dna.c.cint <- get.ci(CP.snp[,c(1,3)])
@@ -404,13 +420,15 @@ par(mfrow = c(2,2))
 \subsection{Call for copy number variation using inferred parameters.}
 
 <<label=bafBayesSNP, eval=TRUE>>=
-snp.seg.cn <- baf.bayes(Bf = segmented.snp$Bf,
-                        depth.ratio = segmented.snp$depth.ratio, 
+snp.seg.cn <- baf.bayes(Bf = seg.i$Bf,
+                        depth.ratio = seg.i$depth.ratio, 
                         avg.depth.ratio = avg.unlogR,
                         cellularity = cellularity,
+                        weight.ratio = 2 * 300,
+                        weight.Bf = 300, ratio.priority = FALSE,
                         dna.content = dna.content, CNt.max = 10)
 
-segmented.snp <- cbind(segmented.snp, snp.seg.cn)
+segmented.snp <- cbind(seg.i, snp.seg.cn)
 
 head(segmented.snp[segmented.snp$chromosome == 1, ])
 @
