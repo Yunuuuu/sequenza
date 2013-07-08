@@ -2,18 +2,13 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table[,3], na.
                                                  to = max(cp.table[,3], na.rm = TRUE), by = 0.1), n = 10),
                     outlier = "white", ...) {
    require(squash)
-   cell.steps   <- length(unique(cp.table[, 2]))
-   color.mat    <- cp.table[, 3][seq(from = 1, to = cell.steps,by = 1)]
-   cp.row.mat   <- seq(from = cell.steps + 1, to = nrow(cp.table), by = cell.steps)
-   last.but.one <- length(cp.row.mat) - 1
-   for (i in 1:last.but.one) {
-      start     <- as.numeric(cp.row.mat[i])
-      n         <- as.numeric(i + 1)
-      end       <- as.numeric(cp.row.mat[n] - 1)
-      color.mat <- rbind(color.mat, cp.table[, 3][seq(from = start[1], to = end[1], by = 1)])
-   }
-   colorgram(x=unique(x = cp.table[, 1]), y = unique(cp.table[, 2]), z = color.mat, zlab = "log-likelihood",
-             colFn = jet, las = 1, xlab= "DNA-content", ylab = "cellularity", map = map, outlier = outlier, ...)
+   z <- tapply(CP[, 'L'], list(CP[, 'dna.content'], CP[, 'cellularity']), mean)
+   x <- as.numeric(rownames(z))
+   y <- as.numeric(colnames(z))
+   colorgram(x, y, z,
+             colFn = jet, map = map, outlier = outlier, las = 1, 
+             xlab= "DNA content", ylab = "Cellularity", 
+             zlab = "log-likelihood", ...)
    L.max <- cp.table[which.max(cp.table[, 3]),]
    points(x = L.max[1], y = L.max[2], pch = 18)
 }
@@ -161,7 +156,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       par(mar = c(0, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(3,1), xaxt='n')
 
       plot(x = mut.tab$n.base, y = mut.tab$F, 
-           ylab = "mutation frequency", las = 1, pch = 19,
+           ylab = "Mutant allele frequency", las = 1, pch = 19,
            col = mutation.colors(mut.tab$mutation),
            ylim = c(min(mut.tab$F, na.rm = TRUE), 1), xlim = xlim)
       mutation.colors()
@@ -194,7 +189,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
          }
       }
    }
-   plotWindows(ratio.windows, ylab = "depth ratio", 
+   plotWindows(ratio.windows, ylab = "Depth ratio", 
                las = 1, n.min = min.N.ratio, ylim = c(0, 2))
    if (!is.null(segments)){
       if (vlines) {
@@ -213,7 +208,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       }
    }
    mtext(main, 3, outer = TRUE, cex = par("cex.main"), line = 2)
-   mtext("Base Pairs 1e+06", 1, outer = TRUE, cex = par("cex.main"), line = 3)
+   mtext("Position (Mb)", 1, outer = TRUE, cex = par("cex.main"), line = 3)
 
    mtext(at = seq(xlim[1], xlim[2], by = 1e7), text = round(seq(xlim[1]/1e6, xlim[2]/1e6, by = 10), 0), side = 1, cex = 0.6)
 }
