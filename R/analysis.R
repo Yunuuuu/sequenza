@@ -56,48 +56,25 @@ read.acgt <- function (file, nrows = -1, fast = TRUE, gz = TRUE,
 }
 
 gc.norm <- function (ratio, gc) {
-   gc.values   <- sort(unique(gc))
-   gc.stats  <- list()
-   pb        <- txtProgressBar(min = 1, max = length(gc.values), style = 3)
-   for (ii in 1:length(gc.values)) {
-      selected        <- gc == gc.values[ii]
-      ratio.values    <-  ratio[selected]
-      gc.stats$raw[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
-      ratio.values    <- ratio.values / median(ratio.values)
-      gc.stats$adj[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
-      ratio[selected] <- ratio.values
-      setTxtProgressBar(pb, ii)
-   }
-   cat("\n")
-   gc.stats$raw <- do.call(rbind, gc.stats$raw)
-   gc.stats$adj <- do.call(rbind, gc.stats$adj)   
-   gc.stats$gc.values <- gc.values
-   gc.stats$ratio <- ratio
-   gc.stats
+   dr.by.gc <- split(ratio, gc)
+   raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
+   dr.by.gc.median <- sapply(dr.by.gc, median)
+   adj <- sweep(raw, 1, dr.by.gc.median, '/')
+   adjratio = ratio / unsplit(dr.by.gc.median, gc)
+   list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)), ratio = adjratio)
 }
 
 gc.sample.stats <- function (filename, gz = TRUE) {
-   cat.command = paste("cat", filename, sep = " ")
-   if (gz == TRUE) {
-      cat.command = paste("gunzip -c", filename, sep = " ")
+   cat.command = paste("cat", filename)
+   if (gz) {
+      cat.command = paste("gunzip -c", filename)
    }
-   gc.data   <- read.table(pipe(paste(cat.command, "| awk '{print $6,$10}'", sep = " ")), header = TRUE)
-   gc.values   <- sort(unique(gc.data$GC.percent))
-   gc.stats  <- list()
-   pb        <- txtProgressBar(min = 1, max = length(gc.values), style = 3)
-   for (ii in 1:length(gc.values)) {
-      selected        <- gc.data$GC.percent == gc.values[ii]
-      ratio.values    <- gc.data$depth.ratio[selected]
-      gc.stats$raw[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
-      ratio.values    <- ratio.values / median(ratio.values)
-      gc.stats$adj[[ii]] <- quantile(x = ratio.values , probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
-      setTxtProgressBar(pb, ii)
-   }
-   cat("\n")
-   gc.stats$raw <- do.call(rbind, gc.stats$raw)
-   gc.stats$adj <- do.call(rbind, gc.stats$adj)
-   gc.stats$gc.values <- gc.values
-   gc.stats
+   gc.data   <- read.table(pipe(paste(cat.command, "| awk '{print $6,$10}'")), header = TRUE)
+   dr.by.gc <- split(gc.data$depth.ratio, gc.data$GC.percent)
+   raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
+   dr.by.gc.median <- sapply(dr.by.gc, median)
+   adj <- sweep(raw, 1, dr.by.gc.median, '/')
+   list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)))
 }
 
 windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
@@ -299,22 +276,26 @@ find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), v
 }
 
 segment.breaks <- function(abf.tab, breaks) {
-   segments <- list()
-   for (i in 1:nrow(breaks)) {
-      # pos.filt <- abf.tab$chromosome == breaks$chrom[i] & abf.tab$n.base >= breaks$start.pos[i] & abf.tab$n.base <= breaks$end.pos[i]
-      data.i  <- abf.tab[abf.tab$chromosome == breaks$chrom[i] & abf.tab$n.base >= breaks$start.pos[i] & abf.tab$n.base <= breaks$end.pos[i], ]
-      het.i   <- data.i[data.i$ref.zygosity == 'het',]
-      Bf.i    <- weighted.mean(x = het.i$Bf, w = sqrt(het.i$good.s.reads), na.rm = TRUE)
-      ratio.i <- weighted.mean(x = data.i$adjusted.ratio, w = sqrt(data.i$depth.sample), na.rm = TRUE)
-      segments[[i]] <- data.frame(chromosome  = breaks$chrom[i],
-                                  start.pos   = breaks$start.pos[i],
-                                  end.pos     = breaks$end.pos[i],
-                                  Bf          = Bf.i,
-                                  depth.ratio = ratio.i,
-                                  N.BAF       = nrow(het.i),
-                                  N.ratio     = nrow(data.i))
-   }
-   do.call(rbind, segments)
+    nb <- nrow(breaks)
+    segments <- data.frame(chromosome  = breaks$chrom,
+                         start.pos = breaks$start.pos,
+                         end.pos = breaks$end.pos,
+                         Bf = numeric(nb),
+                         depth.ratio = numeric(nb),
+                         N.BAF = integer(nb),
+                         N.ratio = integer(nb))
+   for (ii in 1:nrow(breaks)) {
+      isInSegment <- abf.tab$chromosome == breaks$chrom[ii] & 
+                     abf.tab$n.base >= breaks$start.pos[ii] & 
+                     abf.tab$n.base <= breaks$end.pos[ii]
+      abf.tab.i  <- abf.tab[isInSegment, ]
+      segments[ii, 'depth.ratio'] <- weighted.mean(x = abf.tab.i$adjusted.ratio, w = sqrt(abf.tab.i$depth.sample), na.rm = TRUE)
+      segments[ii, 'N.ratio'] <- nrow(abf.tab.i)
+      het.i   <- abf.tab.i[abf.tab.i$ref.zygosity == 'het', ]
+      segments[ii, 'Bf']    <- weighted.mean(x = het.i$Bf, w = sqrt(het.i$good.s.reads), na.rm = TRUE)
+      segments[ii, 'N.BAF'] <- nrow(het.i)
+    }
+    segments
 }
 
 # segment.chromosome <- function(x, breaks) {
