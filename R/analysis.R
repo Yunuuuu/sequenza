@@ -250,7 +250,7 @@ mut.fractions <- function(AB.sample, Af) {
       c(freq.rel[f.max], names(base.freqs[[x]])[f.max], base.freqs[[x]][f.max])
    }
    max.freqs  <- do.call(rbind, lapply(1:length(F), max.fq))
-   data.frame(base.count = as.integer(n.base.mut), maj.base.freq = as.numeric(max.freqs[,1]),
+   data.frame(base.count = as.integer(n.base.mut), maj.base.freq = as.numeric(max.freqs[, 1]),
               base = as.character(max.freqs[,2]), freq = as.numeric(max.freqs[,3]))
 }
 
