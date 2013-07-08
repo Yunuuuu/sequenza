@@ -267,12 +267,10 @@ find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), v
    logR.wins <- winsorize(logR, verbose = verbose)
    allele.seg <- aspcf(logR = logR.wins, BAF = BAF, baf.thres = baf.thres,
                        verbose = verbose, gamma = gamma, kmin = kmin, ...)
-   if (length(grep("chr", abf.baf$chromosome)) == 0) {
-      allele.seg[,c('chrom', 'start.pos', 'end.pos')]
-   } else {
-      allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = '')
-      allele.seg[,c('chrom', 'start.pos', 'end.pos')]
-   }
+    if (length(grep("chr", abf.baf$chromosome)) > 0) { 
+        allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")
+    }
+    allele.seg[, c("chrom", "start.pos", "end.pos")]
 }
 
 segment.breaks <- function(abf.tab, breaks) {
