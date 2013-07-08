@@ -56,24 +56,16 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table[,3], na.
 
 plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
                          m.col = "black", q.bg = "lightblue", log2.plot = FALSE,
-                         n.min = 1, xlim = NULL, ylim = NULL, add = FALSE, ...) {
+                         n.min = 1, xlim, ylim, add = FALSE, ...) {
    if (log2.plot == TRUE) {
       abf.window[, c(3, 4, 5)] <- log2(abf.window[, c(3, 4, 5)]) 
    }
-   x.min        <- abf.window[1, 1]
-   x.max        <- abf.window[nrow(abf.window), 2]
-   y.min        <- min(abf.window[, 4], na.rm = TRUE)
-   y.max        <- max(abf.window[, 5], na.rm = TRUE)
-   if (add == FALSE) { 
-      if (!is.null(xlim) & !is.null(ylim)) {
-         plot(xlim = xlim, ylim = ylim, type = "n", x = NULL, ...)
-      } else if (!is.null(xlim) & is.null(ylim)){   
-         plot(xlim = xlim, ylim = c(y.min, y.max), type = "n", x = NULL, ...)
-      } else if (is.null(xlim) & !is.null(ylim)) {
-         plot(xlim = c(x.min, x.max), ylim = ylim, type = "n", x = NULL, ...)
-      } else {
-         plot(xlim = c(x.min, x.max), ylim = c(y.min, y.max), type = "n", x = NULL, ...)
-      }
+   if(!add) {
+      if(missing(xlim)) 
+         xlim <- c(abf.window[1, 1], abf.window[nrow(abf.window), 2])
+      if(missing(ylim))
+         ylim <- c(min(abf.window[, 4], na.rm = TRUE), max(abf.window[, 5], na.rm = TRUE))
+      plot(xlim, ylim, type = "n", ...)  
    }
    abf.window <- abf.window[abf.window[, 6] >= n.min, ]
    rect(xleft = abf.window[, 1], ybottom = abf.window[, 4], 
