@@ -78,75 +78,54 @@ gc.sample.stats <- function (filename, gz = TRUE) {
 }
 
 windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
-                          weight = rep.int( x = 1, times = length(x)), start.coord = NULL) {
+                          weight = rep.int( x = 1, times = length(x)), start.coord = 1) {
    chr.list         <- unique(chromosomes)
    results          <- list()
    results$windows  <- list()
-   weight <- sqrt(weight)
+   weight   <- sqrt(weight)
+   xw       <- x * weight
+   overlap  <- as.integer(overlap)
+   window.o <- window - round(window * (overlap / (overlap + 1)), 0) 
    # x.adj            <- x
    for (i in 1:length(chr.list)) {
       results$windows[[i]] <- list()
-      is.chr.i              <- chromosomes == chr.list[i]
-      range.pos             <- range(positions[is.chr.i], na.rm = TRUE)
-      if (!is.null(start.coord)) range.pos[1] <- as.integer(start.coord)
-      beam.coords           <- seq(range.pos[1], range.pos[2], by = window)
+      is.chr.i             <- chromosomes == chr.list[i]
+      pos.i                <- positions[is.chr.i]
+      x.i                  <- x[is.chr.i]
+      xw.i                 <- xw[is.chr.i]
+      w.i                  <- weight[is.chr.i]
+      range.pos            <- range(pos.i, na.rm = TRUE)
+      if (!is.null(start.coord)) {
+         range.pos[1] <- as.integer(start.coord)
+      }
+      beam.coords          <- seq(range.pos[1], range.pos[2], by = window.o)
       if (max(beam.coords) != range.pos[2] ) {
          beam.coords <- c(beam.coords, range.pos[2])
       }
-      pos.i <- positions[is.chr.i]
-      rat.i <- x[is.chr.i]
-      #rat.o <- rat.i
-      wgt.i <- weight[is.chr.i]
+      f.windows <- cut(x = pos.i, breaks = beam.coords)
+      xw.i      <- split(x = xw.i, f = f.windows)
+      w.i       <- split(x = w.i, f = f.windows)
+      x.i       <- split(x = x.i, f = f.windows)
       if (overlap > 0 ) {
-         segs        <- do.call(rbind, lapply(X = 1:(length(beam.coords) -1), FUN = function(x) c(beam.coords[x], beam.coords[x + 1])))
-         segs.middle <- apply(X = segs, 2, FUN = function(x) x - overlap)
-         segs.middle <- rbind(segs.middle[-1,], c(max(segs.middle, na.rm = TRUE), max(segs, na.rm = TRUE)))
-         beam.coords <- sort(unique(c(segs, segs.middle)))
          cat(paste("chromosome:", chr.list[i], "from:", range.pos[1],"to:", range.pos[2], "window:", window, "overlaps", overlap, "\n",sep=" "))
       } else {
          cat(paste("chromosome:", chr.list[i], "from:", range.pos[1],"to:", range.pos[2], "window:", window,"\n",sep=" "))
       }
-      if (length(beam.coords) > 2) {
-         pb      <- txtProgressBar(min = 1, max = length(beam.coords) - 1, style = 3)
-         progressb <- TRUE
-      } else {
-         progressb <- FALSE
+      do.windows <- function(x.i, w.i, xw.i, breaks, overlap){
+         coords    <- data.frame(start = breaks[-length(breaks)], end = breaks[-1])
+         quartiles <- do.call(rbind, 
+                              lapply(X = x.i, FUN = function(x) quantile(x, probs = c(0.25, 0.75),
+                                                                         na.rm = TRUE)))
+         sum.w     <- sapply(X = w.i, FUN = function(x) sum(x, na.rm = TRUE))
+         sum.xw    <- sapply(X = xw.i, FUN = function(x) sum(x, na.rm = TRUE))
+         size      <- sapply(X = x.i, FUN = length)
+         data.frame(coords, mean = sum.xw/sum.w, q = quartiles[,1],
+               q = quartiles[,2], N = size, row.names = 1:length(size))            
       }
-      for (n in 1:(length(beam.coords) - 1)) {
-         if (overlap <= 0) {
-            selected <- pos.i >= beam.coords[n] & pos.i < beam.coords[n + 1] 
-            # rat.i.quartiles <- quantile(x = rep.int(x = rat.i[selected], times = wgt.i[selected]),
-            #                             probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
-            rat.i.quartiles <- quantile(x = rat.i[selected], probs = c(0.25, 0.75), na.rm = TRUE)
-            rat.i.mean      <- weighted.mean(x = rat.i[selected], w = wgt.i[selected], na.rm = TRUE)            
-            results$windows[[i]][[n]] <- c(start = beam.coords[n],
-                                           end = beam.coords[n + 1], mean = rat.i.mean,
-                                           q = rat.i.quartiles[1], q = rat.i.quartiles[2],
-                                           N = length(selected[selected == TRUE]))
-         } else {
-            if (n < (length(beam.coords) - 2)) {
-               next.coord <- n + 2
-            } else {
-               next.coord <- n + 1
-            }
-            selected <- pos.i >= beam.coords[n] & pos.i < beam.coords[next.coord]
-            # rat.i.quartiles <- quantile(x = rep.int(x = rat.i[selected], times = wgt.i[selected]),
-            #                             probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
-            rat.i.quartiles <- quantile(x = rat.i[selected], probs = c(0.25, 0.75), na.rm = TRUE)
-            rat.i.mean      <- weighted.mean(x = rat.i[selected], w = wgt.i[selected], na.rm = TRUE)
-            results$windows[[i]][[n]] <- c(start = beam.coords[n],
-                                            end = beam.coords[next.coord], mean = rat.i.mean,
-                                            q = rat.i.quartiles[1], q = rat.i.quartiles[2],
-                                            N = length(selected[selected == TRUE]))
-         }
-         # rat.o[selected] <- as.numeric(rat.i.quartiles[2])
-         if (progressb) {
-            setTxtProgressBar(pb, n)
-         }
-      }
-      results$windows[[i]] <- as.data.frame(do.call(rbind, results$windows[[i]]))
+
+      results$windows[[i]] <- do.windows(x.i = x.i, w.i = w.i, xw.i = xw.i,
+                                         breaks = beam.coords, overlap = overlap)
       # x.adj[is.chr.i]  <- rat.o
-      cat("\n")
    }
    names(results$windows) <- chr.list
    # results$points <- x.adj
