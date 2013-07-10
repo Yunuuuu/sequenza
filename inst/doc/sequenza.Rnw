@@ -98,7 +98,7 @@ abf.data$adjusted.ratio <- abf.data$depth.ratio /
 abf.r.win <- windowValues(x = abf.data$adjusted.ratio,
              positions = abf.data$n.base,
              chromosomes = abf.data$chromosome,
-             window = 1e6, overlap = 5e5,
+             window = 1e6, overlap = 1,
              weight = abf.data$depth.normal)
 @
 
@@ -125,7 +125,7 @@ abf.het  <- abf.data[!abf.hom, ]
 abf.b.win <- windowValues(x = abf.het$Bf,
              positions = abf.het$n.base,
              chromosomes = abf.het$chromosome,
-             window = 1e6, overlap = 5e5,
+             window = 1e6, overlap = 1,
              weight = round(x = abf.het$good.s.reads, digits = 0))
 @
 
@@ -322,14 +322,14 @@ sample.het.i <- sample.i[is.het, ]
 snp.r.win <- windowValues(x = sample.i$adjusted.ratio,
                           positions = sample.i$n.base,
                           chromosomes = sample.i$chromosome,
-                          window = 1e6, overlap = 5e5)
+                          window = 1e6, overlap = 1)
 @
 \subsection{Windowing B-allele frequencies values.}
 <<label=BAFWin, eval=TRUE, results=hide>>=
 snp.b.win <- windowValues(x = sample.het.i$Bf,
                           positions = sample.het.i$n.base,
                           chromosomes = sample.het.i$chromosome,
-                          window = 1e6, overlap = 5e5)
+                          window = 1e6, overlap = 1)
 @
 \subsection{Chromosome view without mutation}
 \begin{figure}[H]
