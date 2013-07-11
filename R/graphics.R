@@ -1,5 +1,5 @@
-cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table[,3], na.rm = TRUE), 
-                                                 to = max(cp.table[,3], na.rm = TRUE), by = 0.1), n = 10),
+cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table$L, na.rm = TRUE), 
+                                                 to = max(cp.table$L, na.rm = TRUE), by = 0.1), n = 10),
                     outlier = "white", ...) {
    require(squash)
    z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.content'], cp.table[, 'cellularity']), mean)
@@ -9,8 +9,8 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table[,3], na.
              colFn = jet, map = map, outlier = outlier, las = 1, 
              xlab= "DNA content", ylab = "Cellularity", 
              zlab = "log-likelihood", ...)
-   L.max <- cp.table[which.max(cp.table[, 3]),]
-   points(x = L.max[1], y = L.max[2], pch = 18)
+   L.max <- cp.table[which.max(cp.table$L),]
+   points(x = L.max$dna.content, y = L.max$cellularity, pch = 18)
 }
 
 
