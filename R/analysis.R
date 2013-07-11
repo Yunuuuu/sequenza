@@ -65,11 +65,9 @@ gc.norm <- function (ratio, gc) {
 }
 
 gc.sample.stats <- function (filename, gz = TRUE) {
-   cat.command = paste("cat", filename)
-   if (gz) {
-      cat.command = paste("gunzip -c", filename)
-   }
-   gc.data   <- read.table(pipe(paste(cat.command, "| awk '{print $6,$10}'")), header = TRUE)
+   gc.data <- read.abfreq(file = filename, nrows = -1, fast = TRUE, gz = gz, 
+                         colClasses = c("NULL", "NULL", "NULL", "NULL", "NULL", 'numeric',
+                                        "NULL", "NULL", "NULL", 'numeric', "NULL", "NULL", "NULL"))   
    dr.by.gc <- split(gc.data$depth.ratio, gc.data$GC.percent)
    raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
    dr.by.gc.median <- sapply(dr.by.gc, median)
