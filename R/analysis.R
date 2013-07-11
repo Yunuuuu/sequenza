@@ -77,7 +77,7 @@ gc.sample.stats <- function (filename, gz = TRUE) {
    list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)))
 }
 
-windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
+windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRUE,
                           weight = rep.int( x = 1, times = length(x)), start.coord = 1) {
    chr.list         <- unique(chromosomes)
    results          <- list()
@@ -107,9 +107,13 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
       w.i       <- split(x = w.i, f = f.windows)
       x.i       <- split(x = x.i, f = f.windows)
       if (overlap > 0 ) {
-         cat(paste("chromosome:", chr.list[i], "from:", range.pos[1],"to:", range.pos[2], "window:", window, "overlaps", overlap, "\n",sep=" "))
+         if (verbose) {
+            cat(paste("chromosome:", chr.list[i], "from:", range.pos[1],"to:", range.pos[2], "window:", window, "overlapping windows:", overlap, "\n",sep=" "))
+         }
       } else {
-         cat(paste("chromosome:", chr.list[i], "from:", range.pos[1],"to:", range.pos[2], "window:", window,"\n",sep=" "))
+         if (verbose) {
+            cat(paste("chromosome:", chr.list[i], "from:", range.pos[1],"to:", range.pos[2], "window:", window,"\n",sep=" "))
+         }
       }
       do.windows <- function(x.i, w.i, xw.i, breaks, overlap){
          coords    <- data.frame(start = breaks[-length(breaks)], end = breaks[-1])
