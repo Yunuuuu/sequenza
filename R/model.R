@@ -13,14 +13,10 @@ theoric.mufreq <- function(cellularity, CNr = 2, CNt = 2, Mt = 1) {
 types.matrix <- function(CNt.min = 1, CNt.max = 7, CNr = 2) {
    cn.ratio.vect <- seq(from = CNt.min / CNr, to =  CNt.max / CNr, by = 1 / CNr)
    CNt           <- cn.ratio.vect * CNr
-   mut.comb      <- sapply(CNt, FUN = function(x) seq(from = 0, to = x, by = 1))
-   times.muts    <- do.call(c, lapply(mut.comb, length))
-   types         <- matrix(nrow = sum(times.muts), ncol = 3)
-   types[,1]     <- CNr
-   types[,2]     <- rep(CNt, times = times.muts)
-   types[,3]     <- do.call(c, mut.comb)
-   colnames(types) <- c("CNr","CNt","Mt")
-   as.data.frame(types)
+   mut.comb      <- sapply(CNt, FUN = function(x) seq(from = 0, to = x))
+   times.muts    <- sapply(mut.comb, length)
+   data.frame(CNr = CNr, CNt = rep(CNt, times = times.muts), 
+              Mt = unlist(mut.comb))
 }
 
 model.points <- function(cellularity = 0.5, dna.content = 1,
