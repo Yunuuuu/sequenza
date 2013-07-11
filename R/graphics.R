@@ -2,7 +2,7 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table[,3], na.
                                                  to = max(cp.table[,3], na.rm = TRUE), by = 0.1), n = 10),
                     outlier = "white", ...) {
    require(squash)
-   z <- tapply(CP[, 'L'], list(CP[, 'dna.content'], CP[, 'cellularity']), mean)
+   z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.content'], cp.table[, 'cellularity']), mean)
    x <- as.numeric(rownames(z))
    y <- as.numeric(colnames(z))
    colorgram(x, y, z,
