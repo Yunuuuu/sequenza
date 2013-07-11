@@ -201,9 +201,9 @@ avg.depth.ratio
 CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
                     weight.ratio = weights.seg,
                     weight.Bf = weights.seg,
-                    by.p = 0.05, by.c = 0.01, avg.depth.ratio = 1,
-                    cellularity.range = c(0.1,1), 
-                    dna.content.range = c(0.5,3), mc.cores = 4)                   
+                    avg.depth.ratio = 1,
+                    cellularity = seq(0.1,1,0.01), 
+                    dna.content = seq(0.5,3,0.05), mc.cores = 4)                   
 @
 <<label=ConfIntCP, echo=TRUE>>=
 head(CP)
@@ -363,9 +363,9 @@ CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         depth.ratio = seg.i$depth.ratio[filter.size], 
                         weight.ratio = weights.snp[filter.size],
                         weight.Bf = weights.snp[filter.size],
-                        by.p = 0.05, by.c = 0.01, avg.depth.ratio = avg.unlogR,
-                        cellularity.range = c(0.1,1), ratio.priority = FALSE,
-                        dna.content.range = c(0.5,3), mc.cores = 4,
+                        avg.depth.ratio = avg.unlogR,
+                        cellularity = seq(0.1,1,0.01), 
+                        dna.content = seq(0.5,3,0.05), mc.cores = 4,
                         priors.labels = 2, priors.values = 1)
 @
 <<label=getCPparamSNP, eval = TRUE>>=
