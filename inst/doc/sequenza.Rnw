@@ -23,7 +23,7 @@
 \headheight=0in
 \headsep=0in
 
-\author{Francesco Favero\footnote{favero@cbs.dtu.dk}}
+\author{Francesco Favero\footnote{favero@cbs.dtu.dk}, Aron C. Eklund}
 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
