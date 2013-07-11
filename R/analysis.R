@@ -85,6 +85,7 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, v
    xw       <- x * weight
    overlap  <- as.integer(overlap)
    window.o <- window - round(window * (overlap / (overlap + 1)), 0)
+   chr.order <- unique(chromosomes)
    mat.w    <- data.frame(chr = chromosomes, pos = positions, x = x, xw = x * weight,
                           w = weight, stringsAsFactors = FALSE)
    mat.w    <- split(mat.w, mat.w$chr)
@@ -126,7 +127,8 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, v
       results$windows[[i]] <- do.windows(x.i = x, w.i = w, xw.i = xw,
                                          breaks = beam.coords, overlap = overlap)
    }
-   names(results$windows) <- names(mat.w)
+   results$windows <- results$windows[as.factor(chr.order)]
+   names(results$windows) <- names(chr.order)
    results
 }
 
