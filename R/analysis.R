@@ -257,28 +257,28 @@ segment.breaks <- function(abf.tab, breaks) {
    bw      <- abf.tab$Bf * w.b
    abf.tab <- cbind(abf.tab[, c("chromosome", "n.base", "ref.zygosity")],
                     rw = rw, w.r = w.r, bw = bw, w.b = w.b)
-   chromosomes <- unique(abf.tab$chromosome)
+   chr.order <- unique(abf.tab$chromosome)
+   abf.tab <- split(abf.tab, f = abf.tab$chromosome)
    segments <- list()
-   for (i in 1:length(chromosomes)) {
-      abf.i       <- abf.tab[abf.tab$chromosome == chromosomes[i], ]
-      abf.b.i     <- abf.i[abf.i$ref.zygosity == 'het', ]
-      breaks.i    <- breaks[breaks$chrom == chromosomes[i], ]
+   for (i in 1:length(abf.tab)) {
+      abf.b.i     <- abf.tab[[i]][abf.tab[[i]]$ref.zygosity == 'het', ]
+      breaks.i    <- breaks[breaks$chrom == names(abf.tab)[i], ]
       nb          <- nrow(breaks.i)
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))
-      fact.r.i    <- cut(abf.i$n.base, breaks.vect)
+      fact.r.i    <- cut(abf.tab[[i]]$n.base, breaks.vect)
       fact.b.i    <- cut(abf.b.i$n.base, breaks.vect)
-      seg.i.s.r   <- sapply(X = split(abf.i$w.r, f = fact.r.i), FUN = length)
+      seg.i.s.r   <- sapply(X = split(abf.tab[[i]]$w.r, f = fact.r.i), FUN = length)
       seg.i.s.b   <- sapply(X = split(abf.b.i$w.b, f = fact.b.i), FUN = length)      
-      seg.i.rw    <- sapply(X = split(abf.i$rw, f = fact.r.i), FUN = function(x) sum(x, na.rm = TRUE))
-      seg.i.w.r   <- sapply(X = split(abf.i$w.r, f = fact.r.i), FUN = function(x) sum(x, na.rm = TRUE))
+      seg.i.rw    <- sapply(X = split(abf.tab[[i]]$rw, f = fact.r.i), FUN = function(x) sum(x, na.rm = TRUE))
+      seg.i.w.r   <- sapply(X = split(abf.tab[[i]]$w.r, f = fact.r.i), FUN = function(x) sum(x, na.rm = TRUE))
       seg.i.bw    <- sapply(X = split(abf.b.i$bw, f = fact.b.i), FUN = function(x) sum(x, na.rm = TRUE))
       seg.i.w.b   <- sapply(X = split(abf.b.i$w.b, f = fact.b.i), FUN = function(x) sum(x, na.rm = TRUE))
-      segments.i <- data.frame(chromosome  = chromosomes[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
+      segments.i <- data.frame(chromosome  = names(abf.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
                                end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.bw/seg.i.w.b, N.BAF = seg.i.s.b,
                                depth.ratio = seg.i.rw/seg.i.w.r, N.ratio = seg.i.s.r, stringsAsFactors = FALSE)
       segments[[i]] <- segments.i[seq(from = 1, to = nrow(segments.i), by = 2),]
    }
-   segments <- do.call(rbind, segments)
+   segments <- do.call(rbind, segments[as.factor(chr.order)])
    row.names(segments) <- 1:nrow(segments)
    segments
 }
