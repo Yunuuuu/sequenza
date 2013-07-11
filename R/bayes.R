@@ -210,44 +210,22 @@ mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 100, weight.ra
    bayes.res
 } 
 
-baf.model.fit <- function(Bf, depth.ratio, weight.Bf = 10, weight.ratio = 10,
-                          cellularity.range = c(0.3,1), dna.content.range = c(0.7,4),
-                          by.c = 0.01, by.p = 0.01, avg.depth.ratio, mc.cores = 2,
-                          CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 2,
-                          ratio.priority = FALSE, skew.baf = 0.95) {
-
-   require(parallel)
-   c.range <- seq( from = min(cellularity.range), to = max(cellularity.range), by = by.c)
-   p.range <- seq( from = min(dna.content.range), to = max(dna.content.range), by = by.p)
-   pc.comb <- function(x, dna.content, cellularity) {
-    cbind(rep(dna.content[x], length(cellularity)),
-          cellularity)
-   }
-   C.P   <- mapply( x = 1:length(p.range), FUN = pc.comb,
-                    MoreArgs=list(dna.content = p.range, cellularity = c.range),
-                    SIMPLIFY = FALSE)
-   C.P   <-  do.call(rbind, C.P)
+baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01), 
+                          dna.content = seq(0.7, 4, by = 0.01),
+                          mc.cores = 2, ...) {
    
-   fit.cp <- function(x, C.P. = C.P, Bf. = Bf, depth.ratio. = depth.ratio,
-                      weight.Bf. = weight.Bf, weight.ratio. = weight.ratio,
-                      avg.depth.ratio. = avg.depth.ratio, CNt.min. = 0, skew.baf. = skew.baf, 
-                      CNt.max. = CNt.max, CNr. = CNr, priors.labels. = priors.labels,
-                      priors.values. = priors.values, ratio.priority. = ratio.priority) {
-      dna.content <- C.P.[x, 1]
-      cellularity <- C.P.[x, 2]
-      L.model <- baf.bayes(Bf = Bf., depth.ratio = depth.ratio., 
-                           weight.Bf = weight.Bf., weight.ratio = weight.ratio.,
-                           cellularity = cellularity, dna.content = dna.content,
-                           avg.depth.ratio = avg.depth.ratio., CNt.min = CNt.min., skew.baf = skew.baf.,
-                           CNt.max = CNt.max., CNr = CNr., priors.labels = priors.labels.,
-                           priors.values = priors.values., ratio.priority = ratio.priority.)
-      L.sum <- sum(L.model[,4])
-      c(dna.content,  cellularity, L.sum)  
+   require(parallel)
+   result <- expand.grid(dna.content = dna.content, cellularity = cellularity, 
+                         KEEP.OUT.ATTRS = FALSE) 
+   
+   fit.cp <- function(ii) {
+      L.model <- baf.bayes(cellularity = result$cellularity[ii], 
+                           dna.content = result$dna.content[ii], ...)
+      sum(L.model[,4])
    }
-   bayes.res <- lapply_pb(X=1:nrow(C.P), FUN = fit.cp, mc.cores = mc.cores)
-   #bayes.res <- lapply(X=1:nrow(C.P), FUN = fit.cp)
-   bayes.res <- do.call(rbind, bayes.res)
-   colnames(bayes.res) <- c("dna.content", "cellularity", "L")
-   bayes.res
+   bayes.res <- lapply_pb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
+   result$L <- unlist(bayes.res)
+   result
 }
+
 
