@@ -91,6 +91,16 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, v
    mat.w    <- split(mat.w, mat.w$chr)
    do.windows <- function(x.i, w.i, xw.i, breaks, overlap){
       coords    <- data.frame(start = breaks[-length(breaks)], end = breaks[-1])
+      if (overlap > 0) {
+      start.w   <- 1:nrow(coords)
+      end.w     <- start.w + overlap
+      end.w[end.w > max(start.w)] <- max(start.w)
+      coords    <- data.frame(start = coords[start.w, 1], end = coords[end.w, 2])
+      idx.merge <- apply(cbind(start.w, end.w), 1, unique)
+      x.i       <- lapply(1:nrow(coords), function(x) do.call(c, x.i[idx.merge[[x]]]))
+      w.i       <- lapply(1:nrow(coords), function(x) do.call(c, w.i[idx.merge[[x]]]))
+      xw.i      <- lapply(1:nrow(coords), function(x) do.call(c, xw.i[idx.merge[[x]]]))
+      }
       quartiles <- do.call(rbind, 
                            lapply(X = x.i, FUN = function(x) quantile(x, probs = c(0.25, 0.75),
                                                                       na.rm = TRUE)))
