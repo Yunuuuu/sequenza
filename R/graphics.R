@@ -112,12 +112,27 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       max.x <- max(c(max(baf.windows$end), max(ratio.windows$end), max(mut.tab$n.base)))
       xlim <- c(min.x, max.x)      
       par(mar = c(0, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(3,1), xaxt='n')
-
+      mutation.colors <- c(
+         'A>C' = rgb(red =   0, green = 178, blue = 238, alpha = 120, max = 255),
+         'T>G' = rgb(red =   0, green = 178, blue = 238, alpha = 120, max = 255),
+         'A>G' = rgb(red = 255, green =  64, blue =  64, alpha = 120, max = 255),
+         'T>C' = rgb(red = 255, green =  64, blue =  64, alpha = 120, max = 255),
+         'A>T' = rgb(red =  34, green = 139, blue =  34, alpha = 120, max = 255),
+         'T>A' = rgb(red =  34, green = 139, blue =  34, alpha = 120, max = 255),
+         'C>A' = rgb(red = 139, green =  90, blue =   0, alpha = 120, max = 255),
+         'G>T' = rgb(red = 139, green =  90, blue =   0, alpha = 120, max = 255),
+         'C>G' = rgb(red = 127, green =   0, blue = 255, alpha = 120, max = 255),
+         'G>C' = rgb(red = 127, green =   0, blue = 255, alpha = 120, max = 255),
+         'C>T' = rgb(red = 255, green = 215, blue =   0, alpha = 120, max = 255),
+         'G>A' = rgb(red = 255, green = 215, blue =   0, alpha = 120, max = 255)
+      )  
       plot(x = mut.tab$n.base, y = mut.tab$F, 
            ylab = "Mutant allele frequency", las = 1, pch = 19,
-           col = mutation.colors(mut.tab$mutation),
+           col = mutation.colors,
            ylim = c(min(mut.tab$F, na.rm = TRUE), 1), xlim = xlim)
-      mutation.colors()
+      unique.colors <- unique(mutation.colors)
+      labels <- sapply(unique.colors, function(a) paste(names(mutation.colors)[mutation.colors == a], collapse = ", "))
+      legend("topleft", legend = labels, fill = unique.colors, border = NA, bty = "n")
       if (!is.null(segments)){
          if (vlines) {
             abline(v = segments$end.pos, lwd = 0.7, lty = 2)
