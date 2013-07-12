@@ -95,15 +95,15 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, v
       end.w[end.w > max(start.w)] <- max(start.w)
       coords    <- data.frame(start = coords[start.w, 1], end = coords[end.w, 2])
       idx.merge <- apply(cbind(start.w, end.w), 1, unique)
-      x.i       <- lapply(1:nrow(coords), function(x) do.call(c, x.i[idx.merge[[x]]]))
-      w.i       <- lapply(1:nrow(coords), function(x) do.call(c, w.i[idx.merge[[x]]]))
-      xw.i      <- lapply(1:nrow(coords), function(x) do.call(c, xw.i[idx.merge[[x]]]))
+      x.i       <- lapply(1:nrow(coords), function(a) do.call(c, x.i[idx.merge[[a]]]))
+      w.i       <- lapply(1:nrow(coords), function(a) do.call(c, w.i[idx.merge[[a]]]))
+      xw.i      <- lapply(1:nrow(coords), function(a) do.call(c, xw.i[idx.merge[[a]]]))
       }
       quartiles <- do.call(rbind, 
-                           lapply(X = x.i, FUN = function(x) quantile(x, probs = c(0.25, 0.75),
+                           lapply(X = x.i, FUN = function(a) quantile(a, probs = c(0.25, 0.75),
                                                                       na.rm = TRUE)))
-      sum.w     <- sapply(X = w.i, FUN = function(x) sum(x, na.rm = TRUE))
-      sum.xw    <- sapply(X = xw.i, FUN = function(x) sum(x, na.rm = TRUE))
+      sum.w     <- sapply(X = w.i, FUN = function(a) sum(a, na.rm = TRUE))
+      sum.xw    <- sapply(X = xw.i, FUN = function(a) sum(a, na.rm = TRUE))
       size      <- sapply(X = x.i, FUN = length)
       data.frame(coords, mean = sum.xw/sum.w, q0 = quartiles[,1],
                  q1 = quartiles[,2], N = size, row.names = 1:length(size))            
@@ -279,10 +279,10 @@ segment.breaks <- function(abf.tab, breaks) {
       fact.b.i    <- cut(abf.b.i$n.base, breaks.vect)
       seg.i.s.r   <- sapply(X = split(abf.tab[[i]]$w.r, f = fact.r.i), FUN = length)
       seg.i.s.b   <- sapply(X = split(abf.b.i$w.b, f = fact.b.i), FUN = length)      
-      seg.i.rw    <- sapply(X = split(abf.tab[[i]]$rw, f = fact.r.i), FUN = function(x) sum(x, na.rm = TRUE))
-      seg.i.w.r   <- sapply(X = split(abf.tab[[i]]$w.r, f = fact.r.i), FUN = function(x) sum(x, na.rm = TRUE))
-      seg.i.bw    <- sapply(X = split(abf.b.i$bw, f = fact.b.i), FUN = function(x) sum(x, na.rm = TRUE))
-      seg.i.w.b   <- sapply(X = split(abf.b.i$w.b, f = fact.b.i), FUN = function(x) sum(x, na.rm = TRUE))
+      seg.i.rw    <- sapply(X = split(abf.tab[[i]]$rw, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
+      seg.i.w.r   <- sapply(X = split(abf.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
+      seg.i.bw    <- sapply(X = split(abf.b.i$bw, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
+      seg.i.w.b   <- sapply(X = split(abf.b.i$w.b, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
       segments.i <- data.frame(chromosome  = names(abf.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
                                end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.bw/seg.i.w.b, N.BAF = seg.i.s.b,
                                depth.ratio = seg.i.rw/seg.i.w.r, N.ratio = seg.i.s.r, stringsAsFactors = FALSE)
