@@ -88,7 +88,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                data.model     <- list()
                CNt.max        <- max(segments$CNt, na.rm = TRUE) + 1
                CNt.min        <- 0
-               data.model$baf <- theoric.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
+               data.model$baf <- theoretical.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
                if (CNr == 2) {
                   data.model$baf <- rbind(c(0,0,0.5,0), data.model$baf)
                } else {

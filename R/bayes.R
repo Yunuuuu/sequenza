@@ -102,7 +102,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio
                                       types = cbind(CNr = CNr, CNt = CNt.min:CNt.max, Mt = 0),
                                       avg.depth.ratio = avg.depth.ratio)
    model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])
-   model.baf          <- theoric.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
+   model.baf          <- theoretical.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
    if(CNt.min == 0) {
       model.baf          <- as.data.frame(rbind(c(0, 0, 1/CNr, 0), model.baf))
    }

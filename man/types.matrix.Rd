@@ -26,7 +26,7 @@
 }
 
 \seealso{
-  \code{theoric.mufreq}, \code{theoric.depth.ratio}, \code{theoric.baf}, \code{model.points}.
+  \code{theoretical.mufreq}, \code{theoretical.depth.ratio}, \code{theoretical.baf}, \code{model.points}.
 }
 
 \examples{

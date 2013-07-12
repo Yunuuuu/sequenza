@@ -26,7 +26,7 @@ model.points(cellularity = 0.5, dna.content = 1, types = cbind(CNr = 2, CNt = 2,
 }
 
 \seealso{
-  \code{types.matrix}, \code{theoric.depth.ratio}, \code{theoric.mufreq}.
+  \code{types.matrix}, \code{theoretical.depth.ratio}, \code{theoretical.mufreq}.
 }
 
 \examples{

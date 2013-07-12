@@ -46,7 +46,7 @@
 }
 
 \seealso{
-  \code{theoric.baf}, \code{theoric.mufreq}, \code{theoric.depth.ratio}
+  \code{theoretical.baf}, \code{theoretical.mufreq}, \code{theoretical.depth.ratio}
 }
 
 \examples{

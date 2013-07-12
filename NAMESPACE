@@ -23,11 +23,11 @@ export(
 	plotWindows,
 	chromosome.view,
 	mclapplyPb,
-	theoric.depth.ratio,
-	theoric.mufreq,
+	theoretical.depth.ratio,
+	theoretical.mufreq,
 	types.matrix,
 	model.points,
-	theoric.baf
+	theoretical.baf
 )
 
 
