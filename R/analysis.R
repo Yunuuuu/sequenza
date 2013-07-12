@@ -1,8 +1,9 @@
 read.abfreq <- function (file, nrows = -1, fast = TRUE, gz = TRUE, 
     colClasses = c('factor', 'integer', 'factor', 'integer', 
       'integer', 'numeric', 'numeric', 'numeric', 'factor', 
-      'numeric', 'numeric', "factor", "factor"), chr.name = NULL, ...) {
-  if(fast && nrows == -1) {
+      'numeric', 'numeric', "factor", "factor"), chr.name = NULL, n.lines = NULL, ...) {
+   if (!is.null(n.lines) & is.null(chr.name)) fast <-  FALSE
+   if(fast && nrows == -1) {
     if(gz) {
        if (!is.null(chr.name)) {
           wc <- system(paste(paste('zgrep -c "^', chr.name, '\t"', sep = ''), file, sep = ' '), intern = TRUE)
@@ -25,16 +26,38 @@ read.abfreq <- function (file, nrows = -1, fast = TRUE, gz = TRUE,
   }
    if (!is.null(chr.name)) {
       if (gz) {
-            grep.part <- paste("zgrep '^", chr.name, "\t'", sep = "")
-         } else {
-            grep.part <- paste("grep '^", chr.name, "\t'", sep = "")
-         }
-      abf.data   <- read.delim(pipe(paste(grep.part, file, sep = " ")), nrows = nrows, colClasses = colClasses, ...)
-      head       <- colnames(read.table(file, header = TRUE, nrow = 1 ))
-      colnames(abf.data) <- head
+         grep.part <- paste("zgrep '^", chr.name, "\t'", sep = "")
+      } else {
+         grep.part <- paste("grep '^", chr.name, "\t'", sep = "")
+      }
+      abf.data   <- read.delim(pipe(paste(grep.part, file, sep = " ")), nrows = nrows, colClasses = colClasses, header = FALSE, ...)
+      if (header == TRUE) {
+         head       <- colnames(read.table(file, header = TRUE, nrow = 1 ))
+         colnames(abf.data) <- head
+      }
       abf.data
-   } else { 
-      read.delim(file, nrows = nrows, colClasses = colClasses, ...)
+   } else {
+      if (!is.null(n.lines)){
+         if (!is.numeric(n.lines) | length(n.lines) != 2) stop("n.lines must be a vector of 2 integers")
+         n.lines <- round(sort(n.lines), 0)
+         if (header == TRUE) {
+            n.lines <- n.lines + 1
+         }
+         if(gz) {
+            abf.data <- read.delim(pipe(paste("gunzip -c", file,"| sed -n '", paste(n.lines[1], n.lines[2], sep = ","),"p'")),
+                       colClasses = colClasses, nrows = 1 + n.lines[2] - n.lines[1], header = FALSE,...)
+         }  else{
+            abf.data <- read.delim(pipe(paste("sed -n '", paste(n.lines[1], n.lines[2], sep = ","),"p'", file)),
+                       colClasses = colClasses, nrows = 1 + n.lines[2] - n.lines[1], header = FALSE, ...)
+         }
+         if (header == TRUE) {
+            head  <- colnames(read.table(file, header = TRUE, nrow = 1 ))
+            colnames(abf.data) <- head
+         }
+         abf.data
+      } else {
+         read.delim(file, nrows = nrows, colClasses = colClasses, header = header, ...)
+      }
    }
 }
 
