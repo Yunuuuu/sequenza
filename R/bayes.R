@@ -168,47 +168,23 @@ shannon.types <- function(types.mat) {
    -sum(tab.types)
 }
 
-mufreq.model.fit <- function(mufreq, depth.ratio, weight.mufreq = 100, weight.ratio = 100, avg.depth.ratio,
-                             cellularity.range = c(0.3,0.8), dna.content.range = c(0.5,4),
-                             by.c = 0.01, by.p = 0.01, mc.cores = 2, CNt.max = 7, CNr = 2,
-                             priors.labels = 2, priors.values = 3) {
+mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01), 
+                          dna.content = seq(0.7, 4, by = 0.01),
+                          mc.cores = 2, ...) {
+   
    require(parallel)
-
-   no.mut  <- 1
-   c.range <- seq( from = min(cellularity.range), to = max(cellularity.range), by = by.c)
-   p.range <- seq( from = min(dna.content.range), to = max(dna.content.range), by = by.p)
-   pc.comb <- function(x, dna.content, cellularity) {
-    cbind(rep(dna.content[x], length(cellularity)),
-          cellularity)
+   result <- expand.grid(dna.content = dna.content, cellularity = cellularity, 
+                         KEEP.OUT.ATTRS = FALSE) 
+   
+   fit.cp <- function(ii) {
+      L.model <- mufreq.bayes(cellularity = result$cellularity[ii], 
+                           dna.content = result$dna.content[ii], ...)
+      sum(L.model[,4])
    }
-   C.P     <- mapply( x = 1:length(p.range), FUN = pc.comb,
-                    MoreArgs=list(dna.content = p.range, cellularity = c.range),
-                    SIMPLIFY = FALSE)
-   C.P     <- do.call(rbind, C.P)
-   types   <- types.matrix(CNt.min = 1, CNt.max = CNt.max, CNr = CNr)
-   types   <- types[types[,3] >= no.mut, ]
-
-   fit.cp <- function(x, C.P. = C.P, mufreq. = mufreq, depth.ratio. = depth.ratio,
-                      weight.mufreq. = weight.mufreq, weight.ratio. = weight.ratio, 
-                      avg.depth.ratio. = avg.depth.ratio, CNt.min. = 1, CNt.max. = CNt.max, CNr. = CNr,
-                      priors.labels. = priors.labels, priors.values. = priors.values) {
-      dna.content. <- C.P.[x, 1]
-      cellularity. <- C.P.[x, 2]
-      L.model <- mufreq.bayes(mufreq = mufreq., depth.ratio = depth.ratio., weight.mufreq = weight.mufreq., 
-                              weight.ratio = weight.ratio., cellularity = cellularity., dna.content = dna.content.,
-                              avg.depth.ratio = avg.depth.ratio., CNt.min = CNt.min., CNt.max = CNt.max., CNr = CNr.,
-                              priors.labels = priors.labels., priors.values = priors.values.)
-      L.sum <- sum(L.model[,4])
-      c(dna.content.,  cellularity., L.sum)  
-   }
-
-   bayes.res <- lapply_pb(X=1:nrow(C.P), FUN = fit.cp, mc.cores = mc.cores)
-   #bayes.res <- lapply(X=1:nrow(C.P), FUN = fit.cp)
-
-   bayes.res <- do.call(rbind, bayes.res)
-   colnames(bayes.res) <- c("dna.content", "cellularity", "L")
-   bayes.res
-} 
+   bayes.res <- lapply_pb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
+   result$L <- unlist(bayes.res)
+   result
+}
 
 baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01), 
                           dna.content = seq(0.7, 4, by = 0.01),
