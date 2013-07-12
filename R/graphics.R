@@ -135,7 +135,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       legend("topleft", legend = labels, fill = unique.colors, border = NA, bty = "n")
       if (!is.null(segments)){
          if (vlines) {
-            abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+            abline(v = segments$end.pos, lwd = 0.9, lty = 2)
          }   
          if (!is.null(data.model)) {
             for (i in 1:nrow(segments)) {
@@ -152,7 +152,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                n.min = min.N.baf)
    if (!is.null(segments)){
       if (vlines) {
-         abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+         abline(v = segments$end.pos, lwd = 0.9, lty = 2)
       }
       segments(x0 = segments$start.pos, y0 = segments$Bf, x1=segments$end.pos, y1 = segments$Bf, col = "red", lwd = 3)
       if (!is.null(data.model)) {
@@ -166,7 +166,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                las = 1, n.min = min.N.ratio, ylim = c(0, 2))
    if (!is.null(segments)){
       if (vlines) {
-         abline(v = segments$end.pos, lwd = 0.7, lty = 2)
+         abline(v = segments$end.pos, lwd = 0.9, lty = 2)
       }   
       segments(x0 = segments$start.pos, y0 = segments$depth.ratio, x1=segments$end.pos, y1 = segments$depth.ratio, col = "red", lwd = 3)
       if (!is.null(data.model)) {
