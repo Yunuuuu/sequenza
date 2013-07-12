@@ -1,5 +1,5 @@
-\name{lapply_pb}
-\alias{lapply_pb}
+\name{mclapplyPb}
+\alias{mclapplyPb}
 
 \title{A wrapper to use progress bar on multi core lapply function.}
 
@@ -8,7 +8,7 @@
 }
 
 \usage{
-  lapply_pb(X, FUN, mc.cores = 2, ...)
+  mclapplyPb(X, FUN, mc.cores = 2, ...)
 }
 
 \arguments{

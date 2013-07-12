@@ -181,7 +181,7 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
                            dna.content = result$dna.content[ii], ...)
       sum(L.model[,4])
    }
-   bayes.res <- lapply_pb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
+   bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
    result$L <- unlist(bayes.res)
    result
 }
@@ -199,7 +199,7 @@ baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
                            dna.content = result$dna.content[ii], ...)
       sum(L.model[,4])
    }
-   bayes.res <- lapply_pb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
+   bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
    result$L <- unlist(bayes.res)
    result
 }

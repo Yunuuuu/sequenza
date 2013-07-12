@@ -22,7 +22,7 @@ export(
 	cp.plot,
 	plotWindows,
 	chromosome.view,
-	lapply_pb,
+	mclapplyPb,
 	theoric.depth.ratio,
 	theoric.mufreq,
 	types.matrix,
