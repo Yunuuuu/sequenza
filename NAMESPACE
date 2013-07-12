@@ -21,7 +21,6 @@ export(
 	baf.model.fit,
 	cp.plot,
 	plotWindows,
-	mutation.colors,
 	chromosome.view,
 	lapply_pb,
 	theoric.depth.ratio,

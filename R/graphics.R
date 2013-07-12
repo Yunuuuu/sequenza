@@ -75,40 +75,6 @@ plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
 
 }
 
-mutation.colors <- function(mut.type = NULL, l.pos = "topright") {
-   col1 <- rgb(red = 0, green = 178, blue = 238, alpha = 120, max = 255)
-   col2 <- rgb(red = 255, green = 64, blue = 64, alpha = 120, max = 255)
-   col3 <- rgb(red = 34, green = 139, blue = 34, alpha = 120, max = 255)
-   col4 <- rgb(red = 139, green = 90, blue = 0, alpha = 120, max = 255)
-   col5 <- rgb(red = 127, green = 0, blue = 255, alpha = 120, max = 255)
-   col6 <- rgb(red = 255, green = 215, blue = 0, alpha = 120, max = 255)
-   g1   <- c('A>C', 'T>G')
-   g2   <- c('A>G', 'T>C')
-   g3   <- c('A>T', 'T>A')
-   g4   <- c('C>A', 'G>T')
-   g5   <- c('C>G', 'G>C')
-   g6   <- c('C>T', 'G>A')
-   colors.vect <- c(rep(x = col1, times = 2),
-                    rep(x = col2, times = 2),
-                    rep(x = col3, times = 2),
-                    rep(x = col4, times = 2),
-                    rep(x = col5, times = 2),
-                    rep(x = col6, times = 2))
-   all.types   <- c(g1, g2, g3, g4, g5, g6)
-   if (is.null(mut.type)) {
-      g1 <- paste(g1, collapse = ", ")
-      g2 <- paste(g2, collapse = ", ")
-      g3 <- paste(g3, collapse = ", ")
-      g4 <- paste(g4, collapse = ", ")
-      g5 <- paste(g5, collapse = ", ")
-      g6 <- paste(g6, collapse = ", ")
-      legend(x = l.pos, legend = c(g1, g2, g3, g4, g5, g6), col = c(col1, col2, col3, col4, col5, col6), pch = 15, bty = "n")
-   } else {
-      mut.to.col   <- setNames(colors.vect, all.types)
-      as.character(mut.to.col[mut.type])
-   }
-}
-
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
                             min.N.baf = 1, min.N.ratio = 1e4, main = "", vlines = FALSE, CNr = 2,
                             cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL) {
