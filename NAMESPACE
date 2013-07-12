@@ -8,7 +8,7 @@ export(
 	mut.fractions,
 	mutation.table,
 	find.breaks,
-    segment.breaks,
+   segment.breaks,
 	mufreq.dbinom,
 	mufreq.dpois,
 	baf.dbinom,
