@@ -61,21 +61,9 @@ read.abfreq <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRU
    }
 }
 
-read.acgt <- function (file, nrows = -1, fast = TRUE, gz = TRUE, 
-    colClasses = c('factor', 'integer', 'factor', 'integer', 
-      'integer', 'integer', 'integer', 'integer'), ...) {
-  if(fast && nrows == -1) {
-    if(gz) {
-      wc <- system(paste('gunzip -c', file, '| wc'), intern = TRUE)
-    } else {
-      wc <- system(paste('wc', file), intern = TRUE)
-    }
-    wc <- sub("^ +", "", wc)
-    wc <- strsplit(wc, ' ')[[1]][1]
-    nrows <- max(as.integer(wc), 1)
-    message('Reading ', nrows, ' lines...')
-  } 
-  read.delim(file, nrows = nrows, colClasses = colClasses, ...)
+read.acgt <- function (file, colClasses = c('factor', 'integer', 'factor', 'integer', 
+                                            'integer', 'integer', 'integer', 'integer'), ...) {
+   read.abfreq(file = file , colClasses = colClasses, ...)
 }
 
 gc.norm <- function (ratio, gc) {
