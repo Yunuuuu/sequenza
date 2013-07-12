@@ -1,4 +1,4 @@
-read.abfreq <- function (file, nrows = -1, fast = TRUE, gz = TRUE, 
+read.abfreq <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
     colClasses = c('factor', 'integer', 'factor', 'integer', 
       'integer', 'numeric', 'numeric', 'numeric', 'factor', 
       'numeric', 'numeric', "factor", "factor"), chr.name = NULL, n.lines = NULL, ...) {
