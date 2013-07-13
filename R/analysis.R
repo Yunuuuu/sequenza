@@ -90,8 +90,7 @@ gc.sample.stats <- function (file, colClasses = c("factor", "NULL", "NULL", "NUL
 
 windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRUE,
                           weight = rep.int( x = 1, times = length(x)), start.coord = 1) {
-   results          <- list()
-   results$windows  <- list()
+   results  <- list()
    weight   <- sqrt(weight)
    xw       <- x * weight
    overlap  <- as.integer(overlap)
@@ -122,7 +121,6 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, v
                  q1 = quartiles[,2], N = size, row.names = 1:length(size))            
    }
    for (i in 1:length(mat.w)) {
-      results$windows[[i]] <- list()
       range.pos            <- range(mat.w[[i]]$pos, na.rm = TRUE)
       if (!is.null(start.coord)) {
          range.pos[1] <- as.integer(start.coord)
@@ -145,11 +143,11 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, v
          }
       }
       
-      results$windows[[i]] <- do.windows(x.i = x, w.i = w, xw.i = xw,
-                                         breaks = beam.coords, overlap = overlap)
+      results[[i]] <- do.windows(x.i = x, w.i = w, xw.i = xw,
+                                 breaks = beam.coords, overlap = overlap)
    }
-   results$windows <- results$windows[as.factor(chr.order)]
-   names(results$windows) <- names(chr.order)
+   results <- results[as.factor(chr.order)]
+   names(results) <- names(chr.order)
    results
 }
 

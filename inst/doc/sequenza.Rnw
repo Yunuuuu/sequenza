@@ -106,9 +106,9 @@ abf.r.win <- windowValues(x = abf.data$adjusted.ratio,
       \centering
 <<label=plotDepthProfile,fig=TRUE,width=6,height=4>>=
 
-plotWindows(abf.r.win$windows[[1]], log2.plot = FALSE, 
+plotWindows(abf.r.win[[1]], log2.plot = FALSE, 
             ylab = "Depth ratio", xlab = "Base pairs", 
-            main = names(abf.r.win$windows)[1], las = 1, n.min = 1, 
+            main = names(abf.r.win)[1], las = 1, n.min = 1, 
             ylim = c(0, 2))
 @
       \caption{Depth ratio profile visualization over a single chromosome. }
@@ -132,8 +132,8 @@ abf.b.win <- windowValues(x = abf.het$Bf,
 \begin{figure}[H]
       \centering
 <<label=plotBAFProfile,fig=TRUE,width=6,height=4>>=
-plotWindows(abf.b.win$windows[[1]], ylim = c(0, 0.5), 
-           main = names(abf.r.win$windows)[1], xlab = "Base pairs",
+plotWindows(abf.b.win[[1]], ylim = c(0, 0.5), 
+           main = names(abf.r.win)[1], xlab = "Base pairs",
            ylab = "B allele frequency", n.min = 10)
 @
       \caption{B-allele frequency profile visualization over a single chromosome.}
@@ -176,8 +176,8 @@ head(mut.tab.no.seg)
       \centering
 <<label=3panelsPlot,fig=TRUE,width=6,height=6>>=
 
-chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win$windows[[1]], 
-                ratio.windows = abf.r.win$windows[[1]], min.N.ratio = 1,
+chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]], 
+                ratio.windows = abf.r.win[[1]], min.N.ratio = 1,
                 segments = seg.s1, main = "TCGA-42-2591 chr 1")
 @ 
       \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position.}
@@ -274,8 +274,8 @@ head(seg.s1.cn)
       \centering
 <<label=chrViewWithCP,fig=TRUE,width=6,height=6>>=
 
-chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win$windows[[1]], 
-                ratio.windows = abf.r.win$windows[[1]],  min.N.ratio = 1,
+chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]], 
+                ratio.windows = abf.r.win[[1]],  min.N.ratio = 1,
                 segments = seg.s1.cn, main = "TCGA-42-2591 chr 1",
                 cellularity = cellularity, dna.content = dna.content,
                 avg.depth.ratio = 1)
@@ -336,8 +336,8 @@ snp.b.win <- windowValues(x = sample.het.i$Bf,
       \centering
 <<label=chrViewNoMut, fig=TRUE, width=6, height=6>>=
 
-chromosome.view(baf.windows = snp.b.win$windows[[1]], 
-                ratio.windows = snp.r.win$windows[[1]],
+chromosome.view(baf.windows = snp.b.win[[1]], 
+                ratio.windows = snp.r.win[[1]],
                  min.N.ratio = 1)
 @ 
       \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. }
@@ -439,8 +439,8 @@ head(segmented.snp[segmented.snp$chromosome == 1, ])
       \centering
 <<label=chrViewNoMutCP1, fig=TRUE, width=6, height=6>>=
 
-chromosome.view(baf.windows = snp.b.win$windows[[1]], 
-                ratio.windows = snp.r.win$windows[[1]],  min.N.ratio = 1,
+chromosome.view(baf.windows = snp.b.win[[1]], 
+                ratio.windows = snp.r.win[[1]],  min.N.ratio = 1,
                 segments = segmented.snp[segmented.snp$chromosome == "1", ],
                 cellularity = cellularity, dna.content = dna.content,
                 avg.depth.ratio = avg.unlogR, main = "1")
@@ -452,8 +452,8 @@ chromosome.view(baf.windows = snp.b.win$windows[[1]],
 \begin{figure}[H]
       \centering
 <<label=chrViewNoMutCP16, fig=TRUE, width=6, height=6>>=
-chromosome.view(baf.windows = snp.b.win$windows[[16]], 
-                ratio.windows = snp.r.win$windows[[16]],  min.N.ratio = 1,
+chromosome.view(baf.windows = snp.b.win[[16]], 
+                ratio.windows = snp.r.win[[16]],  min.N.ratio = 1,
                 segments = segmented.snp[segmented.snp$chromosome == "16", ],
                 cellularity = cellularity, dna.content = dna.content,
                 avg.depth.ratio = avg.unlogR, main = "16")

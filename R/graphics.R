@@ -191,7 +191,7 @@ genome.view <- function(baf.windows, ratio.windows, segments = NULL, main = "",
                             cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL) {
    chr.metrics <- list()
    for (i in 1:length(ratio.windows)) {
-      chr.metrics[[i]] <- range(ratio.windows$windows[[i]]$mean, na.rm = TRUE)
+      chr.metrics[[i]] <- range(ratio.windows[[i]]$mean, na.rm = TRUE)
    }
    chr.metrics <- do.call(rbind, chr.metrics)
    x0 <- chr.metrics[1,1]
