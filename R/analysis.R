@@ -71,19 +71,21 @@ gc.norm <- function (ratio, gc) {
    raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
    dr.by.gc.median <- sapply(dr.by.gc, median)
    adj <- sweep(raw, 1, dr.by.gc.median, '/')
-   adjratio = ratio / unsplit(dr.by.gc.median, gc)
-   list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)), ratio = adjratio)
+   list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)))
 }
 
-gc.sample.stats <- function (filename, gz = TRUE) {
-   gc.data <- read.abfreq(file = filename, nrows = -1, fast = TRUE, gz = gz, 
-                         colClasses = c("NULL", "NULL", "NULL", "NULL", "NULL", 'numeric',
-                                        "NULL", "NULL", "NULL", 'numeric', "NULL", "NULL", "NULL"))   
-   dr.by.gc <- split(gc.data$depth.ratio, gc.data$GC.percent)
-   raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
-   dr.by.gc.median <- sapply(dr.by.gc, median)
-   adj <- sweep(raw, 1, dr.by.gc.median, '/')
-   list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)))
+gc.sample.stats <- function (file, colClasses = c("factor", "NULL", "NULL", "NULL", "NULL", 'numeric',
+                                                  "NULL", "NULL", "NULL", 'numeric', "NULL", "NULL", "NULL"), ...) {
+   abf.data <- read.abfreq(file = file, colClasses = colClasses, ...)
+   gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
+                       gc = abf.data$GC.percent)
+   chr.ord  <- unique(abf.data$chromosome)
+   chr.dim  <- lapply(X = split(abf.data$chromosome, abf.data$chromosome), FUN = length)
+   chr.dim  <- data.frame(chr = chr.ord, n.lines = do.call(rbind,chr.dim[chr.ord]))
+   chr.dim$start <- cumsum(c(1, chr.dim$n.lines[-length(chr.dim$n.lines)]))
+   chr.dim$end   <- chr.dim$start + chr.dim$n.lines - 1
+   gc.stats$file.metrics <- chr.dim
+   gc.stats
 }
 
 windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRUE,
