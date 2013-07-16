@@ -29,9 +29,9 @@ model.points <- function(cellularity = 0.5, dna.content = 1,
    cbind(mufreqs,depth.ratio)
 }
 
-# theoretical.baf <- function(cellularity = 0.5, CNt = 2, B = 1){
+# theoretical.baf <- function(cellularity = 0.5, CNt = 2, B = 1, CNr = 2){
 #    B.tot <- ((B * cellularity)  + (1 - cellularity)) / 
-#             ((CNt * cellularity) + 2*(1 - cellularity))
+#             ((CNt * cellularity) + CNr*(1 - cellularity))
 #    B.tot
 # }
 
