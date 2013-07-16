@@ -74,9 +74,13 @@ gc.norm <- function (ratio, gc) {
    list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)))
 }
 
-gc.sample.stats <- function (file, colClasses = c("factor", "NULL", "NULL", "NULL", "NULL", 'numeric',
-                                                  "NULL", "NULL", "NULL", 'numeric', "NULL", "NULL", "NULL"), ...) {
-   abf.data <- read.abfreq(file = file, colClasses = colClasses, ...)
+gc.sample.stats <- function (file, gz = TRUE) {
+   colClasses = c('factor', 'numeric', 'numeric')
+   if (gz) {
+      abf.data <- read.delim(pipe(paste('gunzip -c', file, '| cut -f 1-6-10'), colClasses = colClasses)
+   } else {
+      abf.data <- read.delim(pipe(paste('cut -f 1-6-10', file), colClasses = colClasses)
+   }
    gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
                        gc = abf.data$GC.percent)
    chr.ord  <- unique(abf.data$chromosome)
