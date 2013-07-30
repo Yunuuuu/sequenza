@@ -128,7 +128,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       )  
       plot(x = mut.tab$n.base, y = mut.tab$F, 
            ylab = "Mutant allele frequency", las = 1, pch = 19,
-           col = mutation.colors,
+           col = mutation.colors[mut.tab$mutation],
            ylim = c(min(mut.tab$F, na.rm = TRUE), 1), xlim = xlim)
       unique.colors <- unique(mutation.colors)
       labels <- sapply(unique.colors, function(a) paste(names(mutation.colors)[mutation.colors == a], collapse = ", "))
