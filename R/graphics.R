@@ -111,7 +111,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       min.x <- min(c(min(baf.windows$start), min(ratio.windows$start), min(mut.tab$n.base)))
       max.x <- max(c(max(baf.windows$end), max(ratio.windows$end), max(mut.tab$n.base)))
       xlim <- c(min.x, max.x)      
-      par(mar = c(0, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(3,1), xaxt='n')
+      par(mar = c(0, 4, 0, 10), oma = c(5, 0, 4, 0), mfcol = c(3,1), xaxt='n', xpd = TRUE)
       mutation.colors <- c(
          'A>C' = rgb(red =   0, green = 178, blue = 238, alpha = 120, maxColorValue = 255),
          'T>G' = rgb(red =   0, green = 178, blue = 238, alpha = 120, maxColorValue = 255),
@@ -132,7 +132,10 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
            ylim = c(min(mut.tab$F, na.rm = TRUE), 1), xlim = xlim)
       unique.colors <- unique(mutation.colors)
       labels <- sapply(unique.colors, function(a) paste(names(mutation.colors)[mutation.colors == a], collapse = ", "))
-      legend("topleft", legend = labels, fill = unique.colors, border = NA, bty = "n")
+      #legend("topleft", legend = labels, fill = unique.colors, border = NA, bty = "n")
+      legend(y = "center", x  = "right", legend = labels,
+             inset = c(-25 * strwidth("a", units = 'figure'), 0),
+             fill = unique.colors, border = NA, bty = "n")
       if (!is.null(segments)){
          if (vlines) {
             abline(v = segments$end.pos, lwd = 0.9, lty = 2)
@@ -146,7 +149,6 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       }
 
    }
-
    plotWindows(baf.windows, ylab = "B allele frequency", 
                xlim = xlim, ylim = c(0, 0.5), las = 1,
                n.min = min.N.baf)
