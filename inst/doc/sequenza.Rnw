@@ -250,12 +250,13 @@ dna.content <- dna.c.cint$max.l
 @
 \subsection{Detect mutated alleles.}
 <<label=mmufBayes, eval=TRUE>>=
-mut.alleles <- mufreq.bayes(mufreq = mut.tab$F, depth.ratio = mut.tab$adjusted.ratio,
+mut.tab.clean <- na.exclude(mut.tab)
+mut.alleles <- mufreq.bayes(mufreq = mut.tab.clean$F, depth.ratio = mut.tab.clean$adjusted.ratio,
                             cellularity = cellularity, dna.content = dna.content,
                             avg.depth.ratio = 1)
 
 head(mut.alleles)
-head(cbind(mut.tab[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
+head(cbind(mut.tab.clean[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
 @
 
 \subsection{Detect Copy number variation.}
