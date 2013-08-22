@@ -163,7 +163,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       }
    }
    plotWindows(ratio.windows, ylab = "Depth ratio", 
-               las = 1, n.min = min.N.ratio, ylim = c(0, 2))
+               las = 1, n.min = min.N.ratio, ylim = c(0, 2.5))
    if (!is.null(segments)){
       if (vlines) {
          abline(v = segments$end.pos, lwd = 0.9, lty = 2)
