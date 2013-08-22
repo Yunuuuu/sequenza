@@ -69,9 +69,11 @@ read.acgt <- function (file, colClasses = c('factor', 'integer', 'factor', 'inte
 gc.norm <- function (ratio, gc) {
    dr.by.gc <- split(ratio, gc)
    raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
-   dr.by.gc.median <- sapply(dr.by.gc, median)
+   dr.by.gc.median <- sapply(dr.by.gc, median, na.rm = TRUE)
+   dr.by.gc.mean <- sapply(dr.by.gc, mean, na.rm = TRUE)
    adj <- sweep(raw, 1, dr.by.gc.median, '/')
-   list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)))
+   list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)),
+        raw.mean = dr.by.gc.mean, raw.median = dr.by.gc.median)
 }
 
 gc.sample.stats <- function (file, gz = TRUE) {
