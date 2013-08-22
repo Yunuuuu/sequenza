@@ -32,7 +32,7 @@ read.abfreq <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRU
       }
       abf.data   <- read.delim(pipe(paste(grep.part, file, sep = " ")), nrows = nrows, colClasses = colClasses, header = FALSE, ...)
       if (header == TRUE) {
-         head       <- colnames(read.table(file, header = TRUE, nrow = 1 ))
+         head       <- colnames(read.table(file, header = TRUE, nrows = 1 ))
          colnames(abf.data) <- head
       }
       abf.data
@@ -51,7 +51,7 @@ read.abfreq <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRU
                        colClasses = colClasses, nrows = 1 + n.lines[2] - n.lines[1], header = FALSE, ...)
          }
          if (header == TRUE) {
-            head  <- colnames(read.table(file, header = TRUE, nrow = 1 ))
+            head  <- colnames(read.table(file, header = TRUE, nrows = 1 ))
             colnames(abf.data) <- head
          }
          abf.data
