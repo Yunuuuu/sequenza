@@ -9,12 +9,12 @@
 }
 
 \usage{
-gc.sample.stats(filename, gz = TRUE)
+gc.sample.stats(file, gz = TRUE)
 gc.norm(ratio, gc)
 }
 
 \arguments{
-  \item{filename}{A file in the abfreq format.}
+  \item{file}{A file in the abfreq format.}
   \item{ratio}{A vector containing depth ratios}
   \item{gc}{A vector corresponding to \code{ratio} with the relative GC-content information}
   \item{gz}{Boolean, indicating if the file is compressed as gzip file or not. Default TRUE.}

@@ -9,7 +9,7 @@
 \usage{
 plotWindows(abf.window, m.lty = 1, m.lwd = 3,
              m.col = "black", q.bg = "lightblue", log2.plot = FALSE,
-             n.min = 1, xlim = NULL, ylim = NULL, add = FALSE, ...)
+             n.min = 1, xlim, ylim, add = FALSE, ...)
 }
 
 \arguments{

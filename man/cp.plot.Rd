@@ -7,9 +7,10 @@
 }
 
 \usage{
-   cp.plot(cp.table, map = makecmap(seq(from = median(cp.table[,3], na.rm = TRUE), 
-                                        to = max(cp.table[,3], na.rm = TRUE), by = 0.1), n = 10),
-                    outlier = "white", ...)
+   cp.plot(cp.table, map = makecmap(seq(from = median(cp.table$L, na.rm = TRUE),
+                                        to = max(cp.table$L,na.rm = TRUE),
+                                        by = 0.1), n = 10),
+           outlier = "white", ...)                 
 }
 
 \arguments{
@@ -30,10 +31,9 @@ seg.s1<- data.frame(start.pos = c(1,4e6,10e6,40e6,70e6), end.pos = c(4e6,10e6,40
                     Bf=c(0.5,0.1250,0.5,0.1250,0.5), depth.ratio = c(1,0.625,1,0.625,1), N.BAF = 300)
 
 # Scan over different values of cellularity and DNA-content
-CP <- baf.model.fit(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio, 
-                    weight.ratio = 300, weight.Bf = 300,
-                    by.p = 0.05, by.c = 0.01, avg.depth.ratio = 1,
-                    cellularity.range = c(0.1,1), dna.content.range = c(0.5,3), mc.cores = 2)
+CP <- baf.model.fit(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
+                    weight.ratio = 300, weight.Bf = 300, avg.depth.ratio = 1,
+                    cellularity = seq(0.1,1,0.01), dna.content = seq(0.5,3,0.05), mc.cores = 2)
 # Plot the results                    
 cp.plot(cp.table = CP)
 }

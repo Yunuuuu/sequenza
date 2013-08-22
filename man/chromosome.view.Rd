@@ -9,7 +9,7 @@
 
 \usage{
 chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL, 
-                min.N.baf = 1, min.N.ratio = 1e4, main = "", CNr = 2, vlines = FALSE,
+                min.N.baf = 1, min.N.ratio = 1e4, main = "", vlines = FALSE, CNr = 2,
                 cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL)
 }
 

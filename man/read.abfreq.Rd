@@ -8,25 +8,25 @@
 }
 
 \usage{
-read.abfreq(file, nrows = -1, fast = TRUE, gz = TRUE, 
+read.abfreq(file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
             colClasses = c('factor', 'integer', 'factor', 'integer', 
             'integer', 'numeric', 'numeric', 'numeric', 'factor', 
-            'numeric', 'numeric', "factor", "factor"), chr.name = NULL, ...)
+            'numeric', 'numeric', "factor", "factor"), chr.name = NULL, n.lines = NULL, ...)
 
-read.acgt(file, nrows = -1, fast = TRUE, gz = TRUE, 
-          colClasses = c('factor', 'integer', 'factor', 'integer', 
+read.acgt(file, colClasses = c('factor', 'integer', 'factor', 'integer', 
           'integer', 'integer', 'integer', 'integer'), ...)
 }
 
 \arguments{
 \item{file}{file name}
 \item{nrows}{number of rows to reads from the files. Default -1, all rows.}
-\item{fast}{Boolean, if true the file would be pre-parsed to count the number of row to speedup the file reading. Default TRUE.}
+\item{fast}{Boolean, if true the file would be pre-parsed to count the number of row to speedup the file reading. Default FALSE.}
 \item{gz}{Boolean if the input file is gzipped or not. Default TRUE.}
+\item{header}{Boolean to specify if the file have the header or not. Default TRUE.}
 \item{colClasses}{Class of the columns expected in the file. Default is to match the acgt and the abfreq format.}           
 \item{chr.name}{If chromosome name is specified, only the selected chromosome would be extracted instead of the whole file. Default NULL.}
-\item{...}{Any arguments accepted by \code{read.delim}}
-
+\item{n.lines}{A vector of two numbes specifine first and last file line to read. If the n.lines is specified, only the selected portion of file would be used. It depends to the \code{sed} UNIX commands. Default NULL.}
+\item{...}{Any arguments accepted by \code{read.delim}, or \code{read.abfreq} for the \code{read.acgt} command.}
 }
 
 \details{

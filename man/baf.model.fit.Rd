@@ -8,33 +8,15 @@
 }
 
 \usage{
-  mufreq.model.fit(mufreq, depth.ratio, weight.mufreq = 100, weight.ratio = 100, avg.depth.ratio,
-                   cellularity.range = c(0.3,0.8), dna.content.range = c(0.5,4), by.c = 0.01, 
-                   by.p = 0.01, mc.cores = 2, CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3)
-  baf.model.fit(Bf, depth.ratio, weight.Bf = 100, weight.ratio = 100, cellularity.range = c(0.3,1),
-                dna.content.range = c(0.7,4), by.c = 0.01, by.p = 0.01, avg.depth.ratio, skew.baf = 0.95,
-                mc.cores = 2, CNt.max = 7, CNr = 2, priors.labels = 2, priors.values = 3, ratio.priority = FALSE)
+  mufreq.model.fit(cellularity = seq(0.3, 1, by = 0.01), dna.content = seq(0.7, 4, by = 0.01), mc.cores = 2, ...)
+  baf.model.fit(cellularity = seq(0.3, 1, by = 0.01), dna.content = seq(0.7, 4, by = 0.01), mc.cores = 2, ...)                    
 }
 
 \arguments{
-  \item{Bf}{A vector containing the B-allele frequency, values range is from 0 to 0.5}
-  \item{mufreq}{A vector containing the mutation frequency, values range is from 0 to 1}
-  \item{depth.ratio}{A vector containing the depth ratios of tumor versus normal}
-  \item{weight.Bf}{A vector of positive integers (bigger then 0) corresponding to the weight of the corresponding B-allele frequency value. Can be a single integer to give same weight to all BAF.}
-  \item{weight.mufreq}{A vector of positive integers (bigger then 0) corresponding to the weight of the corresponding mutation frequency value. Can be a single integer to give same weight to all frequency values.}  
-  \item{weight.ratio}{A vector of positive integers (bigger then 0) corresponding to the weight of the corresponding ratio value. Can be a single integer to give same weight to all the ratios.}
-  \item{cellularity.range}{Range of the values of the cellularity parameters to be tested. Default = c(0.3,0.8)}
-  \item{dna.content.range}{Range of the values of the DNA-content parameters to be tested. Default = c(0.5,4)}
-  \item{by.c}{Increment value to use to generate the vector of cellularities to test. Default = 0.01}
-  \item{by.p}{Increment value to use to generate the vector of dna-contents to test. Default = 0.01}
-  \item{avg.depth.ratio}{The median value of depth ratio}
-  \item{mc.cores}{Number of core to use to compute the possible combinations. Default = 2}
-  \item{CNt.max}{Maximum number of possible copy number. default 7.}
-  \item{CNr}{Copy number status of the germline reference. Default 2.}
-  \item{priors.labels}{Label for the copy number state priors.}
-  \item{priors.values}{Value for the copynumber state priors. By default there is a increased priors on the diploid status.}
-   \item{ratio.priority}{Boolean, if true only the depth ratio would be considered to determine the copy number state, while the Bf value would select the numbers of B-allele. Default FALSE.}
-   \item{skew.baf}{The observed B-allele frequency often doen not converge to the 0.5 frequency, for normal diploid position. This argument indicate the value of the percentile of all the observed B-allele frequency to skew the theoric value below 0.5. Default 0.95}
+  \item{cellularity}{Vector of values of cellularity parameters to be tested. Default = seq(0.3, 1, by = 0.01)}
+  \item{dna.content}{Vector of values of DNA-content parameters to be tested. Default = seq(0.7, 4, by = 0.01)}
+  \item{mc.cores}{number of core to use, defined as in the \code{parallel} packages. Default 2.}
+  \item{...}{Any argument accepted by \code{mufreq.bayes} or \code{baf.bayes}}
 }
 
 \value{
@@ -59,8 +41,7 @@ seg.s1<- data.frame(start.pos = c(1,4e6,10e6,40e6,70e6), end.pos = c(4e6,10e6,40
                     Bf=c(0.5,0.1250,0.5,0.1250,0.5), depth.ratio = c(1,0.625,1,0.625,1), N.BAF = 300)
 
 # Scan over different values of cellularity and DNA-content
-CP <- baf.model.fit(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio, 
-                    weight.ratio = 300, weight.Bf = 300,
-                    by.p = 0.05, by.c = 0.01, avg.depth.ratio = 1,
-                    cellularity.range = c(0.1,1), dna.content.range = c(0.5,3), mc.cores = 2)                   
+CP <- baf.model.fit(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio, weight.ratio = 300,
+                    weight.Bf = 300, avg.depth.ratio = 1, cellularity = seq(0.1, 1, 0.01),
+                    dna.content = seq(0.5, 3, 0.05), mc.cores = 2)                   
 }
