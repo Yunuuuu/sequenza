@@ -237,6 +237,7 @@ mut.fractions <- function(AB.sample, Af) {
 
 mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, max.mut.types = 3,
                            min.type.freq = 0.9, segments = NULL) {
+   chroms      <- unique(abf.tab$chromosome)
    hom.filt    <- abf.tab$ref.zygosity == 'hom'
    abf.tab     <- abf.tab[hom.filt, ]
    reads.filt  <- abf.tab$good.s.reads >= min.reads
@@ -256,7 +257,9 @@ mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, max.
    mut.type    <- paste(abf.tab$AB.germline, mu.fracts$base, sep = '>')   
    abf.tab     <- abf.tab[,c('chromosome', 'n.base', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
    abf.tab     <- cbind(abf.tab, F = mu.fracts$freq, mutation = mut.type)
-   abf.tab[mufreq.filt, ]
+   abf.dummy   <- data.frame(chromosome = chroms, n.base = 1, GC.percent = NA, good.s.reads = NA,
+                             adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)
+   rbind(abf.tab[mufreq.filt, ], abf.dummy)
 }
 
 find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...) {
