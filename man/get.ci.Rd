@@ -21,10 +21,6 @@
   
 }
 
-\details{
-  
-}
-
 \seealso{
   \code{baf.model.fit}, \code{mufreq.model.fit}.
 }
