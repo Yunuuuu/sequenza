@@ -127,7 +127,7 @@ gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
 
 Calculate the GC-adjusted depth ratio:
 <<label=useGCmedians, echo=TRUE>>=
-gc.vect  <- setNames(gc.stats$raw[,2], gc.stats$gc.values)
+gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
 
 abf.data$adjusted.ratio <- abf.data$depth.ratio / 
                            gc.vect[as.character(abf.data$GC.percent)]                       
