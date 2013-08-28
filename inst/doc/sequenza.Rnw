@@ -184,7 +184,7 @@ chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]],
       \label{fig:3panelsPlot}
 \end{figure}
 
-\section{Infer for cellularity and DNA-content}
+\section{Infer for cellularity and DNA-index}
 <<label=filterSegs, echo=TRUE>>=
 seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 5e6, ]
 @
@@ -203,7 +203,7 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     weight.Bf = weights.seg,
                     avg.depth.ratio = 1,
                     cellularity = seq(0.1,1,0.01), 
-                    dna.content = seq(0.5,3,0.05), mc.cores = 4)                   
+                    dna.index = seq(0.5,3,0.05), mc.cores = 4)                   
 @
 <<label=ConfIntCP, echo=TRUE>>=
 head(CP)
@@ -221,7 +221,7 @@ cellu.cint$max.l
 <<label=CPplot,fig=TRUE,width=6,height=6>>=
 cp.plot(CP)
 @ 
-      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-content. The color indicate the log-likelihood of the corresponding cellularity/DNA-content values.}
+      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index. The color indicate the log-likelihood of the corresponding cellularity/DNA-index values.}
       \label{fig:cpPlot}
 \end{figure}
 
@@ -234,11 +234,11 @@ par(mfrow = c(2,2))
         xlab = "likelihood", type = "l")
    abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
 
-   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-content",
+   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-index",
         ylab = "likelihood", type = "l")
    abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
 @ 
-      \caption{Plot of the log likelihood with respective cellularity and DNA-content probability distribution and confidence intervals.}
+      \caption{Plot of the log likelihood with respective cellularity and DNA-index probability distribution and confidence intervals.}
       \label{fig:cpPlotCI}
 \end{figure}
 
@@ -246,13 +246,13 @@ par(mfrow = c(2,2))
 
 <<label=seParam, eval=TRUE>>=
 cellularity <- cellu.cint$max.l
-dna.content <- dna.c.cint$max.l
+dna.index <- dna.c.cint$max.l
 @
 \subsection{Detect mutated alleles.}
 <<label=mmufBayes, eval=TRUE>>=
 mut.tab.clean <- na.exclude(mut.tab)
 mut.alleles <- mufreq.bayes(mufreq = mut.tab.clean$F, depth.ratio = mut.tab.clean$adjusted.ratio,
-                            cellularity = cellularity, dna.content = dna.content,
+                            cellularity = cellularity, dna.index = dna.index,
                             avg.depth.ratio = 1)
 
 head(mut.alleles)
@@ -262,7 +262,7 @@ head(cbind(mut.tab.clean[,c("chromosome","n.base","F","adjusted.ratio", "mutatio
 \subsection{Detect Copy number variation.}
 <<label=bafBayes, eval=TRUE>>=
 cn.alleles <- baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
-                        cellularity = cellularity, dna.content = dna.content,
+                        cellularity = cellularity, dna.index = dna.index,
                         avg.depth.ratio = 1)
 
 seg.s1.cn <- cbind(seg.s1, cn.alleles)
@@ -278,7 +278,7 @@ head(seg.s1.cn)
 chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]], 
                 ratio.windows = abf.r.win[[1]],  min.N.ratio = 1,
                 segments = seg.s1.cn, main = "TCGA-42-2591 chr 1",
-                cellularity = cellularity, dna.content = dna.content,
+                cellularity = cellularity, dna.index = dna.index,
                 avg.depth.ratio = 1)
 @ 
       \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted line indicate different copy number/allelic state. }
@@ -366,7 +366,7 @@ CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         weight.Bf = weights.snp[filter.size],
                         avg.depth.ratio = avg.unlogR,
                         cellularity = seq(0.1,1,0.01), 
-                        dna.content = seq(0.5,3,0.05), mc.cores = 4,
+                        dna.index = seq(0.5,3,0.05), mc.cores = 4,
                         priors.labels = 2, priors.values = 1)
 @
 <<label=getCPparamSNP, eval = TRUE>>=
@@ -379,24 +379,24 @@ cellu.cint$confint
 cellu.cint$max.l
 
 cellularity <- cellu.cint$max.l
-dna.content <- dna.c.cint$max.l
+dna.index <- dna.c.cint$max.l
 @
 
 %max.param = CP.snp[which.max(CP.snp[, 3]), ]
 %max.param
 
-%dna.content <- max.param[1]
+%dna.index <- max.param[1]
 %cellularity <- max.param[2]
 %@
 
 
-\subsection{Cellularity and DNA-content plot for SNP array}
+\subsection{Cellularity and DNA-index plot for SNP array}
 \begin{figure}[H]
       \centering
 <<label=CPplotSNP,fig=TRUE,width=6,height=6>>=
 cp.plot(CP.snp)
 @ 
-      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-content from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/DNA-content values.}
+      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/DNA-index values.}
       \label{fig:cpPlotSNP}
 \end{figure}
 
@@ -409,11 +409,11 @@ par(mfrow = c(2,2))
         xlab = "likelihood", type = "l")
    abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
 
-   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-content",
+   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-index",
         ylab = "likelihood", type = "l")
    abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
 @ 
-      \caption{Plot of the log likelihood with respective cellularity and DNA-content probability distribution and confidence intervals.}
+      \caption{Plot of the log likelihood with respective cellularity and DNA-index probability distribution and confidence intervals.}
       \label{fig:cpPlotCN}
 \end{figure}
 
@@ -427,7 +427,7 @@ snp.seg.cn <- baf.bayes(Bf = seg.i$Bf,
                         cellularity = cellularity,
                         weight.ratio = 2 * 300,
                         weight.Bf = 300, ratio.priority = FALSE,
-                        dna.content = dna.content, CNt.max = 10)
+                        dna.index = dna.index, CNt.max = 10)
 
 segmented.snp <- cbind(seg.i, snp.seg.cn)
 
@@ -443,7 +443,7 @@ head(segmented.snp[segmented.snp$chromosome == 1, ])
 chromosome.view(baf.windows = snp.b.win[[1]], 
                 ratio.windows = snp.r.win[[1]],  min.N.ratio = 1,
                 segments = segmented.snp[segmented.snp$chromosome == "1", ],
-                cellularity = cellularity, dna.content = dna.content,
+                cellularity = cellularity, dna.index = dna.index,
                 avg.depth.ratio = avg.unlogR, main = "1")
 @
       \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allelic state. }
@@ -456,7 +456,7 @@ chromosome.view(baf.windows = snp.b.win[[1]],
 chromosome.view(baf.windows = snp.b.win[[16]], 
                 ratio.windows = snp.r.win[[16]],  min.N.ratio = 1,
                 segments = segmented.snp[segmented.snp$chromosome == "16", ],
-                cellularity = cellularity, dna.content = dna.content,
+                cellularity = cellularity, dna.index = dna.index,
                 avg.depth.ratio = avg.unlogR, main = "16")
 @
       \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allelic state. }

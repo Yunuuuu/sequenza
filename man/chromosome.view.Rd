@@ -10,7 +10,7 @@
 \usage{
 chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL, 
                 min.N.baf = 1, min.N.ratio = 1e4, main = "", vlines = FALSE, CNr = 2,
-                cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL)
+                cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL)
 }
 
 \arguments{
@@ -23,7 +23,7 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
   \item{CNr}{Copy number of the germline genome. Default = 2.}
   \item{vlines}{Boolean if TRUE the plot would include dotted vertical lines corresponding to breaks. Default FALSE.}
   \item{cellularity}{Value of the estimated \code{cellularity} parameter.}
-  \item{dna.content}{Value of the estimated \code{dna.content} parameter.}
+  \item{dna.index}{Value of the estimated \code{dna.index} parameter.}
   \item{avg.depth.ratio}{The median value of depth ratio.}
   \item{main}{Main title of the plot. Default "".}
 }
@@ -43,6 +43,6 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
 #                baf.windows = abf.bafs$windows[[1]],
 #                ratio.windows = abf.ratio$windows[[1]],
 #                segments = seg.s1, main = "TCGA-42-2591 chr 1",
-#                cellularity = 0.85, dna.content = 1.1, avg.depth.ratio = 1)
+#                cellularity = 0.85, dna.index = 1.1, avg.depth.ratio = 1)
 
 }
