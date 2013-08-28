@@ -14,15 +14,15 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRU
   \item{x}{The value to be windowed.}
   \item{positions}{base-pairs position.}
   \item{chromosomes}{Names or numbers of the chromosome.}
-  \item{window}{Size of the window to be gathered. Default 1e6. Smaller window would take more time to be compute.}
-  \item{overlap}{Integer number defining the number of overlapping windows. Default 0, no overlap.}
-  \item{verbose}{Boolean, if TRUE the information about the under processing chromosome will be printed in the console. Default TRUE.}
-  \item{weight}{The weight to be assigned to each \code{x} value. generally is related to the depth of reads.}
-  \item{start.coord}{Define the start coordinate to start to compte gthe  windows. if NULL the first position available would be considered. Default 1.}
+  \item{window}{Size of the window to be gathered. Smaller window would take more time to be compute.}
+  \item{overlap}{Integer defining the number of overlapping windows. Default 0, no overlap.}
+  \item{verbose}{Display information about the chromosome being processed?}
+  \item{weight}{The weight to be assigned to each \code{x} value, usually related to the depth of reads.}
+  \item{start.coord}{The coordinate to start computing the windows. If NULL, the first position available would be considered.}
 }
 
 \details{
-  Sequencing data, even exome seq. produce a big amount of data difficult to be handled by graphic representation. Also, especially sample analyzed with older machines and with low or middle depth of coverage (20x to 70x), value like depth of reads er position have a lot of variation. Using \code{windowValues} it is possible to reduce the both the amount of data and the noise, in order to easily store and graphically represents chromosome by chromosome, or chunks of chromosomes.
+  Sequencing data, even exome seq. produces a big amount of data difficult to be handled by graphic representation. Also, especially sample analyzed with older machines and with low or middle depth of coverage (20x to 70x), value like depth of reads er position have a lot of variation. Using \code{windowValues} it is possible to reduce the both the amount of data and the noise, in order to easily store and graphically represents chromosome by chromosome, or chunks of chromosomes.
 }
 
 \seealso{

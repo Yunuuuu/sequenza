@@ -9,7 +9,7 @@
 \title{Binomial and Poisson distributions}
 
 \description{
-  Return the Density of probability using a Binomial or Poisson distribution for the given value and a vector of model point.
+  Return the density of probability using a Binomial or Poisson distribution for the given value and a vector of model points.
 }
 
 \usage{
@@ -23,15 +23,15 @@
 }
 
 \arguments{
-  \item{baf}{The B-allele frequency in the tested position}
-  \item{mufreq}{The mutation frequency in the tested position}
-  \item{depth.t}{The number of reads covering the tested position in the tumor sample}
-  \item{size}{Generally is the sum of the number of reads covering the tested position in the reference and in the aberrant sample}
-  \item{depth.ratio}{The adjusted sequencing depth ratio in the tested position}
-  \item{baf.model}{A vector of the possibles values of B-allele frequency of the model}
-  \item{mufreq.model}{A vector of the possibles values of mutation frequency of the model}
-  \item{depth.ratio.model}{A vector of the possible values of depth ratio of the model}
-  \item{seq.errors}{An small decimal number to offset the "no mutation" condition to a number higher then 0. Default 0.01}
+  \item{baf}{The B-allele frequency in the tested position.}
+  \item{mufreq}{The mutation frequency in the tested position.}
+  \item{depth.t}{The number of reads covering the tested position in the tumor sample.}
+  \item{size}{Generally is the sum of the number of reads covering the tested position in the reference and in the aberrant sample.}
+  \item{depth.ratio}{The adjusted sequencing depth ratio in the tested position.}
+  \item{baf.model}{A vector of the possibles values of B-allele frequency of the model.}
+  \item{mufreq.model}{A vector of the possibles values of mutation frequency of the model.}
+  \item{depth.ratio.model}{A vector of the possible values of depth ratio of the model.}
+  \item{seq.errors}{An small decimal number to offset the "no mutation" condition to a number higher then 0.}
 }
 
 \details{

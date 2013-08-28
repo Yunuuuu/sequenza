@@ -1,10 +1,10 @@
 \name{find.breaks}
 \alias{find.breaks}
 \alias{segment.breaks}
-\title{Segmenting sequencing data using allele-specific copy number algorithm}
+\title{Segment sequencing data using allele-specific copy number algorithm}
 
 \description{
-  This function uses aspcf from the package \code{copynumber} to segment depth ratio and B-allele frequency obtained from sequencing data.
+  This function uses \code{\link{aspcf}} from the package \code{copynumber} to segment depth ratio and B-allele frequency obtained from sequencing data.
 }
 
 \usage{
@@ -15,12 +15,9 @@ segment.breaks(abf.tab, breaks)
 \arguments{
   \item{abf.baf}{An abfreq file containing only the heterozygous positions.}
   \item{abf.tab}{A complete abfreq file.}  
-  \item{gamma}{\code{aspcf} parameter. Default 80.}
-  \item{kmin}{\code{aspcf} parameter. Default 10.}
-  \item{baf.thres}{\code{aspcf} parameter. Default c(0, 0.5).}
-  \item{verbose}{\code{aspcf} parameter. Default FALSE.}
+  \item{gamma, kmin, baf.thres, verbose}{Arguments passed to \code{aspcf}.}
   \item{breaks}{breaks obtained with the function \code{find.breaks}.}
-  \item{...}{Any parameters accepted from \code{aspcf}.}
+  \item{...}{Additional arguments passed to \code{aspcf}.}
 }
 
 \details{

@@ -1,12 +1,10 @@
 \name{abf.data.abfreq}
-\alias{abfreq.file}
 \alias{abf.data.abfreq}
-\alias{abfreq.data}
 
 \title{ABfreq file example.}
 
 \description{
-  ABfreq file example, obtained from taking the heterozygous position of the TCGA sample: TCGA-42-2501.
+  ABfreq file example, obtained by taking the heterozygous positions of chromosome 1 from the TCGA sample TCGA-42-2501.
 }
 
 \usage{

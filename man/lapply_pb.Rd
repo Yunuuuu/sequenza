@@ -1,10 +1,10 @@
 \name{mclapplyPb}
 \alias{mclapplyPb}
 
-\title{A wrapper to use progress bar on multi core lapply function.}
+\title{mclapply enhanced with a progress bar}
 
 \description{
-  A wrapper to use progress bar on multi core lapply function.
+  This function combines \code{mclapply} (from the \code{multicore} package) with \code{\link{txtProgressBar}} (from \code{utils}).
 }
 
 \usage{
@@ -12,10 +12,8 @@
 }
 
 \arguments{
-  \item{X}{X vector as used by \code{mclapply}.}
-  \item{FUN}{FUN function as used by \code{mclapply}.}
-  \item{mc.cores}{mc.cores as used by \code{mclapply}.}
-  \item{...}{Other arguments accepted by \code{mclapply}.}
+  \item{X, FUN, mc.cores, ...}{Arguments passed to \code{\link{mclapply}}.}
+
 }
 
 \details{

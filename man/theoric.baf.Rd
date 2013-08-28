@@ -17,13 +17,13 @@ theoretical.mufreq(cellularity, CNr = 2, CNt = 2, Mt = 1)
 }
 
 \arguments{
-  \item{CNr}{Copy number of the reference (usually a normal non-tumor sample). Default = 2}
-  \item{CNt}{Copy number of aberrant sample (usually cancer sample). Default = 2}
-  \item{Mt}{Number of alleles carrying the mutation. Default 1}
-  \item{cellularity}{Tumor purity of the sample. Default 0.5}
-  \item{dna.content}{Ratio of the total tumor DNA versus the total normal DNA. Default 1.}
-  \item{copy.number.ratio}{Ratio of the copy number in the aberrant sample versus the normal reference copy number. Default 1.}
-  \item{avg.depth.ratio}{median or mean value of the normalized depth ratios. Default 1.}
+  \item{CNr}{Copy number of the reference (usually a normal non-tumor sample).}
+  \item{CNt}{Copy number of aberrant sample (usually cancer sample).}
+  \item{Mt}{Number of alleles carrying the mutation.}
+  \item{cellularity}{Tumor fraction of the sample.}
+  \item{dna.content}{Ratio of the total tumor DNA versus the total normal DNA.}
+  \item{copy.number.ratio}{Ratio of the copy number in the aberrant sample versus the normal reference copy number.}
+  \item{avg.depth.ratio}{median or mean value of the normalized depth ratios.}
 }
 
 \details{

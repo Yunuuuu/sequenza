@@ -271,8 +271,8 @@ find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), v
    BAF = data.frame(chrom = chromosome, 
                     pos = abf.baf$n.base,
                     s1 = abf.baf$Bf)
-   logR.wins <- winsorize(logR, verbose = verbose)
-   allele.seg <- aspcf(logR = logR.wins, BAF = BAF, baf.thres = baf.thres,
+   logR.wins <- copynumber::winsorize(logR, verbose = verbose)
+   allele.seg <- copynumber::aspcf(logR = logR.wins, BAF = BAF, baf.thres = baf.thres,
                        verbose = verbose, gamma = gamma, kmin = kmin, ...)
     if (length(grep("chr", abf.baf$chromosome)) > 0) { 
         allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")

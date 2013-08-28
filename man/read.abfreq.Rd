@@ -1,7 +1,7 @@
 \name{read.abfreq}
 \alias{read.abfreq}
 \alias{read.acgt}
-\title{Reading efficiently an abfreq or an acgt format file.}
+\title{Read an abfreq or an acgt format file}
 
 \description{
   Reading efficiently an abfreq or an acgt format file.
@@ -20,8 +20,8 @@ read.acgt(file, colClasses = c('factor', 'integer', 'factor', 'integer',
 \arguments{
 \item{file}{file name}
 \item{nrows}{number of rows to reads from the files. Default -1, all rows.}
-\item{fast}{Boolean, if true the file would be pre-parsed to count the number of row to speedup the file reading. Default FALSE.}
-\item{gz}{Boolean if the input file is gzipped or not. Default TRUE.}
+\item{fast}{Boolean, if true the file would be pre-parsed to count the number of rows; in some cases this can speed up the file reading.}
+\item{gz}{Boolean if the input file is gzipped or not.}
 \item{header}{Boolean to specify if the file have the header or not. Default TRUE.}
 \item{colClasses}{Class of the columns expected in the file. Default is to match the acgt and the abfreq format.}           
 \item{chr.name}{If chromosome name is specified, only the selected chromosome would be extracted instead of the whole file. Default NULL.}
