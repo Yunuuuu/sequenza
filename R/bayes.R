@@ -34,14 +34,14 @@ depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model) {
    dpois( x = n.success, lambda = prob * size)
 }
 
-mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.depth.ratio,
+mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.index, avg.depth.ratio,
                          weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, 
                          CNr = 2, priors.labels = CNt.min:CNt.max, priors.values = 1) {
 
    mufreq.tab <- data.frame(F = mufreq, ratio = depth.ratio,
                             weight.mufreq = weight.mufreq, weight.ratio = weight.ratio)
    types <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
-   mufreq.depth.ratio <- cbind(types, model.points(cellularity = cellularity, dna.content = dna.content,
+   mufreq.depth.ratio <- cbind(types, model.points(cellularity = cellularity, dna.index = dna.index,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
    rows.x             <- 1:nrow(mufreq.tab)
    
@@ -91,14 +91,14 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.content, avg.dept
    types.L
 }
 
-baf.bayes <- function(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio,
+baf.bayes <- function(Bf, depth.ratio, cellularity, dna.index, avg.depth.ratio,
                       weight.Bf = 100, weight.ratio = 100, CNt.min = 0,
                       CNt.max = 7, CNr = 2, priors.labels = CNt.min:CNt.max,
                       priors.values = 1, ratio.priority = FALSE, skew.baf = 0.95) {
    
    mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
                             weight.Bf = weight.Bf, weight.ratio = weight.ratio)
-   mufreq.depth.ratio <- model.points(cellularity = cellularity, dna.content = dna.content, 
+   mufreq.depth.ratio <- model.points(cellularity = cellularity, dna.index = dna.index, 
                                       types = cbind(CNr = CNr, CNt = CNt.min:CNt.max, Mt = 0),
                                       avg.depth.ratio = avg.depth.ratio)
    model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])
@@ -169,16 +169,16 @@ shannon.types <- function(types.mat) {
 }
 
 mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01), 
-                          dna.content = seq(0.7, 4, by = 0.01),
+                          dna.index = seq(0.7, 4, by = 0.01),
                           mc.cores = 2, ...) {
    
    require(parallel)
-   result <- expand.grid(dna.content = dna.content, cellularity = cellularity, 
+   result <- expand.grid(dna.index = dna.index, cellularity = cellularity, 
                          KEEP.OUT.ATTRS = FALSE) 
    
    fit.cp <- function(ii) {
       L.model <- mufreq.bayes(cellularity = result$cellularity[ii], 
-                           dna.content = result$dna.content[ii], ...)
+                           dna.index = result$dna.index[ii], ...)
       sum(L.model[,4])
    }
    bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
@@ -187,16 +187,16 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
 }
 
 baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01), 
-                          dna.content = seq(0.7, 4, by = 0.01),
+                          dna.index = seq(0.7, 4, by = 0.01),
                           mc.cores = 2, ...) {
    
    require(parallel)
-   result <- expand.grid(dna.content = dna.content, cellularity = cellularity, 
+   result <- expand.grid(dna.index = dna.index, cellularity = cellularity, 
                          KEEP.OUT.ATTRS = FALSE) 
    
    fit.cp <- function(ii) {
       L.model <- baf.bayes(cellularity = result$cellularity[ii], 
-                           dna.content = result$dna.content[ii], ...)
+                           dna.index = result$dna.index[ii], ...)
       sum(L.model[,4])
    }
    bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)

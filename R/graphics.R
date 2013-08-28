@@ -2,19 +2,43 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table$L, na.rm
                                                  to = max(cp.table$L, na.rm = TRUE), by = 0.1), n = 10),
                     outlier = "white", ...) {
    require(squash)
-   z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.content'], cp.table[, 'cellularity']), mean)
+   z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.index'], cp.table[, 'cellularity']), mean)
    x <- as.numeric(rownames(z))
    y <- as.numeric(colnames(z))
    colorgram(x, y, z,
              colFn = jet, map = map, outlier = outlier, las = 1, 
-             xlab= "DNA content", ylab = "Cellularity", 
+             xlab= "DNA-index", ylab = "Cellularity", 
              zlab = "log-likelihood", ...)
    L.max <- cp.table[which.max(cp.table$L),]
-   points(x = L.max$dna.content, y = L.max$cellularity, pch = 18)
+   points(x = L.max$dna.index, y = L.max$cellularity, pch = 18)
 }
 
+cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999), 
+                             col = palette(), legend.pos = 'bottomright', ...) {
+   require(squash)
+   z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.index'], cp.table[, 'cellularity']), mean)
+   x <- as.numeric(rownames(z))
+   y <- as.numeric(colnames(z))
+   
+   LogSumLik <- log10(sum(10 ^ z))
+   znorm <- z - LogSumLik
+   znormsort <- sort(znorm, decreasing = TRUE)
+   znormcumLik <- cumsum(10 ^ znormsort)
+   n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
+   logLikThresh <- znormsort[n]
+   names(logLikThresh) <- paste0(likThresh * 100, '%')
+   
+   contour(x, y, znorm, levels = znormsort[n], col = col,
+           drawlabels = FALSE,
+           xlab= "DNA index", ylab = "Cellularity", ...)
+   if(!is.na(legend.pos)) {
+      legend(legend.pos, legend = names(logLikThresh), 
+             col = col, lty = 1, title = 'cumLik')
+   } 
+   invisible(logLikThresh)
+}
 
-# plot.fit.model <- function(mufreq.tab, cellularity, dna.content, chr23 = "XY",
+# plot.fit.model <- function(mufreq.tab, cellularity, dna.index, chr23 = "XY",
 #                            cn.ratio.range = c(0.5:2), avg.depth.ratio = avg.depth.ratio,
 #                            cex.m = 1, cex.d = 1, ...) {
 #    xy.index   <- mufreq.tab$chr == "chrX" | mufreq.tab$chr == "chrY"
@@ -31,14 +55,14 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table$L, na.rm
 #          points(x = mufreq.tab$F[xy.index], y = mufreq.tab$adjusted.ratio[xy.index], pch = 19, col = "blue")
 #       }
 #    }
-#    points.fit <-model.points(cellularity = cellularity, dna.content = dna.content,
+#    points.fit <-model.points(cellularity = cellularity, dna.index = dna.index,
 #                              types = types, avg.depth.t = avg.depth.t,
 #                              avg.depth.r = avg.depth.r)
 #    points(points.fit,pch = 19, col = "red", cex = cex.m)
 #    if (length(which(xy.index)) >= 1 & chr23 == "XY") {
-#       legend("bottomright", c("Male chr X/Y",paste(paste("C", cellularity,sep = " : "), paste("P", dna.content,sep = " : "), sep = "; ")), pch = 19, col = c("green","red"))
+#       legend("bottomright", c("Male chr X/Y",paste(paste("C", cellularity,sep = " : "), paste("P", dna.index,sep = " : "), sep = "; ")), pch = 19, col = c("green","red"))
 #    } else {
-#       legend("bottomright", paste(paste("C", cellularity,sep = " : "), paste("P", dna.content,sep = " : "), sep = "; "), pch = 19, col = "red")
+#       legend("bottomright", paste(paste("C", cellularity,sep = " : "), paste("P", dna.index,sep = " : "), sep = "; "), pch = 19, col = "red")
 #    }
 # }
 
@@ -77,12 +101,12 @@ plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
 
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
                             min.N.baf = 1, min.N.ratio = 1e4, main = "", vlines = FALSE, CNr = 2,
-                            cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL) {
+                            cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL) {
    if (is.null(segments)) {
       data.model <- NULL
       } else {
          if ("CNt" %in% colnames(segments)) {
-            if (length(c(cellularity, dna.content, avg.depth.ratio)) != 3) {
+            if (length(c(cellularity, dna.index, avg.depth.ratio)) != 3) {
                data.model <- NULL
             } else {
                data.model     <- list()
@@ -95,7 +119,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                   data.model$baf <- rbind(c(0,0,1,0), data.model$baf)                  
                }   
                types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
-               data.model$muf <- cbind(types, model.points(cellularity = cellularity, dna.content = dna.content,
+               data.model$muf <- cbind(types, model.points(cellularity = cellularity, dna.index = dna.index,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
             }
          } else {
@@ -190,7 +214,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
 
 genome.view <- function(baf.windows, ratio.windows, segments = NULL, main = "", 
                             min.N.baf = 1, min.N.ratio = 1e4, CNr = rep(2, length(ratio.windows)),
-                            cellularity = NULL, dna.content = NULL, avg.depth.ratio = NULL) {
+                            cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL) {
    chr.metrics <- list()
    for (i in 1:length(ratio.windows)) {
       chr.metrics[[i]] <- range(ratio.windows[[i]]$mean, na.rm = TRUE)
