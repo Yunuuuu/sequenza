@@ -13,6 +13,30 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table$L, na.rm
    points(x = L.max$dna.index, y = L.max$cellularity, pch = 18)
 }
 
+cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999), 
+                             col = palette(), legend.pos = 'bottomright', ...) {
+   require(squash)
+   z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.index'], cp.table[, 'cellularity']), mean)
+   x <- as.numeric(rownames(z))
+   y <- as.numeric(colnames(z))
+   
+   LogSumLik <- log10(sum(10 ^ z))
+   znorm <- z - LogSumLik
+   znormsort <- sort(znorm, decreasing = TRUE)
+   znormcumLik <- cumsum(10 ^ znormsort)
+   n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
+   logLikThresh <- znormsort[n]
+   names(logLikThresh) <- paste0(likThresh * 100, '%')
+   
+   contour(x, y, znorm, levels = znormsort[n], col = col,
+           drawlabels = FALSE,
+           xlab= "DNA index", ylab = "Cellularity", ...)
+   if(!is.na(legend.pos)) {
+      legend(legend.pos, legend = names(logLikThresh), 
+             col = col, lty = 1, title = 'cumLik')
+   } 
+   invisible(logLikThresh)
+}
 
 # plot.fit.model <- function(mufreq.tab, cellularity, dna.index, chr23 = "XY",
 #                            cn.ratio.range = c(0.5:2), avg.depth.ratio = avg.depth.ratio,
