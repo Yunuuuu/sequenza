@@ -7,7 +7,7 @@ cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table$L, na.rm
    y <- as.numeric(colnames(z))
    colorgram(x, y, z,
              colFn = jet, map = map, outlier = outlier, las = 1, 
-             xlab= "DNA content", ylab = "Cellularity", 
+             xlab= "DNA-index", ylab = "Cellularity", 
              zlab = "log-likelihood", ...)
    L.max <- cp.table[which.max(cp.table$L),]
    points(x = L.max$dna.index, y = L.max$cellularity, pch = 18)

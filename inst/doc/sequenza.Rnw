@@ -300,7 +300,7 @@ cellu.cint$max.l
 cp.plot(CP)
 @ 
 
-      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA content. The color indicates the log-likelihood of the corresponding cellularity/DNA-index values.}
+      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index. The color indicates the log-likelihood of the corresponding cellularity/DNA-index values.}
       \label{fig:cpPlot}
 \end{figure}
 

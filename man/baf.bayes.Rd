@@ -4,7 +4,7 @@
 \title{Fit the model with specified cellularity and DNA-index parameters}
 
 \description{
-  Given two values for cellularity and DNA content parameters, the function returns, for each given values, the copy number and relative B-allele/mutated allele with the log-likelihood of the goodness of fit.
+  Given two values for cellularity and DNA-index parameters, the function returns, for each given values, the copy number and relative B-allele/mutated allele with the log-likelihood of the goodness of fit.
 }
 
 \usage{
