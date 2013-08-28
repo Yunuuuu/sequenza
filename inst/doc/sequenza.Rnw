@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{sequenza Vignette}
+%\VignetteIndexEntry{sequenza usage example}
 %\VignetteDepends{sequenza}
 %\VignetteKeywords{LOH}
 %\VignetteKeywords{Heterogenity}
@@ -27,7 +27,7 @@
 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
-\title{sequenza package vignette}
+\title{sequenza usage example}
 \maketitle
 
 \tableofcontents
@@ -35,57 +35,97 @@
 \section{Abstract}
 Deep sequence of tumor DNA along with corresponding normal DNA can provide a rich picture of the mutations and aberrations that characterize the tumor. However, analysis of this data can be impeded by of tumor cellularity and heterogeneity and by unwieldy data. Here we describe the \textit{sequenza} software system, which comprises a fast python-based pre-processor and an R-based analysis package. Sequenza enables the efficient estimation of tumor cellularity and ploidy, and generation of copy number, loss-of-heterozygosity, and mutation frequency profiles. 
 
-\section{Running external program}
-Create a GC-windows file:
+This document details a typical analysis of matched tumor-normal exome sequence data using \textit{sequenza}.
+
+\section{Starting data}
+
+Sequenza requires:
+1. A pileup file from the tumor specimen
+2. A pileup file from the normal specimen
+3. A FASTA genome sequence file (optional, for GC-content correction)
+
+Pileup files can be generated using \texttt{samtools} (ref). The genome sequence file can be obtained from (url).
+
+\section{First the non-R part: preprocessing data}
+
+For convenience and efficiency we have implemented preprocessing algorithms in an external (not called from R) Python program. The program is provided with the package; it's exact location can be found like this:
+
+<<label=loadLib, echo=TRUE>>=
+system.file("exec", "sequenza-utils.py", package="sequenza")
+@
+
+You may wish to copy this program to a location on your path. NOTE: this script requires several unix tools and thus probably not work on Windows.
+
+
+Extract average GC content in 50-base genomic windows:
 \shellcmd{
 abfreqtools.py GC-windows -w 50 hg19.fa | gzip > hg19.gc50Base.txt.gz
 }
 
-Merging two pileup (from \texttt{samtools}) to obtain alleles and mutation frequency.
+Process the two pileup files to obtain an "abfreq" file containing alleles and mutation frequency.
 \shellcmd{
 abfreqtools.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pileup.gz -s 0001-met2.pileup.gz -q 20 -n 10 -o 0001-met2.abfreq.txt.gz
 }
 
-\section{Loading sequenza package}
+----- UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME -----
 
+\section{Read the preprocessed data (\textit{abfreq} file) into R}
+
+The remainder of this example takes place in R.
+
+Load the sequenza package:
 <<label=loadLib, echo=TRUE>>=
 library("sequenza")
 @
 
-
-\section{Reading an \textit{abfreq} file}
+Find the example data file:
 <<label=setFile, echo=TRUE>>=
-data.file <-  system.file("data","abf.data.abfreq.txt.gz",package="sequenza")
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+data.file
 @
 
-\subsection{Reading a single chromosome}
+The abfreq file can be read all at once, but processing one chromosome at a time is less demanding on computational resources and might be preferable.  (Note that the demo data included with sequenza is only chromosome 1)
+
+Read only the data corresponding to chromosome 1:
 <<label=readAfreqChr, echo=TRUE>>=
-abf.data <- read.abfreq(data.file,chr.name = "1")
+abf.data <- read.abfreq(data.file, chr.name = "1")
 @
 
-\subsection{Reading entire file}
+Alternatively, read all data at once (not run):
 <<label=readAfreq, echo=TRUE, eval=FALSE>>=
 abf.data <- read.abfreq(data.file)
 @
 
-\section{GC-normalization and noise reduction}
+<<>>==
+str(abf.data)
+@
+
+
+\section{Quality control step?  (EXPLAIN)}
+
+NEED TO EXPLAIN THIS:
 <<label=goodReads, echo=TRUE>>=
 abf.data$good.s.reads <- abf.data$depth.sample * 
                          abf.data$sample.reads.above.quality
 @
 
-Gather gc-content information from the entire file:
+\section{GC-normalization}
+
+The number of reads at a given genomic position can be affected by the local GC content. We attempt to remove this bias as in (ref).
+
+Gather gc-content information from the entire file (normally this would be the entire genome, but in our example it contains only chromosome 1):
 <<label=depthRGCnormall, echo=TRUE, results=hide>>=
 gc.stats <- gc.sample.stats(data.file)
 @
 
+
+WHAT IS THIS?  EXPLAIN...   (not run)
 <<label=depthRGCnorm, echo=TRUE, eval=FALSE>>=
 gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)
 @
 
-\subsection{Use the GC-content median information}
-
+Calculate the GC-adjusted depth ratio:
 <<label=useGCmedians, echo=TRUE>>=
 gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
 
@@ -93,7 +133,24 @@ abf.data$adjusted.ratio <- abf.data$depth.ratio /
                            gc.vect[as.character(abf.data$GC.percent)]                       
 @
 
-\subsection{Windowing depth ratios values.}
+
+<<fig = TRUE, width = 8, height = 4.5>>==
+par(mfrow = c(1,2), cex = 1, las = 1, bty = 'l')
+matplot(gc.stats$gc.values, gc.stats$raw,
+        type = 'b', col = 1, pch = c(1, 19, 1), lty = c(2, 1, 2),
+        xlab = 'GC content (%)', ylab = 'Uncorrected depth ratio')
+legend('topright', legend = colnames(gc.stats$raw), pch = c(1, 19, 1))
+hist2(abf.data$depth.ratio, abf.data$adjusted.ratio,
+      breaks = prettyLog, key = vkey, panel.first = abline(0, 1, lty = 2),
+      xlab = 'Uncorrected depth ratio', ylab = 'GC-adjusted depth ratio')
+@
+
+
+\section{Create genomic profiles}
+
+\subsection{First, the depth ratio}
+
+Summarize the depth ratio in overlapping genomic windows:
 <<label=depthWindowing, echo=TRUE, results=hide>>=
 abf.r.win <- windowValues(x = abf.data$adjusted.ratio,
              positions = abf.data$n.base,
@@ -107,20 +164,23 @@ abf.r.win <- windowValues(x = abf.data$adjusted.ratio,
 <<label=plotDepthProfile,fig=TRUE,width=6,height=4>>=
 
 plotWindows(abf.r.win[[1]], log2.plot = FALSE, 
-            ylab = "Depth ratio", xlab = "Base pairs", 
+            ylab = "Depth ratio", xlab = "Position (bases)", 
             main = names(abf.r.win)[1], las = 1, n.min = 1, 
-            ylim = c(0, 2))
+            ylim = c(0, 2.5))
 @
       \caption{Depth ratio profile visualization over a single chromosome. }
       \label{fig:SingleCNProfview}
 \end{figure}
-\subsection{Windowing B-allele frequencies values.}
+
+
+\subsection{Next, the B-allele frequencies}
 
 <<label=HetSepqring, echo=TRUE>>=
 abf.hom  <- abf.data$ref.zygosity == 'hom'
 abf.het  <- abf.data[!abf.hom, ]
 @
 
+Summarize the BAF in overlapping genomic windows (including only those positions called heterozygous in the normal sample):
 <<label=BAFWindowing, echo=TRUE, results=hide>>=
 abf.b.win <- windowValues(x = abf.het$Bf,
              positions = abf.het$n.base,
@@ -133,24 +193,28 @@ abf.b.win <- windowValues(x = abf.het$Bf,
       \centering
 <<label=plotBAFProfile,fig=TRUE,width=6,height=4>>=
 plotWindows(abf.b.win[[1]], ylim = c(0, 0.5), 
-           main = names(abf.r.win)[1], xlab = "Base pairs",
+           main = names(abf.r.win)[1], xlab = "Position (bases)",
            ylab = "B allele frequency", n.min = 10)
 @
       \caption{B-allele frequency profile visualization over a single chromosome.}
       \label{fig:SingleBAFProfview}
 \end{figure}
 
-\section{Allele specific Segmentation}
-\subsection{Find breaks}
-To find breaks we use the Allele specific segmentation algorithm used in the copynumber package \cite{BMCcopynumber}.
+\section{Allele-specific segmentation}
+
+\subsection{Find genomic breakpoints}
+
+To find breakpoints we use the allele-specific segmentation algorithm from the \textit{copynumber} package \cite{BMCcopynumber}.
 <<label=ASCPF, echo=TRUE>>=
 breaks <- find.breaks(abf.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))
 head(breaks)
 @
-\subsection{Obtain the segment values}
+
+Now obtain the segment values:
 <<label=so.segs, echo=TRUE>>=
 seg.s1 <- segment.breaks(abf.data, breaks = breaks)
 @
+
 \section{Select mutations by mutation frequency}
 
 <<label=doF, echo=TRUE>>=
@@ -158,6 +222,8 @@ mut.tab <- mutation.table(abf.data, mufreq.treshold = 0.15,
                           min.reads = 40, max.mut.types = 1,
                           min.type.freq = 0.9, segments = seg.s1)
 @
+
+NEEDS EXPLANATION HERE... what is the following object?
 <<label=doF, echo=TRUE>>=
 mut.tab.no.seg <- mutation.table(abf.data, mufreq.treshold = 0.15, 
                           min.reads = 40, max.mut.types = 1,
@@ -172,22 +238,28 @@ head(mut.tab.no.seg)
 @
 
 \section{Plot chromosome view with mutations, BAF, depth ratio and segments}
+
 \begin{figure}[H]
       \centering
 <<label=3panelsPlot,fig=TRUE,width=6,height=6>>=
 
 chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]], 
                 ratio.windows = abf.r.win[[1]], min.N.ratio = 1,
-                segments = seg.s1, main = "TCGA-42-2591 chr 1")
+                segments = seg.s1, main = "Chromosome 1")
 @ 
       \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position.}
       \label{fig:3panelsPlot}
 \end{figure}
 
-\section{Infer for cellularity and DNA-index}
+
+\section{Inference of cellularity and DNA-index}
+
+NEEDS EXPLANATION:
 <<label=filterSegs, echo=TRUE>>=
 seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 5e6, ]
 @
+
+NEEDS EXPLANATION:
 <<label=segsWeight, echo=TRUE>>=
 weights.seg  <- 150 + round((seg.filtered$end.pos - seg.filtered$start.pos) / 1e6, 0)
 @
@@ -197,6 +269,7 @@ avg.depth.ratio <- mean(gc.stats$adj[,3])
 avg.depth.ratio
 @
 
+I DON'T UNDERSTAND WHY "avg.depth.ratio = 1" when we have calculated a different number above?:
 <<label=BAFmodelFIT, echo=TRUE, results=hide>>=
 CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
                     weight.ratio = weights.seg,
@@ -205,6 +278,10 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     cellularity = seq(0.1,1,0.01), 
                     dna.index = seq(0.5,3,0.05), mc.cores = 4)                   
 @
+
+WOULD IT MAKE MORE SENSE FOR THIS FUNCTION TO RETURN A MATRIX?
+
+NEED EXPLANATIONS HERE:
 <<label=ConfIntCP, echo=TRUE>>=
 head(CP)
 
@@ -216,12 +293,14 @@ cellu.cint <- get.ci(CP[,c(2,3)])
 cellu.cint$confint
 cellu.cint$max.l
 @
+
 \begin{figure}[H]
       \centering
 <<label=CPplot,fig=TRUE,width=6,height=6>>=
 cp.plot(CP)
 @ 
-      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index. The color indicate the log-likelihood of the corresponding cellularity/DNA-index values.}
+
+      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA content. The color indicates the log-likelihood of the corresponding cellularity/DNA-index values.}
       \label{fig:cpPlot}
 \end{figure}
 
@@ -242,13 +321,17 @@ par(mfrow = c(2,2))
       \label{fig:cpPlotCI}
 \end{figure}
 
-\section{Call for CNV and mutations using the estimated parameter}
+\section{Call CNVs and mutations using the estimated parameters}
 
 <<label=seParam, eval=TRUE>>=
 cellularity <- cellu.cint$max.l
+cellularity
 dna.index <- dna.c.cint$max.l
+dna.index
 @
-\subsection{Detect mutated alleles.}
+
+\subsection{Detect mutated alleles}
+
 <<label=mmufBayes, eval=TRUE>>=
 mut.tab.clean <- na.exclude(mut.tab)
 mut.alleles <- mufreq.bayes(mufreq = mut.tab.clean$F, depth.ratio = mut.tab.clean$adjusted.ratio,
@@ -259,7 +342,8 @@ head(mut.alleles)
 head(cbind(mut.tab.clean[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
 @
 
-\subsection{Detect Copy number variation.}
+\subsection{Detect Copy number variation}
+
 <<label=bafBayes, eval=TRUE>>=
 cn.alleles <- baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
                         cellularity = cellularity, dna.index = dna.index,
@@ -277,7 +361,7 @@ head(seg.s1.cn)
 
 chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]], 
                 ratio.windows = abf.r.win[[1]],  min.N.ratio = 1,
-                segments = seg.s1.cn, main = "TCGA-42-2591 chr 1",
+                segments = seg.s1.cn, main = "Chromosome 1",
                 cellularity = cellularity, dna.index = dna.index,
                 avg.depth.ratio = 1)
 @ 
@@ -285,9 +369,10 @@ chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]],
       \label{fig:crhomViewWithCP}
 \end{figure}
 
+
 \section{Working with SNP array data}
 
-
+MAKE THIS A TOPIC A SEPARATE DOCUMENT
 
 \subsection{Preparing the data}
 <<label=loadingFromCopynumber, eval=TRUE>>=
