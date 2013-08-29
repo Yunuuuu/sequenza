@@ -1,41 +1,32 @@
-cp.plot <- function(cp.table, map = makecmap(seq(from = median(cp.table$L, na.rm = TRUE), 
-                                                 to = max(cp.table$L, na.rm = TRUE), by = 0.1), n = 10),
+cp.plot <- function(cp.table, map = makecmap(seq(from = quantile(log(cp.table$z), 0.75, na.rm = TRUE), 
+                                                 to = max(log(cp.table$z), na.rm = TRUE), by = 1e-2), n = 10),
                     outlier = "white", ...) {
    require(squash)
-   z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.index'], cp.table[, 'cellularity']), mean)
-   x <- as.numeric(rownames(z))
-   y <- as.numeric(colnames(z))
-   colorgram(x, y, z,
+   colorgram(x = cp.table$x, y = cp.table$y, z= log(cp.table$z),
              colFn = jet, map = map, outlier = outlier, las = 1, 
              xlab= "DNA-index", ylab = "Cellularity", 
              zlab = "log-likelihood", ...)
-   L.max <- cp.table[which.max(cp.table$L),]
-   points(x = L.max$dna.index, y = L.max$cellularity, pch = 18)
-}
+   max.xy <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
+   points(x = cp.table$x[max.xy[,'row']], y = cp.table$y[max.xy[,'col']], pch = 18)
+} 
 
 cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999), 
                              col = palette(), legend.pos = 'bottomright', ...) {
    require(squash)
-   z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.index'], cp.table[, 'cellularity']), mean)
-   x <- as.numeric(rownames(z))
-   y <- as.numeric(colnames(z))
-   max.lik <- max(cp.table[, 3])
-   LogSumLik <- log2(sum(2^(cp.table[, 3] - max.lik))) + max.lik
-   znorm <- z - LogSumLik
-   znormsort <- sort(znorm, decreasing = TRUE)
-   znormcumLik <- cumsum(2 ^ znormsort)
+   znormsort <- sort(cp.table$z, decreasing = TRUE)
+   znormcumLik <- cumsum(znormsort)
    n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
-   logLikThresh <- znormsort[n]
-   names(logLikThresh) <- paste0(likThresh * 100, '%')
+   LikThresh <- znormsort[n]
+   names(LikThresh) <- paste0(likThresh * 100, '%')
    
-   contour(x, y, znorm, levels = znormsort[n], col = col,
+   contour(cp.table, levels = znormsort[n], col = col,
            drawlabels = FALSE,
            xlab= "DNA index", ylab = "Cellularity", ...)
    if(!is.na(legend.pos)) {
-      legend(legend.pos, legend = names(logLikThresh), 
+      legend(legend.pos, legend = names(LikThresh), 
              col = col, lty = 1, title = 'cumLik')
    } 
-   invisible(logLikThresh)
+   invisible(LikThresh)
 }
 
 # plot.fit.model <- function(mufreq.tab, cellularity, dna.index, chr23 = "XY",
