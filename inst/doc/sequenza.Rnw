@@ -282,16 +282,9 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
 WOULD IT MAKE MORE SENSE FOR THIS FUNCTION TO RETURN A MATRIX?
 
 NEED EXPLANATIONS HERE:
+
 <<label=ConfIntCP, echo=TRUE>>=
-head(CP)
-
-dna.c.cint <- get.ci(CP[,c(1,3)])
-dna.c.cint$confint
-dna.c.cint$max.l
-
-cellu.cint <- get.ci(CP[,c(2,3)])
-cellu.cint$confint
-cellu.cint$max.l
+cint <- get.ci(CP)
 @
 
 \begin{figure}[H]
@@ -308,15 +301,25 @@ cp.plot.contours(CP, add = TRUE, likThresh = c(0.5, 0.75, 0.95, 0.99))
 \begin{figure}[H]
       \centering
 <<label=CPplotCI,fig=TRUE,width=6,height=6>>=
-par(mfrow = c(2,2))
-   cp.plot(CP)
-   plot(cellu.cint$values[,c(2,1)], ylab = "cellularity",
-        xlab = "likelihood", type = "l")
-   abline(h = cellu.cint$confint, lty = 2, lwd = 0.5, col = "red")  
 
-   plot(dna.c.cint$values[,c(1,2)], xlab = "DNA-index",
-        ylab = "likelihood", type = "l")
-   abline(v = dna.c.cint$confint, lty = 2, lwd = 0.5, col = "red")
+par(mfrow = c(2,2))
+cp.plot(CP)
+plot(cint$values.y, ylab = "Cellularity",
+     xlab = "likelihood", type = "n")
+select <- cint$confint.y[1] <= cint$values.y[,2] & cint$values.y[,2] <= cint$confint.y[2]
+polygon(y = c(cint$confint.y[1], cint$values.y[select, 2], cint$confint.y[2]), 
+        x = c(0, cint$values.y[select, 1], 0), col='red', border=NA)
+lines(cint$values.y)
+abline(h = cint$max.y, lty = 2, lwd = 0.5)  
+
+plot(cint$values.x, xlab = "DNA index",
+     ylab = "likelihood", type = "n")
+select <- cint$confint.x[1] <= cint$values.x[,1] & cint$values.x[,1] <= cint$confint.x[2]
+polygon(x = c(cint$confint.x[1], cint$values.x[select, 1], cint$confint.x[2]), 
+        y = c(0, cint$values.x[select, 2], 0), col='red', border=NA)
+lines(cint$values.x)
+abline(v = cint$max.x, lty = 2, lwd = 0.5)
+
 @ 
       \caption{Plot of the log likelihood with respective cellularity and DNA-index probability distribution and confidence intervals.}
       \label{fig:cpPlotCI}
@@ -325,9 +328,9 @@ par(mfrow = c(2,2))
 \section{Call CNVs and mutations using the estimated parameters}
 
 <<label=seParam, eval=TRUE>>=
-cellularity <- cellu.cint$max.l
+cellularity <- cint$max.y
 cellularity
-dna.index <- dna.c.cint$max.l
+dna.index <- cint$max.x
 dna.index
 @
 
