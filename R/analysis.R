@@ -157,39 +157,27 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, v
    results
 }
 
-get.ci <- function(mat, interval = 0.95) {
-   incr.col <- function(x) {
-      for (i in 1:length(x)) {
-         if (i == 1) {
-            x[i] <- x[i]
-         } else {
-            x[i] <- x[i] + x[i - 1]
-         }
-      }
-      x
-   }
+get.ci <- function(cp.table, interval = 0.95) {
    results  <- list()
-   values   <- sort(unique(mat[, 1]))
-   mat      <- t(mapply(x = values, FUN = function(x ,mat) cbind(x, max(mat[mat[, 1] == x, 2])), MoreArgs = list(mat = mat)))
-   L.max    <- which.max(mat[, 2]) 
-   sum.all  <- log1p(sum(exp(mat[-L.max, 2]-mat[L.max, 2]))) + mat[L.max, 2] 
-   exp.vals <- 2^(mat[, 2] - sum.all)
-   exp.vals[is.infinite(exp.vals)] <- 0
-   values   <- cbind(mat[, 1], expL = exp.vals)
-   val.95   <- quantile(values[, 2], prob = interval, na.rm = TRUE)
-   values.s <- values[values[, 2] >= val.95, ]
-   if (is.null(dim(values.s))) {
-      up.v  <- values.s[1]
-      low.v <- values.s[1]
-      max.l <- values.s[1]
-   } else {
-      up.v     <- max(values.s[, 1])
-      low.v    <- min(values.s[, 1]) 
-      max.l    <- values[which.max(values[, 2]), 1]
-   }
-   results$values  <- values
-   results$confint <- c(low.v, up.v)
-   results$max.l   <- max.l
+   maxs.x   <- apply(cp.table$z, 1, FUN = max)
+   maxs.y   <- apply(cp.table$z, 2, FUN = max)
+   max.xy   <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
+   val.95.x <- quantile(maxs.x, prob = interval, na.rm = TRUE)
+   val.95.y <- quantile(maxs.y, prob = interval, na.rm = TRUE)
+   values.x <- cp.table$x[maxs.x >= val.95.x]
+   values.y <- cp.table$y[maxs.y >= val.95.y]
+   up.x     <- max(values.x)
+   low.x    <- min(values.x) 
+   max.x    <- cp.table$x[which.max(maxs.x)]
+   up.y     <- max(values.y)
+   low.y    <- min(values.y) 
+   max.y    <- cp.table$y[which.max(maxs.y)]
+   results$values.x  <- cbind(x = cp.table$x, y = maxs.x)
+   results$confint.x <- c(low.x, up.x)
+   results$max.x     <- max.x
+   results$values.y  <- cbind(x = maxs.y, y = cp.table$y)
+   results$confint.y <- c(low.y, up.y)
+   results$max.y     <- max.y
    results
 }
 
