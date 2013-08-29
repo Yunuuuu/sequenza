@@ -19,11 +19,11 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999),
    z <- tapply(cp.table[, 'L'], list(cp.table[, 'dna.index'], cp.table[, 'cellularity']), mean)
    x <- as.numeric(rownames(z))
    y <- as.numeric(colnames(z))
-   
-   LogSumLik <- log10(sum(10 ^ z))
+   max.lik <- max(cp.table[, 3])
+   LogSumLik <- log2(sum(2^(cp.table[, 3] - max.lik))) + max.lik
    znorm <- z - LogSumLik
    znormsort <- sort(znorm, decreasing = TRUE)
-   znormcumLik <- cumsum(10 ^ znormsort)
+   znormcumLik <- cumsum(2 ^ znormsort)
    n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
    logLikThresh <- znormsort[n]
    names(logLikThresh) <- paste0(likThresh * 100, '%')
