@@ -182,8 +182,14 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
       sum(L.model[,4])
    }
    bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
-   result$L <- unlist(bayes.res)
-   result
+   result$L <- unlist(bayes.res) 
+   z <- tapply(result$L, list(result$dna.index, result$cellularity), mean)
+   x <- as.numeric(rownames(z))
+   y <- as.numeric(colnames(z))
+   max.lik <- max(result$L)
+   LogSumLik <- log2(sum(2^(result$L - max.lik))) + max.lik
+   znorm <- 2^(z - LogSumLik)
+   list(x = x, y = y, z = znorm)
 }
 
 baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01), 
@@ -200,8 +206,14 @@ baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
       sum(L.model[,4])
    }
    bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
-   result$L <- unlist(bayes.res)
-   result
+   result$L <- unlist(bayes.res) 
+   z <- tapply(result$L, list(result$dna.index, result$cellularity), mean)
+   x <- as.numeric(rownames(z))
+   y <- as.numeric(colnames(z))
+   max.lik <- max(result$L)
+   LogSumLik <- log2(sum(2^(result$L - max.lik))) + max.lik
+   znorm <- 2^(z - LogSumLik)
+   list(x = x, y = y, z = znorm)
 }
 
 
