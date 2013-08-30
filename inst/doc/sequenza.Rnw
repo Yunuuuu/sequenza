@@ -298,6 +298,7 @@ cellu.cint$max.l
       \centering
 <<label=CPplot,fig=TRUE,width=6,height=6>>=
 cp.plot(CP)
+cp.plot.contours(CP, add = TRUE, likThresh = c(0.5, 0.75, 0.95, 0.99))
 @ 
 
       \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index. The color indicates the log-likelihood of the corresponding cellularity/DNA-index values.}
