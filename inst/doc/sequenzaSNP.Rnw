@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{sequenza SNP-array usage example}
-%\VignetteDepends{sequenzaSNP}
+%\VignetteDepends{sequenza}
 %\VignetteKeywords{LOH}
 %\VignetteKeywords{Heterogenity}
 %\VignetteKeywords{Cancer sequencing}
