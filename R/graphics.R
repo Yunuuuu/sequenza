@@ -1,14 +1,17 @@
-cp.plot <- function(cp.table, map = makecmap(seq(from = quantile(log(cp.table$z), 0.75, na.rm = TRUE), 
-                                                 to = max(log(cp.table$z), na.rm = TRUE), by = 1e-2), n = 10),
-                    outlier = "white", ...) {
+cp.plot <- function (cp.table, ...) {
    require(squash)
-   colorgram(x = cp.table$x, y = cp.table$y, z= log(cp.table$z),
-             colFn = jet, map = map, outlier = outlier, las = 1, 
-             xlab= "DNA-index", ylab = "Cellularity", 
-             zlab = "log-likelihood", ...)
+   #colorgram(x = cp.table$x, y = cp.table$y, z = log(cp.table$z), 
+   #    colFn = heat, map = map, outlier = outlier, las = 1, 
+   #    xlab = "DNA-index", ylab = "Cellularity", zlab = "log-likelihood", 
+   #    ...)
+   colorgram(x = cp.table$x, y = cp.table$y, z = matrix(rank(cp.table$z),
+                                                        nrow = nrow(cp.table$z)), colFn = colorRampPalette(c('white', 'lightblue')),
+             las = 1, xlab = "DNA-index", ylab = "Cellularity", zlab = "rank likelihood",
+             ...)
    max.xy <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
-   points(x = cp.table$x[max.xy[,'row']], y = cp.table$y[max.xy[,'col']], pch = 18)
-} 
+   points(x = cp.table$x[max.xy[, "row"]], y = cp.table$y[max.xy[, 
+                                                                 "col"]], pch = 18)
+}
 
 cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999), 
                              col = palette(), legend.pos = 'bottomright', ...) {
@@ -24,7 +27,7 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999),
            xlab= "DNA index", ylab = "Cellularity", ...)
    if(!is.na(legend.pos)) {
       legend(legend.pos, legend = names(LikThresh), 
-             col = col, lty = 1, title = 'cumLik')
+             col = col, lty = 1, title = 'Confidence Region')
    } 
    invisible(LikThresh)
 }
