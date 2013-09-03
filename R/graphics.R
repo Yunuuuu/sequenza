@@ -27,7 +27,7 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999),
            xlab= "DNA index", ylab = "Cellularity", ...)
    if(!is.na(legend.pos)) {
       legend(legend.pos, legend = names(LikThresh), 
-             col = col, lty = 1, title = 'Confidence Region')
+             col = col, lty = 1, title = 'Confidence Region', border = NA, bty = "n")
    } 
    invisible(LikThresh)
 }
