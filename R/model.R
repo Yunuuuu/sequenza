@@ -1,6 +1,6 @@
 theoretical.depth.ratio <- function(cellularity = 0.5, dna.index = 1, copy.number.ratio = 1.5, avg.depth.ratio = 1) {
-   cellu.copy.term <- (1 - cellularity) + (copy.number.ratio * cellularity)
-   avg.depth.ratio * cellu.copy.term / dna.index
+   cellu.copy.term <- (1 - cellularity) + (copy.number.ratio * cellularity / dna.index)
+   avg.depth.ratio * cellu.copy.term
 }
 
 theoretical.mufreq <- function(cellularity, CNr = 2, CNt = 2, Mt = 1) {
