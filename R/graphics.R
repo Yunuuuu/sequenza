@@ -98,28 +98,28 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                             cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL) {
    if (is.null(segments)) {
       data.model <- NULL
-      } else {
-         if ("CNt" %in% colnames(segments)) {
-            if (length(c(cellularity, dna.index, avg.depth.ratio)) != 3) {
-               data.model <- NULL
-            } else {
-               data.model     <- list()
-               CNt.max        <- max(segments$CNt, na.rm = TRUE) + 1
-               CNt.min        <- 0
-               data.model$baf <- theoretical.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
-               if (CNr == 2) {
-                  data.model$baf <- rbind(c(0,0,0.5,0), data.model$baf)
-               } else {
-                  data.model$baf <- rbind(c(0,0,1,0), data.model$baf)                  
-               }   
-               types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
-               data.model$muf <- cbind(types, model.points(cellularity = cellularity, dna.index = dna.index,
-                                                   types = types, avg.depth.ratio = avg.depth.ratio))
-            }
-         } else {
+   } else {
+      if ("CNt" %in% colnames(segments)) {
+         if (length(c(cellularity, dna.index, avg.depth.ratio)) != 3) {
             data.model <- NULL
+         } else {
+            data.model     <- list()
+            CNt.max        <- max(segments$CNt, na.rm = TRUE) + 1
+            CNt.min        <- 0
+            data.model$baf <- theoretical.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
+            if (CNr == 2) {
+               data.model$baf <- rbind(c(0,0,0.5,0), data.model$baf)
+            } else {
+               data.model$baf <- rbind(c(0,0,1,0), data.model$baf)                  
+            }   
+            types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
+            data.model$muf <- cbind(types, model.points(cellularity = cellularity, dna.index = dna.index,
+                                                   types = types, avg.depth.ratio = avg.depth.ratio))
          }
+      } else {
+         data.model <- NULL
       }
+   }
    if (is.null(mut.tab)) {
       par(mar = c(0, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(2,1), xaxt='n')
       min.x <- min(c(min(baf.windows$start), min(ratio.windows$start)))
