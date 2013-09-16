@@ -35,7 +35,9 @@
 
 
 \section{Working with SNP array data}
-
+<<label=loadingSequenza, eval=TRUE>>=
+library(sequenza)
+@
 \subsection{Preparing the data}
 <<label=loadingFromCopynumber, eval=TRUE>>=
 data(BAF)
@@ -51,8 +53,10 @@ sample.i <- data.frame(chromosome = BAF$chrs, n.base = BAF$pos,
 \subsubsection{Correcting logR with a normal sample, or with the mean logR value}
 Without a reference sample (normal germline sample) we can try to divide for the mean value. It would be correct to use the germline logR.
 <<label=logRMeansub, eval=TRUE>>=
-sample.i$adjusted.ratio <- 2^(sample.i$adjusted.ratio)
-sample.i$adjusted.ratio <- sample.i$adjusted.ratio / mean(sample.i$adjusted.ratio)
+#sample.i$adjusted.ratio <- 2^(sample.i$adjusted.ratio)
+#sample.i$adjusted.ratio <- sample.i$adjusted.ratio / mean(sample.i$adjusted.ratio)
+sample.i$adjusted.ratio <- 2^(sample.i$adjusted.ratio/0.55)
+
 @
 \subsubsection{Retrive the homozygous position}
 It should be available a germline sample to get the heterozygours SNP, doing in the same sample it's a risk if the sample is pure. A treshold around 0.25 or 0.35 can be picked to subset the heterozygous position on the germline.
@@ -114,7 +118,7 @@ CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         avg.depth.ratio = avg.unlogR,
                         cellularity = seq(0.1,1,0.01), 
                         dna.index = seq(0.5,3,0.05), mc.cores = 4,
-                        priors.labels = 2, priors.values = 1)
+                        priors.labels = 2, priors.values = 2)
 @
 
 <<label=getCPparamSNP, eval = TRUE>>=
