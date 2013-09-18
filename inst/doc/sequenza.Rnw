@@ -37,14 +37,44 @@ Deep sequence of tumor DNA along with corresponding normal DNA can provide a ric
 
 This document details a typical analysis of matched tumor-normal exome sequence data using \textit{sequenza}.
 
-\section{Starting data}
+\section{Minimum requirements}
+Software: R
+Operating system: Linux, OSX, Windows, ... (any that runs R)
+Memory: Minimum 1GB of RAM.  Recommended >2Gb.
+Disk space: ? times the size of total data 
 
-Sequenza requires:
+R version
+Bioconductor version ? 
+Python version and modules 
+\section{Getting ready with Sequenza package/Installing R/Setting up Sequenza}
+----- download from bitbucket/cbs.dtu.dk
+----- how to install it. R CMD INSTALL sequenza_version.tar.gz
+
+----- Copy sequenza utils to some location ? 
+----- Setting PATH ? 
+
+
+A typical  workflow by Sequenza is as follow :
+1. Convert pileup to abfreq 
+2. GC normalization
+3. Obtain depth ratio and B allele frequencies
+4. Allele-specific segmentation
+5. Infer cellularity and DNA-index by model fitting
+6. Call CNAs(CNVs ?) and mutations
+
+\section{Preparing inputs for Sequenza}
+In order to obtain precise mutational and aberration patterns in a tumor sample, Sequenza requires a matched normal sample from the same patient. In short, the following files are needed to get started with Sequenza. 
+
 1. A pileup file from the tumor specimen
 2. A pileup file from the normal specimen
-3. A FASTA genome sequence file (optional, for GC-content correction)
+3. A FASTA reference genomic sequence file (optional, for GC-content correction)
+
+We recommend using preprocessed and quality filtered BAM files to obtain mpileup calls for both samples. 
 
 Pileup files can be generated using \texttt{samtools} (ref). The genome sequence file can be obtained from (url).
+samtools mpileup  -f hg19.fasta -Q 20 normal.bam
+samtools mpileup  -f hg19.fasta -Q 20 tumor.bam
+
 
 \section{First the non-R part: preprocessing data}
 
@@ -54,7 +84,7 @@ For convenience and efficiency we have implemented preprocessing algorithms in a
 system.file("exec", "sequenza-utils.py", package="sequenza")
 @
 
-You may wish to copy this program to a location on your path. NOTE: this script requires several unix tools and thus probably not work on Windows.
+You may wish to copy this program to a location on your path. NOTE: this script requires several unix tools and thus probably not work on Windows (HOW ABOUT CYGWIN ?).
 
 
 Extract average GC content in 50-base genomic windows:
