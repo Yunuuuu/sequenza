@@ -59,12 +59,12 @@ You may wish to copy this program to a location on your path. NOTE: this script 
 
 Extract average GC content in 50-base genomic windows:
 \shellcmd{
-abfreqtools.py GC-windows -w 50 hg19.fa | gzip > hg19.gc50Base.txt.gz
+sequenza-utils.py GC-windows -w 50 hg19.fa | gzip > hg19.gc50Base.txt.gz
 }
 
 Process the two pileup files to obtain an "abfreq" file containing alleles and mutation frequency.
 \shellcmd{
-abfreqtools.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pileup.gz -s 0001-met2.pileup.gz -q 20 -n 10 -o 0001-met2.abfreq.txt.gz
+sequenza-utils.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pileup.gz -s 0001-met2.pileup.gz -q 20 -n 10 -o 0001-met2.abfreq.txt.gz
 }
 
 ----- UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME -----
@@ -103,7 +103,9 @@ str(abf.data)
 
 \section{Quality control step?  (EXPLAIN)}
 
-NEED TO EXPLAIN THIS:
+Each nucleotide aligned in the sequencing is associate with a quality score. The \textit{sequenza-utils} software is capable of filtering the base with the quality lower then a specified value (default is 20), and returns the rate of reads that have passed the filter in the column \textit{sample.reads.above.quality}, while the \textit{depth.sample} column contains the raw depth calculated in the pileup (from samtools).
+The product of the rate of bases that have passed the quality check and the total amount or reads aligned at the same nucleotide return the number of reads that have passed the quality check.
+
 <<label=goodReads, echo=TRUE>>=
 abf.data$good.s.reads <- abf.data$depth.sample * 
                          abf.data$sample.reads.above.quality
@@ -119,7 +121,7 @@ gc.stats <- gc.sample.stats(data.file)
 @
 
 
-WHAT IS THIS?  EXPLAIN...   (not run)
+Or alternatively it is possible to collect the GC-contents information from an object loaded in the environment.
 <<label=depthRGCnorm, echo=TRUE, eval=FALSE>>=
 gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)
