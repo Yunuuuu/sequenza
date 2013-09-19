@@ -48,7 +48,7 @@ Bioconductor version ?
 Python version and modules 
 \section{Getting ready with Sequenza package/Installing R/Setting up Sequenza}
 ----- download from bitbucket/cbs.dtu.dk
------ how to install it. R CMD INSTALL sequenza_version.tar.gz
+----- how to install it. R CMD INSTALL sequenza\_version.tar.gz
 
 ----- Copy sequenza utils to some location ? 
 ----- Setting PATH ? 
@@ -84,7 +84,7 @@ For convenience and efficiency we have implemented preprocessing algorithms in a
 system.file("exec", "sequenza-utils.py", package="sequenza")
 @
 
-You may wish to copy this program to a location on your path. NOTE: this script requires several unix tools and thus probably not work on Windows (HOW ABOUT CYGWIN ?).
+You may wish to copy this program to a location on your path. NOTE: this script requires several UNIX tools and thus probably not work on Windows (HOW ABOUT CYGWIN ?).
 
 
 Extract average GC content in 50-base genomic windows:
@@ -145,19 +145,19 @@ abf.data$good.s.reads <- abf.data$depth.sample *
 
 The number of reads at a given genomic position can be affected by the local GC content. We attempt to remove this bias as in (ref).
 
-Gather gc-content information from the entire file (normally this would be the entire genome, but in our example it contains only chromosome 1):
+It is possible to gather gc-content information from the entire file (normally this would be the entire genome, but in our example it contains only chromosome 1):
 <<label=depthRGCnormall, echo=TRUE, results=hide>>=
 gc.stats <- gc.sample.stats(data.file)
 @
 
 
-Or alternatively it is possible to collect the GC-contents information from an object loaded in the environment.
+Or alternatively, it is possible to collect the GC-contents information from an object loaded in the environment.
 <<label=depthRGCnorm, echo=TRUE, eval=FALSE>>=
 gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)
 @
 
-Calculate the GC-adjusted depth ratio:
+Calculate the GC-normalized depth ratio:
 <<label=useGCmedians, echo=TRUE>>=
 gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
 
@@ -182,7 +182,7 @@ hist2(abf.data$depth.ratio, abf.data$adjusted.ratio,
 
 \subsection{First, the depth ratio}
 
-Summarize the depth ratio in overlapping genomic windows:
+Summarize the depth ratio by binning the data in overlapping genomic windows:
 <<label=depthWindowing, echo=TRUE, results=hide>>=
 abf.r.win <- windowValues(x = abf.data$adjusted.ratio,
              positions = abf.data$n.base,
@@ -207,12 +207,13 @@ plotWindows(abf.r.win[[1]], log2.plot = FALSE,
 
 \subsection{Next, the B-allele frequencies}
 
+The column \textit{ref.zygosity} contains the zygosity derived from the germline sample. the possible values are \textit{het} for heterozygous positions and \textit{hom} for homozygous positions.
 <<label=HetSepqring, echo=TRUE>>=
 abf.hom  <- abf.data$ref.zygosity == 'hom'
 abf.het  <- abf.data[!abf.hom, ]
 @
 
-Summarize the BAF in overlapping genomic windows (including only those positions called heterozygous in the normal sample):
+Summarize the BAF by binning the data in overlapping genomic windows (including only those positions called heterozygous in the normal sample):
 <<label=BAFWindowing, echo=TRUE, results=hide>>=
 abf.b.win <- windowValues(x = abf.het$Bf,
              positions = abf.het$n.base,
@@ -248,14 +249,15 @@ seg.s1 <- segment.breaks(abf.data, breaks = breaks)
 @
 
 \section{Select mutations by mutation frequency}
-
+I the genotype file (the \textit{abfreq} file) the mutation are detected as homozygous position with a decreased frequency of the germline nucleotide. A set of nucleotide not present in the germline is present with the relative frequency in the column \textit{AB.sample}. Being a frequency derived by the number of reads covering the position, the accuracy of the measurement is depending on the depth in the considered position.
+In order to filter the mutations the function \textit{mutation.table} allow to filter the present mutation to a define level of frequency, a desired number of reads depth, and a desired number of mutated nucleotide per position. Additionally it is possible to swap the \textit{adjusted.ratio} column with the corresponding value after segmentation.
 <<label=doF, echo=TRUE>>=
 mut.tab <- mutation.table(abf.data, mufreq.treshold = 0.15, 
                           min.reads = 40, max.mut.types = 1,
                           min.type.freq = 0.9, segments = seg.s1)
 @
 
-NEEDS EXPLANATION HERE... what is the following object?
+However it is optional, without providing the segmented data the \textit{adjusted.ratio} would remains unchanged.
 <<label=doF, echo=TRUE>>=
 mut.tab.no.seg <- mutation.table(abf.data, mufreq.treshold = 0.15, 
                           min.reads = 40, max.mut.types = 1,
