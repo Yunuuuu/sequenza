@@ -6,15 +6,12 @@ cp.plot <- function (cp.table, ...) {
    #    ...)
    colorgram(x = cp.table$x, y = cp.table$y, z = matrix(rank(cp.table$z),
                                                         nrow = nrow(cp.table$z)), colFn = colorRampPalette(c('white', 'lightblue')),
-             las = 1, xlab = "DNA-index", ylab = "Cellularity", zlab = "rank likelihood",
+             las = 1, xlab = "DNA index", ylab = "Cellularity", zlab = "Rank likelihood",
              ...)
-   max.xy <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
-   points(x = cp.table$x[max.xy[, "row"]], y = cp.table$y[max.xy[, 
-                                                                 "col"]], pch = 18)
 }
 
 cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999), 
-                             col = palette(), legend.pos = 'bottomright', ...) {
+                             col = palette(), legend.pos = 'bottomright', pch = 18, ...) {
    require(squash)
    znormsort <- sort(cp.table$z, decreasing = TRUE)
    znormcumLik <- cumsum(znormsort)
@@ -25,10 +22,14 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999),
    contour(cp.table, levels = znormsort[n], col = col,
            drawlabels = FALSE,
            xlab= "DNA index", ylab = "Cellularity", ...)
+   max.xy <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
+   points(x = cp.table$x[max.xy[, "row"]],
+          y = cp.table$y[max.xy[, "col"]], pch = pch)
    if(!is.na(legend.pos)) {
-      legend(legend.pos, legend = names(LikThresh), 
-             col = col, lty = 1, title = 'Confidence Region', border = NA, bty = "n")
-   } 
+      legend(legend.pos, legend = c(paste("C.R.", names(LikThresh), sep = " "), "Point estimate"), 
+             col = c(col[1:length(LikThresh)], "black"), lty = c(rep(1, length(LikThresh)), NA),
+             pch = c(rep(NA, length(LikThresh)), pch), border = NA, bty = "n")
+   }
    invisible(LikThresh)
 }
 
@@ -93,9 +94,9 @@ plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
 
 }
 
-chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
-                            min.N.baf = 1, min.N.ratio = 1e4, main = "", vlines = FALSE, CNr = 2,
-                            cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL) {
+chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,  min.N.baf = 1, min.N.ratio = 1e4,
+                            main = "", vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0),
+                            CNr = 2, cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL, x.chr.space = 10) {
    if (is.null(segments)) {
       data.model <- NULL
    } else {
@@ -152,11 +153,11 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       labels <- sapply(unique.colors, function(a) paste(names(mutation.colors)[mutation.colors == a], collapse = ", "))
       #legend("topleft", legend = labels, fill = unique.colors, border = NA, bty = "n")
       legend(y = "center", x  = "right", legend = labels,
-             inset = c(-25 * strwidth("a", units = 'figure'), 0),
+             inset = legend.inset,
              fill = unique.colors, border = NA, bty = "n")
       if (!is.null(segments)){
          if (vlines) {
-            abline(v = segments$end.pos, lwd = 0.9, lty = 2)
+            abline(v = segments$end.pos, lwd = 1, lty = 2)
          }   
          if (!is.null(data.model)) {
             for (i in 1:nrow(segments)) {
@@ -172,7 +173,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                n.min = min.N.baf)
    if (!is.null(segments)){
       if (vlines) {
-         abline(v = segments$end.pos, lwd = 0.9, lty = 2)
+         abline(v = segments$end.pos, lwd = 1, lty = 2)
       }
       segments(x0 = segments$start.pos, y0 = segments$Bf, x1=segments$end.pos, y1 = segments$Bf, col = "red", lwd = 3)
       if (!is.null(data.model)) {
@@ -186,7 +187,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                las = 1, n.min = min.N.ratio, ylim = c(0, 2.5))
    if (!is.null(segments)){
       if (vlines) {
-         abline(v = segments$end.pos, lwd = 0.9, lty = 2)
+         abline(v = segments$end.pos, lwd = 1, lty = 2)
       }   
       segments(x0 = segments$start.pos, y0 = segments$depth.ratio, x1=segments$end.pos, y1 = segments$depth.ratio, col = "red", lwd = 3)
       if (!is.null(data.model)) {
@@ -195,15 +196,18 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
          segments(x0 = rep(min(segments$start.pos, na.rm =TRUE), times = nrow(ratios.theoric)),
                   x1 = rep(max(segments$end.pos, na.rm = TRUE), times = nrow(ratios.theoric)), 
                   y0 = ratios.theoric$depth.ratio, lwd = 0.4, lty = "24")
-         text(x = rep(min(segments$start.pos, na.rm =TRUE), times = nrow(ratios.theoric)),
-              y = ratios.theoric$depth.ratio, labels = ratios.theoric$CNt, pos = 2, offset = 0.5, cex = 0.8)
-         
+         #text(x = rep(min(segments$start.pos, na.rm =TRUE), times = nrow(ratios.theoric)),
+         #     y = ratios.theoric$depth.ratio, labels = ratios.theoric$CNt, pos = 2, offset = 0.5, cex = 0.8)
+         axis(labels = as.character(ratios.theoric$CNt), side = 4, line = 0, las = 1,
+              at = ratios.theoric$depth.ratio)
+         mtext(text = "Copy number", side = 4, line = 2, cex = par("cex.lab")*par("cex"))
       }
    }
-   mtext(main, 3, outer = TRUE, cex = par("cex.main"), line = 2)
-   mtext("Position (Mb)", 1, outer = TRUE, cex = par("cex.main"), line = 3)
-
-   mtext(at = seq(xlim[1], xlim[2], by = 1e7), text = round(seq(xlim[1]/1e6, xlim[2]/1e6, by = 10), 0), side = 1, cex = 0.6)
+   par(xaxt='s')
+   axis(labels = as.character(round(seq(xlim[1]/1e6, xlim[2]/1e6, by = x.chr.space), 0)), side = 1 , line = 0,
+        at = seq(xlim[1], xlim[2], by = 1e6 * x.chr.space), outer = FALSE, cex = par("cex.axis")*par("cex"))
+   mtext("Position (Mb)", side = 1, line = 3, outer = FALSE, cex = par("cex.lab")*par("cex"))   
+   mtext(main, 3, outer = TRUE, cex = par("cex.main")*par("cex"), line = 2)
 }
 
 genome.view <- function(baf.windows, ratio.windows, segments = NULL, main = "", 
