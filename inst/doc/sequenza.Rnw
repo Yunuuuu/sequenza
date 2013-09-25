@@ -38,47 +38,50 @@ Deep sequence of tumor DNA along with corresponding normal DNA can provide a ric
 This document details a typical analysis of matched tumor-normal exome sequence data using \textit{sequenza}.
 
 \section{Minimum requirements}
-Software: R
-Operating system: Linux, OSX, Windows, ... (any that runs R)
-Memory: Minimum 1GB of RAM.  Recommended >2Gb.
-Disk space: ? times the size of total data 
+\begin{itemize}
+\item Software: R, Python
+\item Operating system: Linux, OSX
+\item Memory: Minimum 4GB of RAM.  Recommended >8GB.
+\item Disk space: 1.5 GB for each sample 
+\item R version: 2.15.1 
+\item Python version: 2.7
+\end{itemize}
 
-R version
-Bioconductor version ? 
-Python version and modules 
 \section{Getting ready with Sequenza package/Installing R/Setting up Sequenza}
------ download from bitbucket/cbs.dtu.dk
------ how to install it. R CMD INSTALL sequenza\_version.tar.gz
-
------ Copy sequenza utils to some location ? 
------ Setting PATH ? 
-
+\begin{itemize}
+\item download from bitbucket/cbs.dtu.dk
+\item how to install it. R CMD INSTALL sequenza\_version.tar.gz
+\end{itemize}
 
 A typical  workflow by Sequenza is as follow :
-1. Convert pileup to abfreq 
-2. GC normalization
-3. Obtain depth ratio and B allele frequencies
-4. Allele-specific segmentation
-5. Infer cellularity and DNA-index by model fitting
-6. Call CNAs(CNVs ?) and mutations
-
+\begin{enumerate}
+\item Convert pileup to abfreq 
+\item GC normalization
+\item Obtain depth ratio and B allele frequencies
+\item Allele-specific segmentation
+\item Infer cellularity and DNA-index by model fitting
+\item Call CNAs(CNVs ?) and mutations
+\end{enumerate}
 \section{Preparing inputs for Sequenza}
 In order to obtain precise mutational and aberration patterns in a tumor sample, Sequenza requires a matched normal sample from the same patient. In short, the following files are needed to get started with Sequenza. 
-
-1. A pileup file from the tumor specimen
-2. A pileup file from the normal specimen
-3. A FASTA reference genomic sequence file (optional, for GC-content correction)
-
-We recommend using preprocessed and quality filtered BAM files to obtain mpileup calls for both samples. 
+\begin{enumerate}
+\item A pileup file from the tumor specimen
+\item A pileup file from the normal specimen
+\item A FASTA reference genomic sequence file (optional, for GC-content correction)
+\end{enumerate}
+We recommend using pre-processed and quality filtered BAM files to obtain mpileup calls for both samples. 
 
 Pileup files can be generated using \texttt{samtools} (ref). The genome sequence file can be obtained from (url).
+\shellcmd{
 samtools mpileup  -f hg19.fasta -Q 20 normal.bam
+}
+\shellcmd{
 samtools mpileup  -f hg19.fasta -Q 20 tumor.bam
+}
 
+\section{First the non-R part: pre-processing data}
 
-\section{First the non-R part: preprocessing data}
-
-For convenience and efficiency we have implemented preprocessing algorithms in an external (not called from R) Python program. The program is provided with the package; it's exact location can be found like this:
+For convenience and efficiency we have implemented pre-processing algorithms in an external (not called from R) Python program. The program is provided with the package; it's exact location can be found like this:
 
 <<label=loadLib, echo=TRUE>>=
 system.file("exec", "sequenza-utils.py", package="sequenza")
@@ -99,7 +102,7 @@ sequenza-utils.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pile
 
 ----- UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME -----
 
-\section{Read the preprocessed data (\textit{abfreq} file) into R}
+\section{Read the pre-processed data (\textit{abfreq} file) into R}
 
 The remainder of this example takes place in R.
 
@@ -273,6 +276,7 @@ head(mut.tab.no.seg)
 
 \section{Plot chromosome view with mutations, BAF, depth ratio and segments}
 
+The visualization can be made by chromosome, using binned data and segmented data. Optionally can be inserted the mutations table as in figure \ref{fig:3panelsPlot} and the estimated parameters to draw the resulting model lines as in figure \ref{fig:crhomViewWithCP} 
 \begin{figure}[H]
       \centering
 <<label=3panelsPlot,fig=TRUE,width=6,height=6>>=
@@ -288,22 +292,24 @@ chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]],
 
 \section{Inference of cellularity and DNA-index}
 
-NEEDS EXPLANATION:
+The parameter estimation is performed on the segmented data, using BAF and depth ratio information.
+In order to avoid to catch errors due to the heterogeneity of the sample, we can filter the segments smaller then a certain amount. For instance, we can be confident that segments bigger then few megabases have enough data points to usually insure a correct measure. Alternatively it could be possible to exclude chromosomal regions usually know to be problematic, as the region close to the telomeres and also near the centromere 
 <<label=filterSegs, echo=TRUE>>=
 seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 5e6, ]
 @
 
-NEEDS EXPLANATION:
+Every segment is evaluated against the model lines using the resulting density of a binomial distribution and the possible values of the model. In order to perform every segment needs to be associate with a sample size, to generate the distribution function. For practical reason the sample size can not be in the order of the size of the segment in nucleotide (millions), So we use the size of the segment in megabases, added to an arbitrary offset (eg 150), to allow each segment to generate a proper distribution.
 <<label=segsWeight, echo=TRUE>>=
 weights.seg  <- 150 + round((seg.filtered$end.pos - seg.filtered$start.pos) / 1e6, 0)
 @
 
+The genome wide average depth ratio, should be a value close to 1, after normalization. However, since in this example we only consider chromosome 1, we have a different value (I will add one or more chr to make the avg became 1...). 
 <<label=avg.depth.ratio>>=
 avg.depth.ratio <- mean(gc.stats$adj[,3])
 avg.depth.ratio
 @
 
-I DON'T UNDERSTAND WHY "avg.depth.ratio = 1" when we have calculated a different number above?:
+The function \textit{baf.model.fit} evaluate the segmented data to a set of selected value of cellularity and DNA index. Using the implemented model to calculate the theoretic points it returning an x,y,z list containing a matrix z whit the log likelihood for the combinations of the two parameters, a vector x containing all the evaluated DNA index values and a vector y containing all the evaluated cellularity value.
 <<label=BAFmodelFIT, echo=TRUE, results=hide>>=
 CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
                     weight.ratio = weights.seg,
@@ -313,29 +319,28 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     dna.index = seq(0.5,3,0.05), mc.cores = 4)                   
 @
 
-WOULD IT MAKE MORE SENSE FOR THIS FUNCTION TO RETURN A MATRIX?
-
-NEED EXPLANATIONS HERE:
+It is possible to calculate the confidence intervals for the two parameters using the function \textit{get.ci}
 
 <<label=ConfIntCP, echo=TRUE>>=
 cint <- get.ci(CP)
 @
 
+As well it is possible to plot the likelihood over the combination of the two parameters, highlighting the point estimate and lines delimiting the confidence region.
 \begin{figure}[H]
       \centering
 <<label=CPplot,fig=TRUE,width=6,height=6>>=
 cp.plot(CP)
 cp.plot.contours(CP, add = TRUE, likThresh = c(0.5, 0.75, 0.95, 0.99))
 @ 
-
       \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index. The color indicates the log-likelihood of the corresponding cellularity/DNA-index values.}
       \label{fig:cpPlot}
 \end{figure}
 
+
+Alternatively it is possible to draw the likelihood distribution for each parameter, using the information retrieved by the \textit{get.ci} function.
 \begin{figure}[H]
       \centering
 <<label=CPplotCI,fig=TRUE,width=6,height=6>>=
-
 par(mfrow = c(2,2))
 cp.plot(CP)
 plot(cint$values.y, ylab = "Cellularity",
