@@ -238,16 +238,20 @@ mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, max.
          abf.tab$adjusted.ratio[pos.filt] <- segments$depth.ratio[i]
       }
    }
-   mu.fracts   <- mut.fractions(AB.sample = abf.tab$AB.sample, Af = abf.tab$Af)
-   mufreq.filt <- mu.fracts$freq >= mufreq.treshold
-   type.filt   <- mu.fracts$base.count <= max.mut.types
-   prop.filt   <- mu.fracts$maj.base.freq <= min.type.freq
-   mut.type    <- paste(abf.tab$AB.germline, mu.fracts$base, sep = '>')   
-   abf.tab     <- abf.tab[,c('chromosome', 'n.base', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
-   abf.tab     <- cbind(abf.tab, F = mu.fracts$freq, mutation = mut.type)
    abf.dummy   <- data.frame(chromosome = chroms, n.base = 1, GC.percent = NA, good.s.reads = NA,
-                             adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)
-   rbind(abf.tab[mufreq.filt, ], abf.dummy)
+                             adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)   
+   if (nrow(abf.tab) >= 1) {
+      mu.fracts   <- mut.fractions(AB.sample = abf.tab$AB.sample, Af = abf.tab$Af)
+      mufreq.filt <- mu.fracts$freq >= mufreq.treshold
+      type.filt   <- mu.fracts$base.count <= max.mut.types
+      prop.filt   <- mu.fracts$maj.base.freq <= min.type.freq
+      mut.type    <- paste(abf.tab$AB.germline, mu.fracts$base, sep = '>')   
+      abf.tab     <- abf.tab[,c('chromosome', 'n.base', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
+      abf.tab     <- cbind(abf.tab, F = mu.fracts$freq, mutation = mut.type)
+      rbind(abf.tab[mufreq.filt, ], abf.dummy)
+   } else {
+      abf.dummy
+   }
 }
 
 find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...) {
