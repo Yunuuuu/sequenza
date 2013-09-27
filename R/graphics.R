@@ -208,7 +208,8 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                   n.min = min.N.baf)
       if (!is.null(data.model)) {
          make.polygons(segments, data.model$baf)
-         axis(side = 4, line = 0, las = 1, labels = 0:segments$B[nrow(segments)],
+         axis(side = 4, line = 0, las = 1,
+              labels = data.model$baf$B[data.model$baf$CNt == segments$CNt[nrow(segments)]],
               at = data.model$baf$BAF[data.model$baf$CNt == segments$CNt[nrow(segments)]])
          mtext(text = "Number of B alleles", side = 4, line = 2, cex = par("cex.lab")*par("cex"))         
       }
