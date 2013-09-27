@@ -105,24 +105,27 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       polyg.coords <- sapply( 0:max.B, FUN = function (k) as.numeric(sapply(segments$CNt, FUN = function(i) get.B(i, k))))
       polyg.coords[is.na(polyg.coords)] <- 1
       polyg.coords <- cbind(polyg.coords, 1)
-      Xs      <- unlist(lapply(1:nrow(polyg.coords), function(k) segments[k, c("start.pos", "end.pos")]))
-      #edge1   <- seq(2, length(Xs)-1, 2)
-      #edge2   <- seq(3, length(Xs)-1, 2)
-      #Xs.gaps <- (Xs[edge2] - Xs[edge1]) >= 3e6
-      #edge1   <- edge1[Xs.gaps]
-      #edge2   <- edge2[Xs.gaps]
-      #v.gaps  <- apply(rbind(Xs[edge1], Xs[edge2]), 2, mean)
-      #new_Xs  <- c(Xs, c(v.gaps,v.gaps))
-      #new_idx <- c(seq_along(Xs), c(edge1,edge1)+0.5)
-      #Xs      <- new_Xs[order(new_idx)]
+      polyg.pos    <- segments[, c("start.pos", "end.pos")]
+      edge1        <- polyg.pos$end.pos[-nrow(polyg.pos)]
+      edge2        <- polyg.pos$start.pos[-1]
+      no.dat       <- c(1:nrow(polyg.pos))[edge2 - edge1 >= 1e6]
+      v.gaps       <- apply(rbind(edge1[no.dat], edge2[no.dat]), 2, mean)
+      v.gaps       <- cbind(start.pos = v.gaps, end.pos = v.gaps)
+      polyg.p.new  <- rbind(polyg.pos, v.gaps)
+      polyg.c.new  <- polyg.coords
+      for (i in no.dat) {
+         polyg.c.new  <- rbind(polyg.c.new, 0)
+      }
+      new_idx      <- c(seq_along(polyg.pos$start.pos), no.dat+0.5)
+      polyg.pos    <- polyg.p.new[order(new_idx), ]
+      polyg.coords <- polyg.c.new[order(new_idx), ]
+      Xs      <- unlist(lapply(1:nrow(polyg.coords), function(k) polyg.pos[k, ]))
       #color <- colorRampPalette(c("grey99", "grey20"))( max.B + 1 )
       color <- gray.colors((max.B + 1), start = 0.5, end = 0.9, alpha = 0.3)
       extra.x <- c(max(Xs), min(Xs))
       extra.y = c(0 ,0)
       for (k in 1:ncol(polyg.coords)) {
          Ys <- unlist(lapply(polyg.coords[, k], function (i) rep(i, 2)))
-         #Ys <- c(Ys, rep(0, length(c(edge1,edge2))))
-         #Ys <- Ys[new_idx]
          polygon(x = c(Xs,extra.x), y = c(Ys,extra.y), col = color[k], border = NA)
          extra.y <- rev(Ys)
          extra.x <- rev(Xs)
