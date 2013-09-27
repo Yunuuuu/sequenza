@@ -97,6 +97,37 @@ plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,  min.N.baf = 1, min.N.ratio = 1e4,
                             main = "", vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0),
                             CNr = 2, cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL, x.chr.space = 10) {
+   make.polygons <- function(segments, model.baf) {
+      max.B      <- max(model.baf$B[model.baf$CNt == max(segments$CNt)])
+      mat.polygs <- matrix(ncol = max.B+1, nrow = nrow(segments))
+      colnames(mat.polygs) <- 0:max.B
+      get.B <- function (CNt, B) model.baf$BAF[model.baf$CNt == CNt & model.baf$B == B]
+      polyg.coords <- sapply( 0:max.B, FUN = function (k) as.numeric(sapply(segments$CNt, FUN = function(i) get.B(i, k))))
+      polyg.coords[is.na(polyg.coords)] <- 1
+      polyg.coords <- cbind(polyg.coords, 1)
+      Xs      <- unlist(lapply(1:nrow(polyg.coords), function(k) segments[k, c("start.pos", "end.pos")]))
+      #edge1   <- seq(2, length(Xs)-1, 2)
+      #edge2   <- seq(3, length(Xs)-1, 2)
+      #Xs.gaps <- (Xs[edge2] - Xs[edge1]) >= 3e6
+      #edge1   <- edge1[Xs.gaps]
+      #edge2   <- edge2[Xs.gaps]
+      #v.gaps  <- apply(rbind(Xs[edge1], Xs[edge2]), 2, mean)
+      #new_Xs  <- c(Xs, c(v.gaps,v.gaps))
+      #new_idx <- c(seq_along(Xs), c(edge1,edge1)+0.5)
+      #Xs      <- new_Xs[order(new_idx)]
+      #color <- colorRampPalette(c("grey99", "grey20"))( max.B + 1 )
+      color <- gray.colors((max.B + 1), start = 0.5, end = 0.9, alpha = 0.3)
+      extra.x <- c(max(Xs), min(Xs))
+      extra.y = c(0 ,0)
+      for (k in 1:ncol(polyg.coords)) {
+         Ys <- unlist(lapply(polyg.coords[, k], function (i) rep(i, 2)))
+         #Ys <- c(Ys, rep(0, length(c(edge1,edge2))))
+         #Ys <- Ys[new_idx]
+         polygon(x = c(Xs,extra.x), y = c(Ys,extra.y), col = color[k], border = NA)
+         extra.y <- rev(Ys)
+         extra.x <- rev(Xs)
+      }
+   }
    if (is.null(segments)) {
       data.model <- NULL
    } else {
@@ -168,20 +199,36 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       }
 
    }
-   plotWindows(baf.windows, ylab = "B allele frequency", 
-               xlim = xlim, ylim = c(0, 0.5), las = 1,
-               n.min = min.N.baf)
+   if (!is.null(segments)){
+      plotWindows(baf.windows, ylab = "B allele frequency", 
+                  xlim = xlim, ylim = c(0, 0.5), las = 1,
+                  n.min = min.N.baf)
+      if (!is.null(data.model)) {
+         make.polygons(segments, data.model$baf)
+         axis(side = 4, line = 0, las = 1, labels = 0:segments$B[nrow(segments)],
+              at = data.model$baf$BAF[data.model$baf$CNt == segments$CNt[nrow(segments)]])
+         mtext(text = "Number of B alleles", side = 4, line = 2, cex = par("cex.lab")*par("cex"))         
+      }
+      plotWindows(baf.windows, ylab = "B allele frequency", 
+                  xlim = xlim, ylim = c(0, 0.5), las = 1,
+                  n.min = min.N.baf, add = TRUE)
+   }
+   else {
+      plotWindows(baf.windows, ylab = "B allele frequency", 
+                  xlim = xlim, ylim = c(0, 0.5), las = 1,
+                  n.min = min.N.baf)
+   }
    if (!is.null(segments)){
       if (vlines) {
          abline(v = segments$end.pos, lwd = 1, lty = 2)
       }
       segments(x0 = segments$start.pos, y0 = segments$Bf, x1=segments$end.pos, y1 = segments$Bf, col = "red", lwd = 3)
-      if (!is.null(data.model)) {
-         for (i in 1:nrow(segments)) {
-            segments(x0 = segments$start.pos[i], x1 = segments$end.pos[i], 
-                     y0 = unique(data.model$baf$BAF[data.model$baf$CNt == segments$CNt[i]]), lwd = 0.4, lty = "24")
-         }
-      }
+      #if (!is.null(data.model)) {
+         #for (i in 1:nrow(segments)) {
+         #   segments(x0 = segments$start.pos[i], x1 = segments$end.pos[i], 
+         #            y0 = unique(data.model$baf$BAF[data.model$baf$CNt == segments$CNt[i]]), lwd = 0.4, lty = "24")
+         #}
+      #}
    }
    plotWindows(ratio.windows, ylab = "Depth ratio", 
                las = 1, n.min = min.N.ratio, ylim = c(0, 2.5))
