@@ -203,9 +203,8 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
 
    }
    if (!is.null(segments)){
-      plotWindows(baf.windows, ylab = "B allele frequency", 
-                  xlim = xlim, ylim = c(0, 0.5), las = 1,
-                  n.min = min.N.baf)
+      plot(ylab = "B allele frequency", type = "n",
+           x = xlim, y = c(0, 0.5), las = 1)
       if (!is.null(data.model)) {
          make.polygons(segments, data.model$baf)
          axis(side = 4, line = 0, las = 1,
@@ -216,23 +215,21 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       plotWindows(baf.windows, ylab = "B allele frequency", 
                   xlim = xlim, ylim = c(0, 0.5), las = 1,
                   n.min = min.N.baf, add = TRUE)
-   }
-   else {
-      plotWindows(baf.windows, ylab = "B allele frequency", 
-                  xlim = xlim, ylim = c(0, 0.5), las = 1,
-                  n.min = min.N.baf)
-   }
-   if (!is.null(segments)){
       if (vlines) {
          abline(v = segments$end.pos, lwd = 1, lty = 2)
       }
       segments(x0 = segments$start.pos, y0 = segments$Bf, x1=segments$end.pos, y1 = segments$Bf, col = "red", lwd = 3)
       #if (!is.null(data.model)) {
-         #for (i in 1:nrow(segments)) {
-         #   segments(x0 = segments$start.pos[i], x1 = segments$end.pos[i], 
-         #            y0 = unique(data.model$baf$BAF[data.model$baf$CNt == segments$CNt[i]]), lwd = 0.4, lty = "24")
-         #}
+      #   for (i in 1:nrow(segments)) {
+      #      segments(x0 = segments$start.pos[i], x1 = segments$end.pos[i], 
+      #               y0 = unique(data.model$baf$BAF[data.model$baf$CNt == segments$CNt[i]]), lwd = 0.4, lty = "24")
+      #   }
       #}
+   }
+   else {
+      plotWindows(baf.windows, ylab = "B allele frequency", 
+                  xlim = xlim, ylim = c(0, 0.5), las = 1,
+                  n.min = min.N.baf)
    }
    plotWindows(ratio.windows, ylab = "Depth ratio", 
                las = 1, n.min = min.N.ratio, ylim = c(0, 2.5))
