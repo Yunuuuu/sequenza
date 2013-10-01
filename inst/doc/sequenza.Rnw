@@ -44,7 +44,7 @@ This document details a typical analysis of matched tumor-normal exome sequence 
 \item Memory: Minimum 4GB of RAM.  Recommended >8GB.
 \item Disk space: 1.5 GB for each sample 
 \item R version: 2.15.1 
-\item Python version: 2.7
+\item Python version: 2.7 with itertools, codecs modules;  multiprocessing.pool, multiprocessing.queue for parallelization; rpy2 for running sequenza-utils from R. 
 \end{itemize}
 
 \section{Getting ready with Sequenza package/Installing R/Setting up Sequenza}
@@ -60,7 +60,7 @@ A typical  workflow by Sequenza is as follow :
 \item Obtain depth ratio and B allele frequencies
 \item Allele-specific segmentation
 \item Infer cellularity and DNA-index by model fitting
-\item Call CNAs(CNVs ?) and mutations
+\item Segmentation and mutations
 \end{enumerate}
 \section{Preparing inputs for Sequenza}
 In order to obtain precise mutational and aberration patterns in a tumor sample, Sequenza requires a matched normal sample from the same patient. In short, the following files are needed to get started with Sequenza. 
@@ -76,7 +76,7 @@ Pileup files can be generated using \texttt{samtools} (ref). The genome sequence
 samtools mpileup  -f hg19.fasta -Q 20 normal.bam
 }
 \shellcmd{
-samtools mpileup  -f hg19.fasta -Q 20 tumor.bam
+samtools mpileup -f hg19.fasta -Q 20 tumor.bam
 }
 
 \section{First the non-R part: pre-processing data}
@@ -89,6 +89,8 @@ system.file("exec", "sequenza-utils.py", package="sequenza")
 
 You may wish to copy this program to a location on your path. NOTE: this script requires several UNIX tools and thus probably not work on Windows (HOW ABOUT CYGWIN ?).
 
+IS THE GC CONTENT FILE INDEPENDENT OF REFERENCE GENOME USED FOR ALIGNMENT AND MPILEUP ?
+SHOULD NON-CANONICAL CHROMOSOMES BE REMOVED IF ONE WANTS GC CONTENT CALCULATIONS BE DONE ON THEIR REFERENCE GENOME ?
 
 Extract average GC content in 50-base genomic windows:
 \shellcmd{
@@ -103,6 +105,7 @@ sequenza-utils.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pile
 ----- UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME -----
 
 \section{Read the pre-processed data (\textit{abfreq} file) into R}
+
 
 The remainder of this example takes place in R.
 
