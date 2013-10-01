@@ -17,7 +17,6 @@ export(
    cp.plot.contours,
 	plotWindows,
 	chromosome.view,
-	mclapplyPb,
 	theoretical.depth.ratio,
 	theoretical.mufreq,
 	types.matrix,
