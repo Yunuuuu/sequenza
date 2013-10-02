@@ -258,14 +258,70 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
    mtext(main, 3, outer = TRUE, cex = par("cex.main")*par("cex"), line = 2)
 }
 
-genome.view <- function(baf.windows, ratio.windows, segments = NULL, main = "", 
-                            min.N.baf = 1, min.N.ratio = 1e4, CNr = rep(2, length(ratio.windows)),
-                            cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL) {
-   chr.metrics <- list()
-   for (i in 1:length(ratio.windows)) {
-      chr.metrics[[i]] <- range(ratio.windows[[i]]$mean, na.rm = TRUE)
+#genome.view <- function(baf.windows, ratio.windows, segments = NULL, main = "", 
+#                            min.N.baf = 1, min.N.ratio = 1e4, CNr = rep(2, length(ratio.windows)),
+#                            cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL) {
+#   chr.metrics <- list()
+#   for (i in 1:length(ratio.windows)) {
+#      chr.metrics[[i]] <- range(ratio.windows[[i]]$mean, na.rm = TRUE)
+#   }
+#   chr.metrics <- do.call(rbind, chr.metrics)
+#   x0 <- chr.metrics[1,1]
+#   
+#}
+
+genome.view <- function(segments, info.type = "AB", ...) {
+   chr.order <- unique(segments$chromosome)
+   seg.list  <- split(x = segments[,c("chromosome", "start.pos", "end.pos", "A", "B", "CNt")],
+                      f = segments$chromosome)
+   seg.list  <- seg.list[order(order(chr.order))]
+   seg.max   <- lapply(X = seg.list, FUN = function(x) x[nrow(x), "end.pos" ])
+   seg.pos   <- lapply(seg.list, "[", TRUE, c("start.pos", "end.pos"))
+   seg.max   <- cumsum(do.call(rbind, seg.max))
+   chr.offset <- 0
+   for (i in 1:length(seg.pos)){
+      seg.pos[[i]] <- seg.pos[[i]] + chr.offset
+      colnames(seg.pos[[i]]) <- c("abs.start","abs.end")
+      chr.offset   <- seg.max[i]
    }
-   chr.metrics <- do.call(rbind, chr.metrics)
-   x0 <- chr.metrics[1,1]
-   
+   seg.max      <- sapply(X = seg.pos, FUN = function(x) x[nrow(x), "abs.end" ])
+   abs.list     <- mapply(cbind, seg.list, seg.pos, SIMPLIFY = FALSE)
+   abs.segments <- do.call(rbind, abs.list)
+   if (info.type == "AB") {
+      plot(x = c(min(abs.segments$abs.start), max(abs.segments$abs.end)),
+           y = c(-0.1, (max(abs.segments$A)+0.1)), type = "n",
+           ylab = "Copy number", xlab = "Position (Mb)",
+           xaxt='n',  yaxt='n', xaxs = "i", ...)
+      axis(labels = 0:max(abs.segments$A),
+           at = 0:max(abs.segments$A),
+           side = 2, line = 0, las = 1)
+      #abline(h = c(0:max(abs.segments$A)), lty = 2)
+      segments(x0 = abs.segments$abs.start, x1 = abs.segments$abs.end,
+               y0 = (abs.segments$B-0.1), y1 = (abs.segments$B-0.1), col="blue", lwd = 5, lend = 1)
+      segments(x0 = abs.segments$abs.start, x1 = abs.segments$abs.end,
+               y0 = (abs.segments$A+0.1), y1 = (abs.segments$A+0.1), col="red", lwd = 5, lend = 1)
+   } else {
+      plot(x = c(min(abs.segments$abs.start), max(abs.segments$abs.end)),
+           y = c(min(abs.segments$CNt), max(abs.segments$CNt)), type = "n",
+           ylab = "Copy number", xlab = "Position (Mb)",
+           xaxt='n', yaxt = 'n', xaxs = "i", ...)
+      axis(labels = min(abs.segments$CNt):max(abs.segments$CNt),
+           at = min(abs.segments$CNt):max(abs.segments$CNt),
+           side = 2, line = 0, las = 1)     
+      #abline(h = c(min(abs.segments$CNt):max(abs.segments$CNt)), lty = 2)
+      segments(x0 = abs.segments$abs.start, x1 = abs.segments$abs.end,
+               y0 = abs.segments$CNt, y1= abs.segments$CNt, col="red", lwd = 5, lend = 1)    
+   }
+   abline(v = c(0, seg.max), lty = 3)
+   for (i in 1:length(abs.list)){
+      max.pos <- nrow(abs.list[[i]])
+      mtext(chr.order[i], side = 3, line = 0,
+            at = sum(abs.list[[i]]$abs.start[1], abs.list[[i]]$abs.end[max.pos])/2)
+      #axis(labels = as.character(round(seq(abs.list[[i]]$start.pos[1]/1e6, abs.list[[i]]$end.pos[max.pos]/1e6, by = 20), 0)),
+      #     at = seq(abs.list[[i]]$abs.start[1], abs.list[[i]]$abs.end[max.pos], by = 2e7), outer = FALSE, cex = par("cex.axis")*par("cex"),
+      #     side = 1 , line = 0)
+   }
+   axis(labels = as.character(round(seq(abs.list[[1]]$start.pos[1]/1e6, abs.list[[1]]$end.pos[nrow(abs.list[[1]])]/1e6, by = 50), 0)),
+        at = seq(abs.list[[1]]$abs.start[1], abs.list[[1]]$abs.end[nrow(abs.list[[1]])], by = 5e7), outer = FALSE, cex = par("cex.axis")*par("cex"),
+        side = 1 , line = 1)
 }
