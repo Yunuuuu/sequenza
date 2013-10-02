@@ -270,14 +270,14 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
 #   
 #}
 
-genome.view <- function(segments, info.type = "AB", ...) {
-   chr.order <- unique(segments$chromosome)
-   seg.list  <- split(x = segments[,c("chromosome", "start.pos", "end.pos", "A", "B", "CNt")],
-                      f = segments$chromosome)
+genome.view <- function(seg.cn, info.type = "AB", ...) {
+   chr.order <- unique(seg.cn$chromosome)
+   seg.list  <- split(x = seg.cn[,c("chromosome", "start.pos", "end.pos", "A", "B", "CNt")],
+                      f = seg.cn$chromosome)
    seg.list  <- seg.list[order(order(chr.order))]
    seg.max   <- lapply(X = seg.list, FUN = function(x) x[nrow(x), "end.pos" ])
    seg.pos   <- lapply(seg.list, "[", TRUE, c("start.pos", "end.pos"))
-   seg.max   <- cumsum(do.call(rbind, seg.max))
+   seg.max   <- cumsum(as.numeric(do.call(rbind, seg.max)))
    chr.offset <- 0
    for (i in 1:length(seg.pos)){
       seg.pos[[i]] <- seg.pos[[i]] + chr.offset
