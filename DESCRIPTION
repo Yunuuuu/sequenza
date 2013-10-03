@@ -1,7 +1,7 @@
 Package: sequenza
 Title:   Analysis and visualization of tumor sequencing data.
 Description: This package provides tools to analyze NGS data, including cellularity and ploidy estimation, mutation and copy number detection and quantification, detection of mono-allelic expression and allelic/subclonal mutation classification.
-Version: 0.0.13
+Version: 0.0.14
 Date: 2013-07-11
 Author: Francesco Favero, Aron C. Eklund
 Maintainer: Francesco Favero <favero@cbs.dtu.dk>
