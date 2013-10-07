@@ -95,8 +95,9 @@ plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
 }
 
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,  min.N.baf = 1, min.N.ratio = 1e4,
-                            main = "", vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0),
-                            CNr = 2, cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL, x.chr.space = 10) {
+                            main = "", vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0), BAF.style = "none",
+                            CNr = 2, cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24", model.col = 1,
+                            x.chr.space = 10) {
    make.polygons <- function(segments, model.baf) {
       max.B      <- max(model.baf$B[model.baf$CNt == max(segments$CNt)])
       mat.polygs <- matrix(ncol = max.B+1, nrow = nrow(segments))
@@ -196,7 +197,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
          if (!is.null(data.model)) {
             for (i in 1:nrow(segments)) {
                 segments(x0 = segments$start.pos[i], x1 = segments$end.pos[i], 
-                         y0 = unique(data.model$muf$mufreqs[data.model$muf$CNt == segments$CNt[i]]), lwd = 0.4, lty = "24")
+                         y0 = unique(data.model$muf$mufreqs[data.model$muf$CNt == segments$CNt[i]]), lwd = model.lwd, lty = model.lty, col = model.col)
             }
          }
       }
@@ -205,12 +206,14 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
    if (!is.null(segments)){
       plot(ylab = "B allele frequency", type = "n",
            x = xlim, y = c(0, 0.5), las = 1)
-      if (!is.null(data.model)) {
-         make.polygons(segments, data.model$baf)
-         axis(side = 4, line = 0, las = 1,
-              labels = data.model$baf$B[data.model$baf$CNt == segments$CNt[nrow(segments)]],
-              at = data.model$baf$BAF[data.model$baf$CNt == segments$CNt[nrow(segments)]])
-         mtext(text = "Number of B alleles", side = 4, line = 2, cex = par("cex.lab")*par("cex"))         
+      if (BAF.style == "blocks") {
+         if (!is.null(data.model)) {
+            make.polygons(segments, data.model$baf)
+            axis(side = 4, line = 0, las = 1,
+                 labels = data.model$baf$B[data.model$baf$CNt == segments$CNt[nrow(segments)]],
+                 at = data.model$baf$BAF[data.model$baf$CNt == segments$CNt[nrow(segments)]])
+            mtext(text = "Number of B alleles", side = 4, line = 2, cex = par("cex.lab")*par("cex"))         
+         }
       }
       plotWindows(baf.windows, ylab = "B allele frequency", 
                   xlim = xlim, ylim = c(0, 0.5), las = 1,
@@ -219,12 +222,14 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
          abline(v = segments$end.pos, lwd = 1, lty = 2)
       }
       segments(x0 = segments$start.pos, y0 = segments$Bf, x1=segments$end.pos, y1 = segments$Bf, col = "red", lwd = 3)
-      #if (!is.null(data.model)) {
-      #   for (i in 1:nrow(segments)) {
-      #      segments(x0 = segments$start.pos[i], x1 = segments$end.pos[i], 
-      #               y0 = unique(data.model$baf$BAF[data.model$baf$CNt == segments$CNt[i]]), lwd = 0.4, lty = "24")
-      #   }
-      #}
+      if (BAF.style == "lines") {
+         if (!is.null(data.model)) {
+            for (i in 1:nrow(segments)) {
+               segments(x0 = segments$start.pos[i], x1 = segments$end.pos[i], 
+                        y0 = unique(data.model$baf$BAF[data.model$baf$CNt == segments$CNt[i]]), lwd = model.lwd, lty = model.lty, col = model.col)
+            }
+         }
+      }
    }
    else {
       plotWindows(baf.windows, ylab = "B allele frequency", 
@@ -243,7 +248,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
 
          segments(x0 = rep(min(segments$start.pos, na.rm =TRUE), times = nrow(ratios.theoric)),
                   x1 = rep(max(segments$end.pos, na.rm = TRUE), times = nrow(ratios.theoric)), 
-                  y0 = ratios.theoric$depth.ratio, lwd = 0.4, lty = "24")
+                  y0 = ratios.theoric$depth.ratio, lwd = model.lwd, lty = model.lty, col = model.col)
          #text(x = rep(min(segments$start.pos, na.rm =TRUE), times = nrow(ratios.theoric)),
          #     y = ratios.theoric$depth.ratio, labels = ratios.theoric$CNt, pos = 2, offset = 0.5, cex = 0.8)
          axis(labels = as.character(ratios.theoric$CNt), side = 4, line = 0, las = 1,
@@ -325,3 +330,4 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
         at = seq(abs.list[[1]]$abs.start[1], abs.list[[1]]$abs.end[nrow(abs.list[[1]])], by = 5e7), outer = FALSE, cex = par("cex.axis")*par("cex"),
         side = 1 , line = 1)
 }
+
