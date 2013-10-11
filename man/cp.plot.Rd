@@ -8,22 +8,18 @@
 }
 
 \usage{
-   cp.plot(cp.table, map = makecmap(seq(from = median(cp.table$L, na.rm = TRUE),
-                                        to = max(cp.table$L,na.rm = TRUE),
-                                        by = 0.1), n = 10),
-           outlier = "white", ...)
-   cp.plot.contours(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999),
-                    col = palette(), legend.pos = 'bottomright', ...)          
+   cp.plot(cp.table, ...)
+   cp.plot.contours(cp.table, likThresh = c(0.95),
+                    col = palette(), legend.pos = 'bottomright', pch = 18, ...)          
 }
 
 \arguments{
   \item{cp.table}{A matrix obtained using \code{baf.model.fit} or \code{mufreq.model.fit}.}
-  \item{map}{\code{map} argument as used in the \code{colorgram} function. Default to display nicely the likelihood colors.}
-  \item{outlier}{\code{outlier} argument as used in the \code{colorgram} function. Default value to do not color low likelihood positions.}
-  \item{likThresh}{Vector for the likelihood tresholds to select}
-  \item{col}{color palette, or vector of colours}
-  \item{legend.pos}{Position for the legent in the function \code{cp.plot.contours}}
-  \item{...}{Additional arguments accepted by the function \code{colorgram} for \code{cp.plot}, or \code{countours} for \code{cp.plot.contours}}
+  \item{likThresh}{Vector for the likelihood tresholds to select.}
+  \item{col}{color palette, or vector of colours.}
+  \item{legend.pos}{Position for the legent in the function \code{cp.plot.contours}.}
+  \item{pch}{Charachter to use to draw the extimated point in the \code{cp.plot.contour} function.}
+  \item{...}{Additional arguments accepted by the function \code{colorgram} for \code{cp.plot}, or \code{countours} for \code{cp.plot.contours}.}
 }
 
 

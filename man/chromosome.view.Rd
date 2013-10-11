@@ -1,5 +1,6 @@
 \name{chromosome.view}
 \alias{chromosome.view}
+\alias{genome.view}
 
 \title{Graphically represent multiple chromosomal features in parallel}
 
@@ -8,9 +9,13 @@
 }
 
 \usage{
-chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL, 
-                min.N.baf = 1, min.N.ratio = 1e4, main = "", vlines = FALSE, CNr = 2,
-                cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL)
+chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
+                min.N.baf = 1, min.N.ratio = 10000, main = "", vlines = FALSE,
+                legend.inset = c(-20 * strwidth("a", units = "figure"), 0),
+                BAF.style = "none", CNr = 2, cellularity = NULL, dna.index = NULL,
+                avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24",
+                model.col = 1, x.chr.space = 10)
+genome.view(seg.cn, info.type = "AB", ...)
 }
 
 \arguments{
@@ -26,6 +31,15 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
   \item{dna.index}{Value of the estimated \code{dna.index} parameter.}
   \item{avg.depth.ratio}{The median value of depth ratio.}
   \item{main}{Main title of the plot. Default "".}
+  \item{legend.inset}{The inset argument to pass to the \code{legend} function, to place the mutations lagen in the plot.}
+  \item{BAF.style}{The style of drawing the theoretical lines for the B allele frequency panel. Possible values are "lines", "blocks", "none". Default is "none".}
+  \item{model.lwd}{Width of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
+  \item{model.lty}{Line type of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
+  \item{model.col}{Color of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
+  \item{x.chr.space}{Step in megabase on the positions to visualize on the x-axis. Default is 10.}
+  \item{seg.cn}{Genome wide segments, with the columns A, B and CNt.}
+  \item{info.type}{Information to plot in \code{genome.view}. Available oprioan are "CNt", for copy number and "AB" (default) for the two alleles.}
+  \item{...}{Oprional arguments from \code{plot}.}
 }
 
 \details{
@@ -44,5 +58,6 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
 #                ratio.windows = abf.ratio$windows[[1]],
 #                segments = seg.s1, main = "TCGA-42-2591 chr 1",
 #                cellularity = 0.85, dna.index = 1.1, avg.depth.ratio = 1)
+
 
 }

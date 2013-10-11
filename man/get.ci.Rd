@@ -7,18 +7,20 @@
 }
 
 \usage{
-   get.ci(mat, interval = 0.95)
+   get.ci(cp.table, interval = 0.95)
 }
 \arguments{
-  \item{mat}{a matrix contain a column with parameter values (the first OR the second column from a CP matrix) and a column with the log-likelihood (the third column of a CP matrix).}
+  \item{cp.table}{A list objects obtained with \code{baf.model.fit} or \code{mufreq/model.fit} functions.}
   \item{interval}{The minimum confidence of interval in decimal. Default 0.95}
 }
 
 \value{
-  \item{values}{a matrix containing the parameter values with respective likelihood (ideal for plotting the likelihood function).}
-  \item{confint}{the confidence intervals}
-  \item{max.l}{The value wit maximum likelihood}
-  
+  \item{values.x}{A matrix containing the dna.index values with respective likelihood.}
+  \item{confint.x}{The two edges of the confidence interval for the correct dna.index estimation.}
+  \item{max.x}{The point estimate for the dna.index, with the maximum likelihood.}
+  \item{values.y}{A matrix containing the cellularity values with respective likelihood.}
+  \item{confint.y}{The two edges of the confidence interval for the correct cellularity estimation.}
+  \item{max.y}{The point estimate for the cellularity, with the maximum likelihood.}
 }
 
 \seealso{

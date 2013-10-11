@@ -9,11 +9,11 @@
 
 \usage{
 read.abfreq(file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
-            colClasses = c('factor', 'integer', 'factor', 'integer', 
-            'integer', 'numeric', 'numeric', 'numeric', 'factor', 
-            'numeric', 'numeric', "factor", "factor"), chr.name = NULL, n.lines = NULL, ...)
+            colClasses = c('character', 'integer', 'character', 'integer', 
+            'integer', 'numeric', 'numeric', 'numeric', 'character', 
+            'numeric', 'numeric', "character", "character"), chr.name = NULL, n.lines = NULL, ...)
 
-read.acgt(file, colClasses = c('factor', 'integer', 'factor', 'integer', 
+read.acgt(file, colClasses = c('character', 'integer', 'character', 'integer', 
           'integer', 'integer', 'integer', 'integer'), ...)
 }
 

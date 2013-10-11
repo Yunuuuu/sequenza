@@ -10,7 +10,7 @@ cp.plot <- function (cp.table, ...) {
              ...)
 }
 
-cp.plot.contours <- function(cp.table, likThresh = c(0.5, 0.9, 0.99, 0.999), 
+cp.plot.contours <- function(cp.table, likThresh = c(0.95), 
                              col = palette(), legend.pos = 'bottomright', pch = 18, ...) {
    require(squash)
    znormsort <- sort(cp.table$z, decreasing = TRUE)
