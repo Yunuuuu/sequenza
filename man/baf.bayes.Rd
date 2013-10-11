@@ -8,10 +8,10 @@
 }
 
 \usage{
-  baf.bayes(Bf, depth.ratio, cellularity, dna.content, avg.depth.ratio,
+  baf.bayes(Bf, depth.ratio, cellularity, dna.index, avg.depth.ratio,
             weight.Bf = 100, weight.ratio = 100, CNt.min = 0, CNt.max = 7, CNr = 2,
             priors.labels = CNt.min:CNt.max, priors.values = 1, ratio.priority = FALSE, skew.baf = 0.95)
-  mufreq.bayes(mufreq, depth.ratio, cellularity, dna.content, avg.depth.ratio,
+  mufreq.bayes(mufreq, depth.ratio, cellularity, dna.index, avg.depth.ratio,
             weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, CNr = 2,
             priors.labels = CNt.min:CNt.max, priors.values = 1)
 }
@@ -24,7 +24,7 @@
   \item{weight.mufreq}{A vector of positive integers corresponding to the weight of the corresponding mutation frequency value. Can be a single integer to give same weight to all frequency values.}  
   \item{weight.ratio}{A vector of positive integers corresponding to the weight of the corresponding ratio value. Can be a single integer to give same weight to all the ratios.}
   \item{cellularity}{The fraction of the sample comprising tumor cells (from 0 to 1).}
-  \item{dna.content}{The amount of DNA per tumor cell, relative to a normal cell. E.g. dna.content = 2 indicates a tetraploid tumor.}
+  \item{dna.index}{The amount of DNA per tumor cell, relative to a normal cell. E.g. dna.index = 2 indicates a tetraploid tumor.}
   \item{avg.depth.ratio}{The median value of depth ratio.}
   \item{CNt.min}{Minimum copy number to consider in the model.}
   \item{CNt.max}{Maximum copy number to consider in the model.}
@@ -52,7 +52,7 @@
 }
 
 \examples{
-# example with few segment artificially generated with cellularity 0.75 (75%) and dna.contents 1 (diploid cell)
+# example with few segment artificially generated with cellularity 0.75 (75%) and dna.indexs 1 (diploid cell)
 
 seg.s1<- data.frame(start.pos = c(1,4e6,10e6,40e6,70e6), end.pos = c(4e6,10e6,40e6,70e6,200e6), 
                     Bf=c(0.5,0.1250,0.5,0.1250,0.5), depth.ratio = c(1,0.625,1,0.625,1), N.BAF = 300)
@@ -61,13 +61,13 @@ seg.s1<- data.frame(start.pos = c(1,4e6,10e6,40e6,70e6), end.pos = c(4e6,10e6,40
 # Trying to fit the model with different values
 baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
           weight.ratio = 300, weight.Bf = 300, 
-          cellularity = 0.75, dna.content = 1, avg.depth.ratio = 1)
+          cellularity = 0.75, dna.index = 1, avg.depth.ratio = 1)
 
 baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
           weight.ratio = 300, weight.Bf = 300,
-          cellularity = 0.5, dna.content = 1, avg.depth.ratio = 1)
+          cellularity = 0.5, dna.index = 1, avg.depth.ratio = 1)
           
 baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
           weight.ratio = 300, weight.Bf = 300,
-          cellularity = 0.75, dna.content = 1.5, avg.depth.ratio = 1)
+          cellularity = 0.75, dna.index = 1.5, avg.depth.ratio = 1)
 }
