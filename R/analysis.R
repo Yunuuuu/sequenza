@@ -77,7 +77,7 @@ gc.norm <- function (ratio, gc) {
 }
 
 gc.sample.stats <- function (file, gz = TRUE) {
-   colClasses = c('factor', 'numeric', 'numeric')
+   colClasses = c('character', 'numeric', 'numeric')
    if (gz) {
       abf.data <- read.delim(pipe(paste('gunzip -c', file, '| cut -f 1,6,10')), colClasses = colClasses)
    } else {
