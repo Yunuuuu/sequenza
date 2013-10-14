@@ -123,12 +123,12 @@ data.file
 The abfreq file can be read all at once, but processing one chromosome at a time is less demanding on computational resources and might be preferable.  (Note that the demo data included with sequenza is only chromosome 1)
 
 Read only the data corresponding to chromosome 1:
-<<label=readAfreqChr, echo=TRUE>>=
+<<label=readAfreqChr, echo=TRUE, eval=FALSE>>=
 abf.data <- read.abfreq(data.file, chr.name = "1")
 @
 
 Alternatively, read all data at once (not run):
-<<label=readAfreq, echo=TRUE, eval=FALSE>>=
+<<label=readAfreq, echo=TRUE>>=
 abf.data <- read.abfreq(data.file)
 @
 
@@ -284,9 +284,9 @@ The visualization can be made by chromosome, using binned data and segmented dat
       \centering
 <<label=3panelsPlot,fig=TRUE,width=6,height=6>>=
 
-chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]], 
+chromosome.view(mut.tab = mut.tab[mut.tab$chromosome == "1",], baf.windows = abf.b.win[[1]], 
                 ratio.windows = abf.r.win[[1]], min.N.ratio = 1,
-                segments = seg.s1, main = "Chromosome 1")
+                segments = seg.s1[seg.s1$chromosome == "1",], main = "Chromosome 1")
 @ 
       \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position.}
       \label{fig:3panelsPlot}
@@ -298,7 +298,7 @@ chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]],
 The parameter estimation is performed on the segmented data, using BAF and depth ratio information.
 In order to avoid to catch errors due to the heterogeneity of the sample, we can filter the segments smaller then a certain amount. For instance, we can be confident that segments bigger then few megabases have enough data points to usually insure a correct measure. Alternatively it could be possible to exclude chromosomal regions usually know to be problematic, as the region close to the telomeres and also near the centromere 
 <<label=filterSegs, echo=TRUE>>=
-seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 5e6, ]
+seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 10e6, ]
 @
 
 Every segment is evaluated against the model lines using the resulting density of a binomial distribution and the possible values of the model. In order to perform every segment needs to be associate with a sample size, to generate the distribution function. For practical reason the sample size can not be in the order of the size of the segment in nucleotide (millions), So we use the size of the segment in megabases, added to an arbitrary offset (eg 150), to allow each segment to generate a proper distribution.
@@ -308,7 +308,7 @@ weights.seg  <- 150 + round((seg.filtered$end.pos - seg.filtered$start.pos) / 1e
 
 The genome wide average depth ratio, should be a value close to 1, after normalization. However, since in this example we only consider chromosome 1, we have a different value (I will add one or more chr to make the avg became 1...). 
 <<label=avg.depth.ratio>>=
-avg.depth.ratio <- mean(gc.stats$adj[,3])
+avg.depth.ratio <- mean(gc.stats$adj[,2])
 avg.depth.ratio
 @
 
@@ -317,7 +317,7 @@ The function \textit{baf.model.fit} evaluate the segmented data to a set of sele
 CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
                     weight.ratio = weights.seg,
                     weight.Bf = weights.seg,
-                    avg.depth.ratio = 1,
+                    avg.depth.ratio = avg.depth.ratio,
                     cellularity = seq(0.1,1,0.01), 
                     dna.index = seq(0.5,3,0.05), mc.cores = 4)                   
 @
@@ -405,9 +405,9 @@ head(seg.s1.cn)
       \centering
 <<label=chrViewWithCP,fig=TRUE,width=6,height=6>>=
 
-chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]], 
+chromosome.view(mut.tab = mut.tab[mut.tab$chromosome == "1",], baf.windows = abf.b.win[[1]], 
                 ratio.windows = abf.r.win[[1]],  min.N.ratio = 1,
-                segments = seg.s1.cn, main = "Chromosome 1",
+                segments = seg.s1.cn[seg.s1.cn$chromosome == "1",], main = "Chromosome 1",
                 cellularity = cellularity, dna.index = dna.index,
                 avg.depth.ratio = 1)
 @ 
@@ -416,6 +416,20 @@ chromosome.view(mut.tab = mut.tab, baf.windows = abf.b.win[[1]],
 \end{figure}
 
 %\newpage
+\begin{figure}[H]
+      \centering
+<<label=chrView17WithCP,fig=TRUE,width=6,height=6>>=
+
+chromosome.view(mut.tab = mut.tab[mut.tab$chromosome == "17",], baf.windows = abf.b.win[[17]], 
+                ratio.windows = abf.r.win[[17]],  min.N.ratio = 1,
+                segments = seg.s1.cn[seg.s1.cn$chromosome == "17",], main = "Chromosome 17",
+                cellularity = cellularity, dna.index = dna.index,
+                avg.depth.ratio = 1)
+@ 
+      \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted line indicate different copy number/allelic state. }
+      \label{fig:crhomView17WithCP}
+\end{figure}
+
 
 %%%% bibliography
 \bibliographystyle{plain}

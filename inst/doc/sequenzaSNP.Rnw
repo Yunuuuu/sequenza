@@ -98,7 +98,7 @@ chromosome.view(baf.windows = snp.b.win[[1]],
 
 \subsection{Segmenting with the \textit{copynumber} package}
 <<label=copynumber, eval=TRUE>>=
-breaks <- find.breaks(sample.het.i, gamma = 40, kmin = 20, baf.thres = c(0, 0.5))
+breaks <- find.breaks(sample.het.i, gamma = 20, kmin = 15, baf.thres = c(0, 0.5))
 seg.i  <- segment.breaks(sample.i, breaks = breaks)
 @
 
@@ -134,18 +134,10 @@ dna.index   <- cint$max.x
       \centering
 <<label=CPplotSNP,fig=TRUE,width=6,height=6>>=
 cp.plot(CP.snp)
+cp.plot.contours(CP.snp, add = TRUE)
 @ 
-      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/DNA-index values.}
+      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/DNA-index combinations.}
       \label{fig:cpPlotSNP}
-\end{figure}
-
-\begin{figure}[H]
-      \centering
-<<label=CPplotCISNP,fig=TRUE,width=6,height=6>>=
-   cp.plot.contours(CP.snp)
-@ 
-      \caption{Plot of the log likelihood with respective cellularity and DNA-index probability distribution and confidence intervals.}
-      \label{fig:cpPlotCN}
 \end{figure}
 
 \subsection{Call for copy number variation using inferred parameters.}
