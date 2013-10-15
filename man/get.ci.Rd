@@ -3,14 +3,14 @@
 \title{Compute the confidence intervals for CP matrix}
 
 \description{
-  Compute the confidence intervals for CP matrix.
+  Compute the confidence intervals for a CP matrix.
 }
 
 \usage{
    get.ci(cp.table, interval = 0.95)
 }
 \arguments{
-  \item{cp.table}{A list objects obtained with \code{baf.model.fit} or \code{mufreq/model.fit} functions.}
+  \item{cp.table}{A list objects obtained with \code{baf.model.fit} or \code{mufreq.model.fit} functions.}
   \item{interval}{The minimum confidence of interval in decimal. Default 0.95}
 }
 

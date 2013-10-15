@@ -5,7 +5,7 @@
 \title{Graphically represent multiple chromosomal features in parallel}
 
 \description{
-  Reading a mufreq file in an efficient way.
+  Graphically represent multiple chromosomal features in parallel.
 }
 
 \usage{
@@ -21,29 +21,29 @@ genome.view(seg.cn, info.type = "AB", ...)
 \arguments{
   \item{baf.windows}{Matrix containing the windowed B-allele frequency values for one chromosome.}
   \item{ratio.windows}{Matrix containing the windowed depth ratios value for one chromosome.}
-  \item{mut.tab}{If specified the mutation would be drawn in a top panel. \code{mut.tab} must be generated from the \code{mutation.table} command. Default NULL.}
-  \item{segments}{If specified the segment for B-allele frequency and depth ratio would be displayed with a red line, and vertical dotted lines would be drawn corresponding to the breaks points. Default NULL.}
+  \item{mut.tab}{Mutation table of one single chromosome. If specified the mutation would be drawn in a top panel. \code{mut.tab} must be generated from the \code{mutation.table} command. Default NULL.}
+  \item{segments}{Segmentation for one single chromosome. If specified the segment for B-allele frequency and depth ratio would be displayed with a red line. Default NULL.}
   \item{min.N.baf}{Minimum amount of observations in a BAF window to be plotted. Default 1.}
   \item{min.N.ratio}{Minimum amount of observations in a depth ratio window to be plotted. Default 1e4.}
   \item{CNr}{Copy number of the germline genome. Default = 2.}
   \item{vlines}{Boolean if TRUE the plot would include dotted vertical lines corresponding to breaks. Default FALSE.}
   \item{cellularity}{Value of the estimated \code{cellularity} parameter.}
   \item{dna.index}{Value of the estimated \code{dna.index} parameter.}
-  \item{avg.depth.ratio}{The median value of depth ratio.}
+  \item{avg.depth.ratio}{The average value of the normalized depth ratio.}
   \item{main}{Main title of the plot. Default "".}
-  \item{legend.inset}{The inset argument to pass to the \code{legend} function, to place the mutations lagen in the plot.}
-  \item{BAF.style}{The style of drawing the theoretical lines for the B allele frequency panel. Possible values are "lines", "blocks", "none". Default is "none".}
+  \item{legend.inset}{The inset argument to pass to the \code{legend} function Define the distance of the mutation legend from the plot border.}
+  \item{BAF.style}{The style to visualize the theoretical thresholds for the B allele frequency panel. Possible values are "lines", "blocks", "none". Default is "none".}
   \item{model.lwd}{Width of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
   \item{model.lty}{Line type of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
   \item{model.col}{Color of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
   \item{x.chr.space}{Step in megabase on the positions to visualize on the x-axis. Default is 10.}
   \item{seg.cn}{Genome wide segments, with the columns A, B and CNt.}
-  \item{info.type}{Information to plot in \code{genome.view}. Available oprioan are "CNt", for copy number and "AB" (default) for the two alleles.}
-  \item{...}{Oprional arguments from \code{plot}.}
+  \item{info.type}{Information to plot in \code{genome.view}. Available options are "CNt" to draw the copy numbers and "AB" (default) to draw the two alleles.}
+  \item{...}{Optional arguments from \code{plot}.}
 }
 
 \details{
-  \code{chromosome.view} is a versatile wrapper using \code{plot.windows} and some handy \code{par} parameter, to nicely display the sequencing results, and the model fitting.
+  \code{chromosome.view} is a convenient plotting function using \code{plot.windows} and some handy \code{par} parameter, to nicely display the sequencing results, and the model fitting.
 }
 
 \seealso{

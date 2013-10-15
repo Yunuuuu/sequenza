@@ -3,7 +3,7 @@
 \title{Generate mutation frequency and depth ratio model point at given cellularity and DNA-index value.}
 
 \description{
-  \code{model.points} function is a wrapper of various theoretic model generation functions to easily create points.
+  \code{model.points} function combines various theoretic model functions to easily generate a matrix of points with theoretical mutation frequency and depth ratio.
 }
 
 \usage{
@@ -12,9 +12,9 @@ model.points(cellularity = 0.5, dna.index = 1, types = cbind(CNr = 2, CNt = 2, M
 
 \arguments{
   \item{cellularity}{A specified value (from 0 to 1) indicating the purity for the given tumor sample.}
-  \item{dna.index}{A specified value (starting from 0.5) indicating the DNA index in the tumor sample. eg.: dna.index = 1 means diploid tumor.}
+  \item{dna.index}{A specified value (starting from 0.5) indicating the DNA index in the tumor sample. eg.: dna.index = 1 means diploid tumor genome.}
   \item{types}{desired types matrix obtained with the function \code{\link{types.matrix}}.}
-  \item{avg.depth.ratio}{The median value of depth ratio.}
+  \item{avg.depth.ratio}{The average value of the normalized depth ratio.}
 }
 \value{
   \item{mufreq}{Theoretical value of mutation frequency at the corresponding "type tag".}

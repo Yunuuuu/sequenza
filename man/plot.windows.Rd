@@ -3,7 +3,7 @@
 \title{Plot the specified windowed chromosome.}
 
 \description{
-  \code{plotWindows} is a wrapper to easily plot a specified chromosome included in the list object returned by the function \code{windows.value}.
+  \code{plotWindows} is a convenient plot function that consent to visualize a specified chromosome attribute using the matrix produced by the function \code{windows.value}.
 }
 
 \usage{
@@ -13,7 +13,7 @@ plotWindows(abf.window, m.lty = 1, m.lwd = 3,
 }
 
 \arguments{
-  \item{abf.window}{A specified matrix in the list object produced by \code{windows.value}}
+  \item{abf.window}{A matrix in the list object produced by \code{windows.value}}
   \item{m.lty}{The type of lines to use for the segments indicating the mean values. Default 1.}
   \item{m.lwd}{The width of the segments indicating the mean values. Default 3.}
   \item{m.col}{The color of the segments indicating the mean values. Default "black".}

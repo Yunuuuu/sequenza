@@ -9,7 +9,7 @@
 \title{Binomial and Poisson distributions}
 
 \description{
-  Return the density of probability using a Binomial or Poisson distribution for the given value and a vector of model points.
+  Return the density of probability of a Binomial (or a Poisson) distribution, testing one single value on a vector of model points.
 }
 
 \usage{

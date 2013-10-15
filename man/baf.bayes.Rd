@@ -4,7 +4,7 @@
 \title{Fit the model with specified cellularity and DNA-content parameters}
 
 \description{
-  Given two values for cellularity and DNA content parameters, the function returns, for each given values, the copy number and relative B-allele/mutated allele with the log-likelihood of the goodness of fit.
+  Given the estimated cellularity and DNA index parameters, the function returns, for every given segment (or position) the most likely copy number and B-allele (or mutated allele) with the corresponding log-likelihood of the fit.
 }
 
 \usage{
@@ -20,19 +20,19 @@
   \item{Bf}{A vector containing B-allele frequencies (values can range from 0 to 0.5).}
   \item{mufreq}{A vector containing mutation frequencies (values can range from 0 to 1).}
   \item{depth.ratio}{A vector containing the depth ratios of tumor versus normal.}
-  \item{weight.Bf}{A vector of positive integers corresponding to the weight of the corresponding B-allele frequency value. Can be a single integer to give same weight to all BAFs.}
-  \item{weight.mufreq}{A vector of positive integers corresponding to the weight of the corresponding mutation frequency value. Can be a single integer to give same weight to all frequency values.}  
-  \item{weight.ratio}{A vector of positive integers corresponding to the weight of the corresponding ratio value. Can be a single integer to give same weight to all the ratios.}
+  \item{weight.Bf}{A vector corresponding to the weight of B-allele frequency value.}
+  \item{weight.mufreq}{A vector corresponding to the weight of the mutation frequency value.}  
+  \item{weight.ratio}{A vector corresponding to the weight of the ratio value.}
   \item{cellularity}{The fraction of the sample comprising tumor cells (from 0 to 1).}
-  \item{dna.index}{The amount of DNA per tumor cell, relative to a normal cell. E.g. dna.index = 2 indicates a tetraploid tumor.}
-  \item{avg.depth.ratio}{The median value of depth ratio.}
+  \item{dna.index}{The amount of DNA per tumor cell, relative to a normal cell. E.g. dna.index = 2 indicates a tetraploid cell.}
+  \item{avg.depth.ratio}{The average value of the normalized depth ratio.}
   \item{CNt.min}{Minimum copy number to consider in the model.}
   \item{CNt.max}{Maximum copy number to consider in the model.}
   \item{CNr}{Copy number of the normal genome. }
   \item{priors.labels}{Label for the copy number state priors.}
   \item{priors.values}{Value for the copy number state priors. Default priors is 1 for every copy number state.}
   \item{ratio.priority}{Boolean, if true only the depth ratio would be considered to determine the copy number state, while the Bf value would select the numbers of B-allele.}
-  \item{skew.baf}{The observed B-allele frequency often doen not converge to the 0.5 frequency, for normal diploid position. This argument indicate the value of the percentile of all the observed B-allele frequency to skew the theoric value below 0.5. Default 0.95}
+  \item{skew.baf}{The observed B-allele frequency often does not converge to the 0.5 frequency, for normal diploid positions. This argument indicate the value of the percentile of all the observed B-allele frequency to skew the theoric value below 0.5. Default 0.95}
 }
 
 \value{
@@ -44,7 +44,7 @@
   \item{L}{Log-likelihood of model fitting at the given point}
 }
 \details{
-  \code{baf.bayes} and \code{mufreq.depth.ratio.fit} uses a naive Bayesian approach to calculate the likelihood of fitness of the data point with the model-point resulting from the given values of cellularity and DNA-contents.
+  \code{baf.bayes} and \code{mufreq.bayes} uses a naive Bayesian approach to calculate the likelihood of fitness of the data point with the model-point resulting from the given values of cellularity and DNA-contents.
 }
 
 \seealso{

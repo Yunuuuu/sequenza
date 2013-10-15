@@ -4,7 +4,7 @@
 \title{Plot log-likelihood for the tested values of cellularity and DNA-index}
 
 \description{
-  This function uses function \code{colorgram} of the package \code{squash} to plot log-likelihood for the tested combinations of cellularity and DNA-index
+  This function uses the \code{colorgram} function from the package \code{squash} to plot log-likelihood for the tested combinations of cellularity and DNA-index
 }
 
 \usage{
@@ -15,10 +15,10 @@
 
 \arguments{
   \item{cp.table}{A matrix obtained using \code{baf.model.fit} or \code{mufreq.model.fit}.}
-  \item{likThresh}{Vector for the likelihood tresholds to select.}
-  \item{col}{color palette, or vector of colours.}
-  \item{legend.pos}{Position for the legent in the function \code{cp.plot.contours}.}
-  \item{pch}{Charachter to use to draw the extimated point in the \code{cp.plot.contour} function.}
+  \item{likThresh}{Vector containing selected likelihood tresholds.}
+  \item{col}{Vector of colours.}
+  \item{legend.pos}{Position for the legend in the function \code{cp.plot.contours}. Default \code{"bottomright"}.}
+  \item{pch}{Charachter used to draw the extimated point in the \code{cp.plot.contour} function. Default 18.}
   \item{...}{Additional arguments accepted by the function \code{colorgram} for \code{cp.plot}, or \code{countours} for \code{cp.plot.contours}.}
 }
 

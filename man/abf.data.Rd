@@ -4,7 +4,7 @@
 \title{ABfreq file example.}
 
 \description{
-  ABfreq file example: subset and shuffled genome, containing only mutations and heterozygous posituons of an original ovarian cancer exome sequencing from TCGA.
+  Example of ABfreq file: This data is representative of an exome-sequenced tumor sample, e.g. as one would obtain from the TCGA.
 }
 
 \usage{

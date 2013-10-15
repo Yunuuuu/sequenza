@@ -5,7 +5,7 @@
 \title{Correct the depth of coverage ratio value considering the biases derived from GC-contents.}
 
 \description{
-  Normalize every GC-contents position using the median value of positions with same GC-percentage contents. 
+  Detect GC-contents driven bias, collect chromosomes coordinate in the file to improve I/O performance. 
 }
 
 \usage{

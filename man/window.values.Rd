@@ -1,6 +1,6 @@
 \name{windowValues}
 \alias{windowValues}
-\title{Transform the data on base-pair windows of a specified size}
+\title{Binning the data on within windows of a specified size}
 
 \description{
   Given value with corresponding genomic position with chromosomes and positions information, the function will return a list containing as much matrices as the chromosomes in the input vector. Each matrix would contains base-pair windows describing the chromosome, for each window the weighted mean, 25 and 75\% quartiles of the input values and the number of observation are reported.
@@ -22,7 +22,7 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRU
 }
 
 \details{
-  Sequencing data, even exome seq. produces a big amount of data difficult to be handled by graphic representation. Also, especially sample analyzed with older machines and with low or middle depth of coverage (20x to 70x), value like depth of reads er position have a lot of variation. Using \code{windowValues} it is possible to reduce the both the amount of data and the noise, in order to easily store and graphically represents chromosome by chromosome, or chunks of chromosomes.
+  Sequencing data produces a big amount of data difficult to be handled by standard graphic representation. In addition, sample analyzed with older machines and with low or middle depth of coverage (20x to 50x), measures like read depth are subject of big variations, unrelated to biological reasons. Using \code{windowValues} it is possible to reduce either the amount of data as well the measure noise.
 }
 
 \seealso{

@@ -18,7 +18,7 @@
 
 \value{
 \item{CNr}{Number of alleles in the normal sample.}
-\item{CNt}{Numbers of allele in he aberrant sample}
+\item{CNt}{Numbers of allele in the aberrant sample}
 \item{Mt}{Number of mutated alleles}
 }
 \details{

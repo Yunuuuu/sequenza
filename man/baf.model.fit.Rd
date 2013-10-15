@@ -28,13 +28,13 @@
 }
 
 \details{
-  \code{baf.model.fit} uses the function \code{baf.bayes} to infer the log-likelihood of model-fitting using the possible combination of cellularity and DNA-index values provided in the arguments.
-  Similarly \code{mufreq.model.fit} fit the mutation/depth ratio model using the function code{mufreq.bayes}.
-  \code{baf.model.fit} Is generally used to infer cellularity and dna.indexs on segmented chromosomes, while \code{mufreq.model.fit} can be also used to estimate the same parameters, in addition can be useful to roughly estimate sub-clonal fractions. Be aware  that the mutation frequency is more sensible to sampling bias, and is generally more noisy compared to the segmented B-allele frequency. 
+  \code{baf.model.fit} uses the function \code{baf.bayes} to infer the log-likelihood of model-fitting using the possible combinations of cellularity and DNA-index values provided in the arguments.
+  Similarly \code{mufreq.model.fit} fit the mutation/depth ratio model using the function \code{mufreq.bayes}.
+  \code{baf.model.fit} Is generally used to infer cellularity and dna.index on segmented chromosomes, while \code{mufreq.model.fit} can be also used to estimate the same parameters from mutations, and in addition can be useful to roughly estimate sub-clonal fractions. Be aware  that the mutation frequency is more sensible to sampling bias, and is generally more noisy compared to the segmented B-allele frequency. 
 }
 
 \seealso{
-  \code{baf.bayes}, \code{mufreq.bayes}, \code{cp.plot}.
+  \code{baf.bayes}, \code{mufreq.bayes}, \code{cp.plot}, \code{get.ci}.
 }
 
 \examples{

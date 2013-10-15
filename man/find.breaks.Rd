@@ -21,7 +21,7 @@ segment.breaks(abf.tab, breaks)
 }
 
 \details{
-  \code{copynumber} is a package to make efficient copy number estimation in SNP-array data. The function \code{find.breaks} uses its algorithm to find break points. The default parameters are adjusted to behave better on sequencing data, but a careful choice of better \code{gamma} value is advised.
+  \code{copynumber} is a package to perform an efficient segmentation of SNP-array data. The function \code{find.breaks} uses an allele specific algorithm to find break points. The default parameters are adjusted to behave better on sequencing data, but a careful choice of an optimal \code{gamma} value is advised.
 }
 
 \examples{
