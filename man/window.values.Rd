@@ -30,17 +30,22 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRU
 }
 
 \examples{
+   \dontrun{
 
-# 1Mb windows with 500kb of overlap of depth ratio
-#abf.ratio <- windowValues(x = round(abf.data$adjusted.ratio, 3),
-#                           positions = abf.data$n.base,
-#                           chromosomes = abf.data$chromosome, window = 1e6,
-#                           weight = abf.data$depth.normal, start.coord = 1, overlap = 5e5)
-
-# 1Mb windows with 500kb of overlap of B-allele frequency
-#abf.bafs  <- windowValues(x = abf.het$Bf,
-#                           positions = abf.het$n.base,
-#                           chromosomes = abf.het$chromosome, window = 1e6,
-#                           weight = round(x = abf.het$good.s.reads, digits = 0),
-#                           start.coord = 1, overlap = 5e5)
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+abf.data <- read.abfreq(data.file)
+# 1Mb windows, each window is overlapping with 1 other adjacent window: depth ratio
+abf.ratio <- windowValues(x = abf.data$depth.ratio,
+                           positions = abf.data$n.base,
+                           chromosomes = abf.data$chromosome, window = 1e6,
+                           weight = abf.data$depth.normal, start.coord = 1, overlap = 1)
+abf.hom  <- abf.data$ref.zygosity == 'hom'
+abf.het  <- abf.data[!abf.hom, ]
+# 1Mb windows, each window is overlapping with 1 other adjacent window: B-allele frequency
+abf.bafs  <- windowValues(x = abf.het$Bf,
+                           positions = abf.het$n.base,
+                           chromosomes = abf.het$chromosome, window = 1e6,
+                           weight = abf.het$depth.sample,
+                           start.coord = 1, overlap = 1)
+   }
 }

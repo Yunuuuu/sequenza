@@ -25,9 +25,28 @@ segment.breaks(abf.tab, breaks)
 }
 
 \examples{
-# Find breaks from heterozygous positions:
-# breaks <- find.breaks(abf.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))
 
-# find the mean B-allele frequency and depth tratio values for the segments using all the available data. 
-# seg.s1 <- segment.breaks(abf.data, breaks = breaks)
+  \dontrun{
+
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+# read all the chromosomes:
+abf.data  <- read.abfreq(data.file)
+# Gather genome wide GC-stats from raw file:
+gc.stats <- gc.sample.stats(data.file)
+gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
+# Read only one chromosome:
+abf.data  <- read.abfreq(data.file, chr.name = 12)
+abf.data$good.s.reads <- abf.data$depth.sample * 
+                         abf.data$sample.reads.above.quality
+# Correct the coverage of the loaded chromosome:
+abf.data$adjusted.ratio <- abf.data$depth.ratio / 
+                           gc.vect[as.character(abf.data$GC.percent)]
+# Select the heterozygous positions
+abf.hom  <- abf.data$ref.zygosity == 'hom'
+abf.het  <- abf.data[!abf.hom, ]
+# Detect breakpoints
+breaks <- find.breaks(abf.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))
+# use heterozygous and homozygous position to measure segment values
+segment.breaks(abf.data, breaks = breaks)
+   }
 }

@@ -29,10 +29,26 @@ gc.norm(ratio, gc)
 
 \examples{
 
-# gc.stats <- gc.sample.stats("abfreq/TCGA-42-2591_abfreq.txt.gz")
-# gc.vect  <- setNames(gc.stats$raw[,3], gc.stats$gc.values)
-# abf.data$adjusted.ratio <- abf.data$depth.ratio / gc.vect[as.character(abf.data$GC.percent)]
+  \dontrun{
 
-# abf.data$adjusted.ratio <- gc.norm(ratio = abf.data$depth.ratio, gc = abf.data$GC.percent)
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+# read all the chromosomes:
+abf.data  <- read.abfreq(data.file)
+# Normalize coverage by GC-content
+gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
+                    gc = abf.data$GC.percent)
+gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
+abf.data$adjusted.ratio <- abf.data$depth.ratio / 
+                           gc.vect[as.character(abf.data$GC.percent)]
 
+# Alternatively gather genome wide GC-stats from raw file:
+gc.stats <- gc.sample.stats(data.file)
+gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
+# Read only one chromosome:
+abf.data  <- read.abfreq(data.file, chr.name = 12)
+# Correct the coverage of the loaded chromosome:
+abf.data$adjusted.ratio <- abf.data$depth.ratio / 
+                           gc.vect[as.character(abf.data$GC.percent)]
+
+   }
 }

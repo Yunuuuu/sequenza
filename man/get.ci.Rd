@@ -26,8 +26,3 @@
 \seealso{
   \code{baf.model.fit}, \code{mufreq.model.fit}.
 }
-
-\examples{
-  ## read a mufreq file with the header
-  ## m1 <- read.mufreq("sector1.mufreq.gz",header=T)
-}

@@ -48,7 +48,3 @@
 \seealso{
   \code{theoretical.baf}, \code{theoretical.mufreq}, \code{theoretical.depth.ratio}
 }
-
-\examples{
-  ## depth.ratio.dpois(depth.t = mat[1,]$depth.sample, depth.n = mat[1,]$depth.normal, depth.ratio = mat[1,]$adjusted.ratio, test.ratio)
-}

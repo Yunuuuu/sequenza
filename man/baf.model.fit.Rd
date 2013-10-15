@@ -8,8 +8,10 @@
 }
 
 \usage{
-  mufreq.model.fit(cellularity = seq(0.3, 1, by = 0.01), dna.index = seq(0.7, 4, by = 0.01), mc.cores = 2, ...)
-  baf.model.fit(cellularity = seq(0.3, 1, by = 0.01), dna.index = seq(0.7, 4, by = 0.01), mc.cores = 2, ...)                    
+  mufreq.model.fit(cellularity = seq(0.3, 1, by = 0.01),
+                   dna.index = seq(0.7, 4, by = 0.01), mc.cores = 2, ...)
+  baf.model.fit(cellularity = seq(0.3, 1, by = 0.01),
+                dna.index = seq(0.7, 4, by = 0.01), mc.cores = 2, ...)                    
 }
 
 \arguments{
@@ -36,12 +38,47 @@
 }
 
 \examples{
-# example with few segment artificially generated with cellularity 0.75 (75%) and dna.indexs 1 (diploid cell)
-seg.s1<- data.frame(start.pos = c(1,4e6,10e6,40e6,70e6), end.pos = c(4e6,10e6,40e6,70e6,200e6), 
-                    Bf=c(0.5,0.1250,0.5,0.1250,0.5), depth.ratio = c(1,0.625,1,0.625,1), N.BAF = 300)
+  \dontrun{
 
-# Scan over different values of cellularity and DNA-index
-CP <- baf.model.fit(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio, weight.ratio = 300,
-                    weight.Bf = 300, avg.depth.ratio = 1, cellularity = seq(0.1, 1, 0.01),
-                    dna.index = seq(0.5, 3, 0.05), mc.cores = 2)                   
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+# read all the chromosomes:
+abf.data  <- read.abfreq(data.file)
+# Gather genome wide GC-stats from raw file:
+gc.stats <- gc.sample.stats(data.file)
+gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
+# Read only one chromosome:
+abf.data  <- read.abfreq(data.file, chr.name = 1)
+abf.data$good.s.reads <- abf.data$depth.sample * 
+                         abf.data$sample.reads.above.quality
+# Correct the coverage of the loaded chromosome:
+abf.data$adjusted.ratio <- abf.data$depth.ratio / 
+                           gc.vect[as.character(abf.data$GC.percent)]
+# Select the heterozygous positions
+abf.hom  <- abf.data$ref.zygosity == 'hom'
+abf.het  <- abf.data[!abf.hom, ]
+# Detect breakpoints
+breaks <- find.breaks(abf.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))
+# use heterozygous and homozygous position to measure segment values
+seg.s1 <- segment.breaks(abf.data, breaks = breaks)
+
+# filter out small ambiguous segments, and conveniently weight the segments by size:
+seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 10e6, ]
+weights.seg  <- 150 + round((seg.filtered$end.pos - 
+                             seg.filtered$start.pos) / 1e6, 0)
+# get the genome wide mean of the normalized depth ratio:
+avg.depth.ratio <- mean(gc.stats$adj[,2])
+# run the BAF model fit
+
+CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
+                    weight.ratio = weights.seg,
+                    weight.Bf = weights.seg,
+                    avg.depth.ratio = avg.depth.ratio,
+                    cellularity = seq(0.1,1,0.01), 
+                    dna.index = seq(0.5,3,0.05), mc.cores = 4)  
+                    
+confint <- get.ci(CP)
+dna.index   <- confint$max.x
+cellularity <- confint$max.y
+
+   }                 
 }

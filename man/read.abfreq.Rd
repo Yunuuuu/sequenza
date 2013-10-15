@@ -66,6 +66,19 @@ The \code{acgt} file format is similar to the \code{abfreq} file, but contains o
 }
 
 \examples{
-  ## read chromosome 1 from an abfreq file.
-  ## abf.data <- read.abfreq("abfreq/TCGA-42-2591_abfreq.txt.gz", header = TRUE, chr.name = "1")
+   \dontrun{
+
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+## read chromosome 1 from an abfreq file.
+abf.data <- read.abfreq(data.file, chr.name = 1)
+
+## fast accessing cromosome 17 using the file metrics
+gc.stats <- gc.sample.stats(data.file)
+chrX <- gc.stats$file.metrics[gc.stats$file.metrics$chr == "X", ]
+abf.data <- read.abfreq(data.file, n.lines = c(chrX$start, chrX$end))
+
+## Comparison the running time of the two different methods.
+system.time(read.abfreq(data.file, n.lines = c(chrX$start, chrX$end)))
+system.time(abf.data <- read.abfreq(data.file,chr.name="X"))
+   }
 }

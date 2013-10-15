@@ -32,24 +32,24 @@ plotWindows(abf.window, m.lty = 1, m.lwd = 3,
 
 \examples{
 
-# Use windows of 1Mb on a sample 
+   \dontrun{
 
-# abf.ratio <- windowValues(x = round(abf.data$adjusted.ratio, 3),
-#                           positions = abf.data$n.base,
-#                           chromosomes = abf.data$chromosome, window = 1e6,
-#                           overlap = 5e5, weight = abf.data$depth.normal, start.coord = 1)
-#
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+abf.data <- read.abfreq(data.file)
+# 1Mb windows, each window is overlapping with 1 other adjacent window: depth ratio
+abf.ratio <- windowValues(x = abf.data$depth.ratio,
+                           positions = abf.data$n.base,
+                           chromosomes = abf.data$chromosome, window = 1e6,
+                           weight = abf.data$depth.normal, start.coord = 1, overlap = 1)
+                           
+plotWindows(abf.r.win[[1]], log2.plot = FALSE, 
+            ylab = "Depth ratio", xlab = "Position (bases)", 
+            main = names(abf.r.win)[1], las = 1, n.min = 1, 
+            ylim = c(0, 2.5))
 
-# Plot the first of the resulting chromosome 
-#
-
-# plotWindows(abf.ratio$ windows[[1]], ylab = "Depth ratio", xlab = "Bp", 
-#              main = "Chromosome 1", las =1, n.min = 1e4, ylim = c(0, 2))
-
-# Plot all the chromosome:
-
-# for (i in 1:lenght(abf.ratio)) {
-#    plotWindows(abf.ratio$ windows[[i]], ylab = "Depth ratio", xlab = "Bp", 
-#                 main = [i], las =1, n.min = 1e4, ylim = c(0, 2))
-# }
+plotWindows(abf.r.win[[17]], log2.plot = FALSE, 
+            ylab = "Depth ratio", xlab = "Position (bases)", 
+            main = names(abf.r.win)[1], las = 1, n.min = 1, 
+            ylim = c(0, 2.5))
+   }
 }

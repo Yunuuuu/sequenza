@@ -34,7 +34,24 @@ mut.fractions(AB.sample, Af)
 }
 
 \examples{
-#mut.tab <- mutation.table(abf.data, mufreq.treshold = 0.15, 
-#                           min.reads = 40, max.mut.types = 1,
-#                          min.type.freq = 0.9, segments = seg.s1)
+
+   \dontrun{
+
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+abf.data  <- read.abfreq(data.file)
+# Detect how many reads passed the quality treshold
+abf.data$good.s.reads <- abf.data$depth.sample * 
+                         abf.data$sample.reads.above.quality
+# Normalize coverage by GC-content
+gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
+                    gc = abf.data$GC.percent)
+gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
+abf.data$adjusted.ratio <- abf.data$depth.ratio / 
+                           gc.vect[as.character(abf.data$GC.percent)]     
+# Subset mutations, apply mutation frequency treshold.
+mut.tab   <- mutation.table(abf.data, mufreq.treshold = 0.15, 
+                            min.reads = 40, max.mut.types = 1,
+                            min.type.freq = 0.9)
+mut.tab <- na.exclude(mut.tab)
+   }
 }

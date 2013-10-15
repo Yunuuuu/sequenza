@@ -52,22 +52,69 @@
 }
 
 \examples{
-# example with few segment artificially generated with cellularity 0.75 (75%) and dna.indexs 1 (diploid cell)
+  \dontrun{
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+# read all the chromosomes:
+abf.data  <- read.abfreq(data.file)
+# Gather genome wide GC-stats from raw file:
+gc.stats <- gc.sample.stats(data.file)
+gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
+# Read only one chromosome:
+abf.data  <- read.abfreq(data.file, chr.name = 1)
+abf.data$good.s.reads <- abf.data$depth.sample * 
+                         abf.data$sample.reads.above.quality
+# Correct the coverage of the loaded chromosome:
+abf.data$adjusted.ratio <- abf.data$depth.ratio / 
+                           gc.vect[as.character(abf.data$GC.percent)]
+# Select the heterozygous positions
+abf.hom  <- abf.data$ref.zygosity == 'hom'
+abf.het  <- abf.data[!abf.hom, ]
+# Detect breakpoints
+breaks <- find.breaks(abf.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))
+# use heterozygous and homozygous position to measure segment values
+seg.s1 <- segment.breaks(abf.data, breaks = breaks)
 
-seg.s1<- data.frame(start.pos = c(1,4e6,10e6,40e6,70e6), end.pos = c(4e6,10e6,40e6,70e6,200e6), 
-                    Bf=c(0.5,0.1250,0.5,0.1250,0.5), depth.ratio = c(1,0.625,1,0.625,1), N.BAF = 300)
+# filter out small ambiguous segments, and conveniently weight the segments by size:
+seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 10e6, ]
+weights.seg  <- 150 + round((seg.filtered$end.pos - 
+                             seg.filtered$start.pos) / 1e6, 0)
+# get the genome wide mean of the normalized depth ratio:
+avg.depth.ratio <- mean(gc.stats$adj[,2])
+# run the BAF model fit
+
+CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
+                    weight.ratio = weights.seg,
+                    weight.Bf = weights.seg,
+                    avg.depth.ratio = avg.depth.ratio,
+                    cellularity = seq(0.1,1,0.01), 
+                    dna.index = seq(0.5,3,0.05), mc.cores = 4)  
+                    
+confint <- get.ci(CP)
+dna.index   <- confint$max.x
+cellularity <- confint$max.y
+
+#detect copy number alteration on the segments:
+
+cn.alleles <- baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
+                        cellularity = cellularity, dna.index = dna.index,
+                        avg.depth.ratio = 1)
+
+head(cbind(seg.s1, cn.alleles))
+
+# create mutation table:
+mut.tab   <- mutation.table(abf.data, mufreq.treshold = 0.15, 
+                            min.reads = 40, max.mut.types = 1,
+                            min.type.freq = 0.9, segments = seg.s1)
+                            
+mut.tab.clean <- na.exclude(mut.tab)
+
+# Detect mutated alleles:
+mut.alleles <- mufreq.bayes(mufreq = mut.tab.clean$F,
+                            depth.ratio = mut.tab.clean$adjusted.ratio,
+                            cellularity = cellularity, dna.index = dna.index,
+                            avg.depth.ratio = avg.depth.ratio)
+head(cbind(mut.tab.clean[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
 
 
-# Trying to fit the model with different values
-baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
-          weight.ratio = 300, weight.Bf = 300, 
-          cellularity = 0.75, dna.index = 1, avg.depth.ratio = 1)
-
-baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
-          weight.ratio = 300, weight.Bf = 300,
-          cellularity = 0.5, dna.index = 1, avg.depth.ratio = 1)
-          
-baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
-          weight.ratio = 300, weight.Bf = 300,
-          cellularity = 0.75, dna.index = 1.5, avg.depth.ratio = 1)
+   }
 }
