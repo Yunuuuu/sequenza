@@ -7,7 +7,7 @@ export(
 	get.ci,
 	mut.fractions,
 	mutation.table,
-	find.breaks,
+   find.breaks,
    segment.breaks,
 	mufreq.bayes,
 	baf.bayes,
@@ -22,7 +22,9 @@ export(
 	theoretical.mufreq,
 	types.matrix,
 	model.points,
-	theoretical.baf
+	theoretical.baf,
+   sequenza,
+   sequenza.extract
 )
 
 
