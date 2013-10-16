@@ -304,33 +304,3 @@ segment.breaks <- function(abf.tab, breaks) {
    row.names(segments) <- 1:nrow(segments)
    segments
 }
-
-# segment.chromosome <- function(x, breaks) {
-#    segments <- list()
-#    chromosome = unique(x$chromosome)
-#    for (i in 1:length(breaks)) {
-#       if (i ==1) {
-#          start.i = 1
-#       } else {
-#          start.i = breaks[i-1]
-#       }
-#       end.i = breaks[i]
-#       pos.filter.i <- x$n.base >= start.i & x$n.base <= end.i
-#       het.filter.i <- pos.filter.i & x$ref.zygosity == 'het'
-#       start.j <- min(x$n.base[pos.filter.i])
-#       # Bf.i    <- median(rep(x$Bf[het.filter.i], 
-#       #                 times = round( x$depth.sample[het.filter.i] * x$sample.reads.above.quality[het.filter.i], 0)))
-#       # ratio.i <- median(rep(x$adjusted.ratio[pos.filter.i], 
-#       #                 times = x$depth.sample[pos.filter.i]))
-#        Bf.i    <- weighted.mean(x = x$Bf[het.filter.i], w = sqrt(x$depth.sample[het.filter.i] * x$sample.reads.above.quality[het.filter.i]))
-#        ratio.i <- weighted.mean(x = x$adjusted.ratio[pos.filter.i], w = sqrt(x$depth.sample[pos.filter.i]))
-#       segments[[i]] <- data.frame(chromosome  = chromosome,
-#                                   start       = start.j,
-#                                   end         = end.i,
-#                                   Bf          = Bf.i,
-#                                   depth.ratio = ratio.i,
-#                                   N.BAF       = length(het.filter.i[het.filter.i == TRUE]),
-#                                   N.ratio     = length(pos.filter.i[pos.filter.i == TRUE]))
-#    }
-#    do.call(rbind, segments)
-# }
