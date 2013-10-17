@@ -58,9 +58,9 @@ Without a reference sample (normal germline sample) we can try to divide for the
 sample.i$adjusted.ratio <- 2^(sample.i$adjusted.ratio/0.55)
 
 @
-\subsubsection{Retrive the homozygous position}
-It should be available a germline sample to get the heterozygours SNP, doing in the same sample it's a risk if the sample is pure. A treshold around 0.25 or 0.35 can be picked to subset the heterozygous position on the germline.
-In the example we are lowering the treshold while taking the SNP from the same aberrant sample.
+\subsubsection{Retrieve the homozygous position}
+It should be available a germline sample to get the heterozygours SNP, doing in the same sample it's a risk if the sample is pure. A threshold around 0.25 or 0.35 can be picked to subset the heterozygous position on the germline.
+In the example we are lowering the threshold while taking the SNP from the same aberrant sample.
 <<label=hetFind, eval=TRUE>>=
 het.lim <- 0.2
 is.het <- sample.i$Bf >= het.lim & sample.i$Bf <= 1 - het.lim
@@ -168,7 +168,7 @@ chromosome.view(baf.windows = snp.b.win[[1]],
                 cellularity = cellularity, dna.index = dna.index,
                 avg.depth.ratio = avg.unlogR, main = "1")
 @
-      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allelic state. }
+      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allele state. }
       \label{fig:crhomViewNoMutCP1}
 \end{figure}
 
@@ -181,7 +181,7 @@ chromosome.view(baf.windows = snp.b.win[[16]],
                 cellularity = cellularity, dna.index = dna.index,
                 avg.depth.ratio = avg.unlogR, main = "16")
 @
-      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allelic state. }
+      \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allele state. }
       \label{fig:crhomViewNoMutCP16}
 \end{figure}
 
