@@ -4,7 +4,7 @@
 \title{Use sequenza to estimate tumor purity and ploidy.}
 
 \description{
-  
+  Efficiently extract the information from raw data, perform the Bayesian estimation of cellularity and ploidy.
 }
 
 \usage{
@@ -27,8 +27,8 @@
   \item{max.mut.types}{Maximum number of mutation type per position. Integer from 1 to 3 (since the base are only 4). Default 3, accept "noisy" mutation calls.}
   \item{min.type.freq}{Minimal frequency of aberrant types.}
   \item{sequenza.extract}{A list obtained from the \code{sequenza.extract} function.}
-  \item{female}{Boolean inidicating if the sample is malw or female, to properly handle the X and Y chromosomes. Default TRUE.}
-  \item{segment.filter}{Treshold in base pairs to filter out the noise caused by short segment while testing for cellularity and ploidy. Will not effect the segmentation results. Default 1e7 bases.}
+  \item{female}{Boolean indicating if the sample is male or female, to properly handle the X and Y chromosomes. Default TRUE.}
+  \item{segment.filter}{Threshold in base pairs to filter out the noise caused by short segment while testing for cellularity and ploidy. Will not effect the segmentation results. Default 1e7 bases.}
   \item{XY}{Vector containing the character used for the X and Y chromosome. Default c(X = "X", Y = "Y").}
   \item{cellularity}{Vector of values of cellularity parameters to be tested. Default = seq(0.3, 1, by = 0.01)}
   \item{dna.index}{Vector of values of DNA-index parameters to be tested. Default = seq(0.7, 4, by = 0.01)}
@@ -38,8 +38,8 @@
 }
 
 \details{
-   The function \code{sequenza.extract} take care of efficently read the raw data, normilize the depth.ratio considering the CG-content bias, the allele specific segmetation, filtering noisy mutations and binning the raw data. And it returns all the computed object in a single list object.
-   Every object is itself a list, containing all the relative information, divided chromosme by chromosome.
+   The function \code{sequenza.extract} take care of efficiently read the raw data, normalize the depth.ratio considering the CG-content bias, the allele specific segmentation, filtering noisy mutations and binning the raw data. And it returns all the computed object in a single list object.
+   Every object is itself a list, containing all the relative information, divided chromosome by chromosome.
 }
 
 \seealso{
