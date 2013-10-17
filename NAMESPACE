@@ -23,7 +23,7 @@ export(
 	types.matrix,
 	model.points,
 	theoretical.baf,
-   sequenza,
+   sequenza.fit,
    sequenza.extract
 )
 
