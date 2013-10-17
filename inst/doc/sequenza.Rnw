@@ -287,7 +287,8 @@ cp.plot(CP)
 cp.plot.contours(CP, add = TRUE)
 plot(cint$values.y, ylab = "Cellularity",
      xlab = "likelihood", type = "n")
-select <- cint$confint.y[1] <= cint$values.y[,2] & cint$values.y[,2] <= cint$confint.y[2]
+select <- cint$confint.y[1] <= cint$values.y[,2] &
+          cint$values.y[,2] <= cint$confint.y[2]
 polygon(y = c(cint$confint.y[1], cint$values.y[select, 2], cint$confint.y[2]), 
         x = c(0, cint$values.y[select, 1], 0), col='red', border=NA)
 lines(cint$values.y)
@@ -295,7 +296,8 @@ abline(h = cint$max.y, lty = 2, lwd = 0.5)
 
 plot(cint$values.x, xlab = "DNA index",
      ylab = "likelihood", type = "n")
-select <- cint$confint.x[1] <= cint$values.x[,1] & cint$values.x[,1] <= cint$confint.x[2]
+select <- cint$confint.x[1] <= cint$values.x[,1] &
+          cint$values.x[,1] <= cint$confint.x[2]
 polygon(x = c(cint$confint.x[1], cint$values.x[select, 1], cint$confint.x[2]), 
         y = c(0, cint$values.x[select, 2], 0), col='red', border=NA)
 lines(cint$values.x)
@@ -325,12 +327,14 @@ avg.depth.ratio <- mean(test$gc$adj[, 2])
 To detect variant alleles we use a mutation frequency model, implemented in the function \textit{mufreq.bayes}, with the estimated cellularity and dna.index parameters:
 <<label=mmufBayes, eval=TRUE>>=
 mut.tab     <- na.exclude(do.call(rbind, test$mutations))
-mut.alleles <- mufreq.bayes(mufreq = mut.tab$F, depth.ratio = mut.tab$adjusted.ratio,
+mut.alleles <- mufreq.bayes(mufreq = mut.tab$F,
+                            depth.ratio = mut.tab$adjusted.ratio,
                             cellularity = cellularity, dna.index = dna.index,
-                            avg.depth.ratio = 1)
+                            avg.depth.ratio = avg.depth.ratio)
 
 head(mut.alleles)
-head(cbind(mut.tab[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
+head(cbind(mut.tab[,c("chromosome","n.base","F","adjusted.ratio", "mutation")],
+           mut.alleles))
 @
 
 The result consists in four values for every imputed mutation: \textit{CNr} Is the provided copy number of the normal sample at the given position (default = 2); \textit{CNt} is the estimated copy number of the tumor at the given position; \textit{Mt} is the estimated numbers of alleles carrying the mutation; \textit{L} is the log-likelihood of the model fit.;
