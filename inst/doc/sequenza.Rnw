@@ -42,72 +42,87 @@ This document details a typical analysis of matched tumor-normal exome sequence 
 \item Software: R, Python
 \item Operating system: Linux, OSX
 \item Memory: Minimum 4GB of RAM.  Recommended >8GB.
-\item Disk space: 1.5 GB for each sample 
+\item Disk space: 1.5 GB for sample 
 \item R version: 2.15.1 
-\item Python version: 2.7 with itertools, codecs modules;  multiprocessing.pool, multiprocessing.queue for parallelization; rpy2 for running sequenza-utils from R. 
+\item Python version: 2.7; rpy2 for running sequenza R functions from python. 
 \end{itemize}
 
-\section{Getting ready with Sequenza package/Installing R/Setting up Sequenza}
-\begin{itemize}
-\item download from bitbucket/cbs.dtu.dk
-\item how to install it. R CMD INSTALL sequenza\_version.tar.gz
-\end{itemize}
+\section{Getting started}
+In order to install sequenza, you can select obtain the package from the nearest CRAN mirror doing:
+<<label=instLib, echo=TRUE, eval=FALSE>>=
+install.packages("sequenza")
+@
 
 A typical  workflow by Sequenza is as follow :
 \begin{enumerate}
 \item Convert pileup to abfreq 
 \item GC normalization
-\item Obtain depth ratio and B allele frequencies
-\item Allele-specific segmentation
+\item Allele-specific segmentation using the depth ratio and the B allele frequencies
 \item Infer cellularity and DNA-index by model fitting
-\item Segmentation and mutations
+\item Call CNV and variant alleles
 \end{enumerate}
+
 \section{Preparing inputs for Sequenza}
 In order to obtain precise mutational and aberration patterns in a tumor sample, Sequenza requires a matched normal sample from the same patient. In short, the following files are needed to get started with Sequenza. 
 \begin{enumerate}
-\item A pileup file from the tumor specimen
-\item A pileup file from the normal specimen
-\item A FASTA reference genomic sequence file (optional, for GC-content correction)
+\item A bam file or a derived pileup file from the tumor specimen.
+\item A bam file or a derived pileup file from the normal specimen.
+\item A FASTA reference genomic sequence file (optional, for GC-content correction, and to trasform bam to pileup if needed.)
 \end{enumerate}
-We recommend using pre-processed and quality filtered BAM files to obtain mpileup calls for both samples. 
+We recommend using pre-processed and quality filtered BAM files to obtain pileup calls for both samples. 
 
 Pileup files can be generated using \texttt{samtools} (ref). The genome sequence file can be obtained from (url).
 \shellcmd{
-samtools mpileup  -f hg19.fasta -Q 20 normal.bam
+samtools mpileup  -f hg19.fasta -Q 20 normal.bam | gzip > normal.pileup.gz
 }
 \shellcmd{
-samtools mpileup -f hg19.fasta -Q 20 tumor.bam
+samtools mpileup -f hg19.fasta -Q 20 tumor.bam | gzip > tumor.pileup.gz
 }
 
-\section{First the non-R part: pre-processing data}
+\section{Pre-processing data with \textit{sequenza-utils.py}.}
 
-For convenience and efficiency we have implemented pre-processing algorithms in an external (not called from R) Python program. The program is provided with the package; it's exact location can be found like this:
+For convenience and efficiency we have implemented pre-processing algorithms in an standalone (not called from R) Python program. Although, the program is provided with the package; it's exact location can be found like this:
 
 <<label=loadLib, echo=TRUE>>=
 system.file("exec", "sequenza-utils.py", package="sequenza")
 @
 
-You may wish to copy this program to a location on your path. NOTE: this script requires several UNIX tools and thus probably not work on Windows (HOW ABOUT CYGWIN ?).
+You may wish to copy this program to a location on your path.
 
 IS THE GC CONTENT FILE INDEPENDENT OF REFERENCE GENOME USED FOR ALIGNMENT AND MPILEUP ?
 SHOULD NON-CANONICAL CHROMOSOMES BE REMOVED IF ONE WANTS GC CONTENT CALCULATIONS BE DONE ON THEIR REFERENCE GENOME ?
 
-Extract average GC content in 50-base genomic windows:
+To obtain the GC content information (required to obtain an \textit{ABfreq} file), is possible to use a function from sequenza-utils, and extract the average GC content using a fixed genomic windows.
+The following example is by using a 50 nucleotides window:
 \shellcmd{
 sequenza-utils.py GC-windows -w 50 hg19.fa | gzip > hg19.gc50Base.txt.gz
 }
 
-Process the two pileup files to obtain an "abfreq" file containing alleles and mutation frequency.
+When the GC content file is available, it is possible to process the two pileup files to obtain an \textit{ABfreq} file containing genotype information, alleles and mutation frequency, and more other features.
 \shellcmd{
-sequenza-utils.py pileup2tab -gc hg19.gc50Base.txt.gz -r 0001-normal\_blood.pileup.gz -s 0001-met2.pileup.gz -q 20 -n 10 -o 0001-met2.abfreq.txt.gz
+sequenza-utils.py pileup2abfreq -gc hg19.gc50Base.txt.gz -r normal.pileup.gz -s tumor.pileup.gz | gzip > out.abfreq.gz
 }
 
------ UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME UPDATE ME -----
+If you don't have yet the pileup, or you are not interested on storing the pileup for further use, you can use two \textit{fifo} files, to pipe the samtools output directly to \textit{sequenza-utils}:
+\shellcmd{
+mkfifo normal.fifo tumor.fifo
+}
+\shellcmd{
+samtools mpileup  -f hg19.fasta -Q 20 normal.bam > normal.fifo \&\&
+}
+\shellcmd{
+samtools mpileup -f hg19.fasta -Q 20 tumor.bam > tumor.fifo \&\&
+}
+\shellcmd{
+sequenza-utils.py pileup2abfreq -gc hg19.gc50Base.txt.gz -r normal.fifo -s tumor.fifo | gzip > out.abfreq.gz
+}
+\shellcmd{
+rm normal.fifo tumor.fifo
+}
 
-\section{Read the pre-processed data (\textit{abfreq} file) into R}
+After the aligned sequence data have been preprocessed, the \textit{sequenza} R package would handle all the normalization and analysis steps. So the following part of this vignette will take place in R.
 
-
-The remainder of this example takes place in R.
+\section{Read the pre-processed data (\textit{ABfreq} file) into R}
 
 Load the sequenza package:
 <<label=loadLib, echo=TRUE>>=
@@ -120,14 +135,14 @@ data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza"
 data.file
 @
 
-The abfreq file can be read all at once, but processing one chromosome at a time is less demanding on computational resources and might be preferable.  (Note that the demo data included with sequenza is only chromosome 1)
+The abfreq file can be read all at once, but processing one chromosome at a time is less demanding on computational resources and might be preferable.
 
 Read only the data corresponding to chromosome 1:
 <<label=readAfreqChr, echo=TRUE, eval=FALSE>>=
 abf.data <- read.abfreq(data.file, chr.name = "1")
 @
 
-Alternatively, read all data at once (not run):
+Alternatively, read all data at once:
 <<label=readAfreq, echo=TRUE>>=
 abf.data <- read.abfreq(data.file)
 @
@@ -136,6 +151,7 @@ abf.data <- read.abfreq(data.file)
 str(abf.data)
 @
 
+It is also provided a way to read the file even faster, after mapping the chromosomes location in the file, it is possible to select the coordinate (in terms of from line x to line y) of the file to read. see the man page of \textit{read.abfreq} for one example.
 
 \section{Quality control step?  (EXPLAIN)}
 
@@ -151,11 +167,14 @@ abf.data$good.s.reads <- abf.data$depth.sample *
 
 The number of reads at a given genomic position can be affected by the local GC content. We attempt to remove this bias as in (ref).
 
-It is possible to gather gc-content information from the entire file (normally this would be the entire genome, but in our example it contains only chromosome 1):
+It is possible to gather gc-content information from the entire file and in the meantime map the chromosome position in the file, to fast acces chromosome by chromosome later:
 <<label=depthRGCnormall, echo=TRUE, results=hide>>=
 gc.stats <- gc.sample.stats(data.file)
 @
 
+<<label=gcstr, echo=TRUE >>=
+str(gc.stats)
+@
 
 Or alternatively, it is possible to collect the GC-contents information from an object loaded in the environment.
 <<label=depthRGCnorm, echo=TRUE, eval=FALSE>>=
@@ -163,7 +182,7 @@ gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)
 @
 
-Calculate the GC-normalized depth ratio:
+In either case the the normalization to the depth.ratio is performed in the following way:
 <<label=useGCmedians, echo=TRUE>>=
 gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
 
