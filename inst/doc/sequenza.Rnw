@@ -10,6 +10,16 @@
 \usepackage{subfigure}
 \usepackage{listings}
 \usepackage{float}
+\lstdefinestyle{BashInputStyle}{
+  language=bash,
+  basicstyle=\small\sffamily,
+  numbers=left,
+  numberstyle=\tiny,
+  numbersep=3pt,
+  columns=fullflexible,
+  linewidth=0.9\linewidth,
+  xleftmargin=0.1\linewidth
+}
 
 \newcommand{\shellcmd}[1]{\\\indent\indent\texttt{\footnotesize\# #1}\\}
 \newcommand{\Rfunction}[1]{{\texttt{#1}}}
@@ -37,7 +47,9 @@ Deep sequence of tumor DNA along with corresponding normal DNA can provide a ric
 
 This document details a typical analysis of matched tumor-normal exome sequence data using \textit{sequenza}.
 
-\section{Minimum requirements}
+\section{Getting started}
+
+\subsection{Minimum requirements}
 \begin{itemize}
 \item Software: R, Python
 \item Operating system: Linux, OSX
@@ -47,95 +59,84 @@ This document details a typical analysis of matched tumor-normal exome sequence 
 \item Python version: 2.7; rpy2 for running sequenza R functions from python. 
 \end{itemize}
 
-\section{Getting started}
+\subsection{Installation}
 In order to install sequenza, you can select obtain the package from the nearest CRAN mirror doing:
 <<label=instLib, echo=TRUE, eval=FALSE>>=
 install.packages("sequenza")
 @
-
+\subsection{Workflow Overview}
 A typical  workflow by Sequenza is as follow :
 \begin{enumerate}
-\item Convert pileup to abfreq 
+\item Convert pileup to \textit{ABfreq} 
 \item GC normalization
 \item Allele-specific segmentation using the depth ratio and the B allele frequencies
 \item Infer cellularity and DNA-index by model fitting
 \item Call CNV and variant alleles
 \end{enumerate}
 
-\section{Preparing inputs for Sequenza}
+\subsection{Preparing inputs for Sequenza}
 In order to obtain precise mutational and aberration patterns in a tumor sample, Sequenza requires a matched normal sample from the same patient. In short, the following files are needed to get started with Sequenza. 
 \begin{enumerate}
 \item A bam file or a derived pileup file from the tumor specimen.
 \item A bam file or a derived pileup file from the normal specimen.
-\item A FASTA reference genomic sequence file (optional, for GC-content correction, and to trasform bam to pileup if needed.)
+\item A FASTA reference genomic sequence file (optional, for GC-content correction, and to transform bam to pileup if needed.)
 \end{enumerate}
 We recommend using pre-processed and quality filtered BAM files to obtain pileup calls for both samples. 
 
 Pileup files can be generated using \texttt{samtools} (ref). The genome sequence file can be obtained from (url).
-\shellcmd{
-samtools mpileup  -f hg19.fasta -Q 20 normal.bam | gzip > normal.pileup.gz
-}
-\shellcmd{
-samtools mpileup -f hg19.fasta -Q 20 tumor.bam | gzip > tumor.pileup.gz
-}
+\begin{lstlisting}[style=BashInputStyle]
+   samtools mpileup  -f hg19.fasta -Q 20 normal.bam | gzip > normal.pileup.gz
+   samtools mpileup -f hg19.fasta -Q 20 tumor.bam | gzip > tumor.pileup.gz
+\end{lstlisting}
 
-\section{Pre-processing data with \textit{sequenza-utils.py}.}
+\subsection{Processing the data with \textit{sequenza-utils.py}.}
 
 For convenience and efficiency we have implemented pre-processing algorithms in an standalone (not called from R) Python program. Although, the program is provided with the package; it's exact location can be found like this:
 
-<<label=loadLib, echo=TRUE>>=
+<<label=findexec, echo=TRUE>>=
 system.file("exec", "sequenza-utils.py", package="sequenza")
 @
-
 You may wish to copy this program to a location on your path.
 
-IS THE GC CONTENT FILE INDEPENDENT OF REFERENCE GENOME USED FOR ALIGNMENT AND MPILEUP ?
-SHOULD NON-CANONICAL CHROMOSOMES BE REMOVED IF ONE WANTS GC CONTENT CALCULATIONS BE DONE ON THEIR REFERENCE GENOME ?
-
-To obtain the GC content information (required to obtain an \textit{ABfreq} file), is possible to use a function from sequenza-utils, and extract the average GC content using a fixed genomic windows.
+To obtain the GC content information (required to obtain an \textit{ABfreq} file), is possible to use a function from sequenza-utils, and extract the average GC content using a fixed genomic windows, or download the gc5Base from golden path (\url{http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/gc5Base/}).
 The following example is by using a 50 nucleotides window:
-\shellcmd{
-sequenza-utils.py GC-windows -w 50 hg19.fa | gzip > hg19.gc50Base.txt.gz
-}
+\begin{lstlisting}[style=BashInputStyle]
+   sequenza-utils.py GC-windows -w 50 hg19.fa | gzip > hg19.gc50Base.txt.gz
+\end{lstlisting}
 
 When the GC content file is available, it is possible to process the two pileup files to obtain an \textit{ABfreq} file containing genotype information, alleles and mutation frequency, and more other features.
-\shellcmd{
-sequenza-utils.py pileup2abfreq -gc hg19.gc50Base.txt.gz -r normal.pileup.gz -s tumor.pileup.gz | gzip > out.abfreq.gz
-}
+\begin{lstlisting}[style=BashInputStyle]
+   sequenza-utils.py pileup2abfreq -gc hg19.gc50Base.txt.gz \
+                                   -r normal.pileup.gz \
+                                   -s tumor.pileup.gz | gzip > out.abfreq.gz
+\end{lstlisting}
 
-If you don't have yet the pileup, or you are not interested on storing the pileup for further use, you can use two \textit{fifo} files, to pipe the samtools output directly to \textit{sequenza-utils}:
-\shellcmd{
-mkfifo normal.fifo tumor.fifo
-}
-\shellcmd{
-samtools mpileup  -f hg19.fasta -Q 20 normal.bam > normal.fifo \&\&
-}
-\shellcmd{
-samtools mpileup -f hg19.fasta -Q 20 tumor.bam > tumor.fifo \&\&
-}
-\shellcmd{
-sequenza-utils.py pileup2abfreq -gc hg19.gc50Base.txt.gz -r normal.fifo -s tumor.fifo | gzip > out.abfreq.gz
-}
-\shellcmd{
-rm normal.fifo tumor.fifo
-}
+If you don't have yet the pileup, or you are not interested on storing the pileup for further use, you can use two \textit{FIFO} files, to pipe the samtools output directly to \textit{sequenza-utils}:
+\begin{lstlisting}[style=BashInputStyle]
+   mkfifo normal.fifo tumor.fifo
+   samtools mpileup  -f hg19.fasta -Q 20 normal.bam > normal.fifo &
+   samtools mpileup -f hg19.fasta -Q 20 tumor.bam > tumor.fifo &
+   sequenza-utils.py pileup2abfreq -gc hg19.gc50Base.txt.gz \
+                                   -r normal.fifo \
+                                   -s tumor.fifo | gzip > out.abfreq.gz
+   rm normal.fifo tumor.fifo
+\end{lstlisting}
 
-After the aligned sequence data have been preprocessed, the \textit{sequenza} R package would handle all the normalization and analysis steps. So the following part of this vignette will take place in R.
+\section{Exploring the \textit{ABfreq} file and GC-correction}
 
-\section{Read the pre-processed data (\textit{ABfreq} file) into R}
-
+After the aligned sequence data have been pre-processed, the \textit{sequenza} R package would handle all the normalization and analysis steps. So the following part of this vignette will take place in R.
 Load the sequenza package:
 <<label=loadLib, echo=TRUE>>=
 library("sequenza")
 @
-
-Find the example data file:
+\subsection{Read the file}
+In the package we provide an example file, to find the complete path of the example data file:
 <<label=setFile, echo=TRUE>>=
 data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
 data.file
 @
 
-The abfreq file can be read all at once, but processing one chromosome at a time is less demanding on computational resources and might be preferable.
+The ABfreq file can be read all at once, but processing one chromosome at a time is less demanding on computational resources and might be preferable for small resource system, or when processing WGS data.
 
 Read only the data corresponding to chromosome 1:
 <<label=readAfreqChr, echo=TRUE, eval=FALSE>>=
@@ -151,23 +152,23 @@ abf.data <- read.abfreq(data.file)
 str(abf.data)
 @
 
-It is also provided a way to read the file even faster, after mapping the chromosomes location in the file, it is possible to select the coordinate (in terms of from line x to line y) of the file to read. see the man page of \textit{read.abfreq} for one example.
+It is also provided a way to read the file even faster, after mapping the chromosomes location in the file, it is possible to select the coordinate (in terms of from line x to line y) of the file to read. see the man page of \textit{read.abfreq} for an example.
 
-\section{Quality control step?  (EXPLAIN)}
+\subsection{Quality control and normalization}
 
-Each nucleotide aligned in the sequencing is associate with a quality score. The \textit{sequenza-utils} software is capable of filtering the base with the quality lower then a specified value (default is 20), and returns the rate of reads that have passed the filter in the column \textit{sample.reads.above.quality}, while the \textit{depth.sample} column contains the raw depth calculated in the pileup (from samtools).
-The product of the rate of bases that have passed the quality check and the total amount or reads aligned at the same nucleotide return the number of reads that have passed the quality check.
-
+Each aligned base, in the next generation sequencing, is associate with a quality score. The \textit{sequenza-utils} software is capable of filtering the base with a quality score lower then a specified value (default is 20). The rate of reads that have passed the filter in returned the column \textit{sample.reads.above.quality}, while the \textit{depth.sample} column contains the raw depth indicated in the pileup (from samtools).
+The product :
 <<label=goodReads, echo=TRUE>>=
 abf.data$good.s.reads <- abf.data$depth.sample * 
                          abf.data$sample.reads.above.quality
 @
+Would roughly indicate the actual number of reads that passed the quality filter for each position. The column \textit{good.s.reads} (good sample reads) is required in many function in a usual \textit{sequenza} workflow. 
 
-\section{GC-normalization}
+\subsection{GC-normalization}
 
-The number of reads at a given genomic position can be affected by the local GC content. We attempt to remove this bias as in (ref).
+The GC content bias is affecting most of the sample, however some sample are more biased then other. We attempt to remove this bias by normalize by the mean depth ratio value of a corresponding GC content value.
 
-It is possible to gather gc-content information from the entire file and in the meantime map the chromosome position in the file, to fast acces chromosome by chromosome later:
+It is possible to gather gc-content information from the entire file and in the meantime map the chromosome position in the file (to fast access chromosome by chromosome later, see ?read.abfreq):
 <<label=depthRGCnormall, echo=TRUE, results=hide>>=
 gc.stats <- gc.sample.stats(data.file)
 @
@@ -176,7 +177,7 @@ gc.stats <- gc.sample.stats(data.file)
 str(gc.stats)
 @
 
-Or alternatively, it is possible to collect the GC-contents information from an object loaded in the environment.
+Or alternatively, it is possible to collect the GC-contents information from an object already loaded in the environment.
 <<label=depthRGCnorm, echo=TRUE, eval=FALSE>>=
 gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)
@@ -190,8 +191,9 @@ abf.data$adjusted.ratio <- abf.data$depth.ratio /
                            gc.vect[as.character(abf.data$GC.percent)]                       
 @
 
-
-<<fig = TRUE, width = 8, height = 4.5>>==
+\begin{figure}[H]
+      \centering
+<<label=GCfig, fig = TRUE, width = 8, height = 4.5>>==
 par(mfrow = c(1,2), cex = 1, las = 1, bty = 'l')
 matplot(gc.stats$gc.values, gc.stats$raw,
         type = 'b', col = 1, pch = c(1, 19, 1), lty = c(2, 1, 2),
@@ -201,170 +203,88 @@ hist2(abf.data$depth.ratio, abf.data$adjusted.ratio,
       breaks = prettyLog, key = vkey, panel.first = abline(0, 1, lty = 2),
       xlab = 'Uncorrected depth ratio', ylab = 'GC-adjusted depth ratio')
 @
-
-
-\section{Create genomic profiles}
-
-\subsection{First, the depth ratio}
-
-Summarize the depth ratio by binning the data in overlapping genomic windows:
-<<label=depthWindowing, echo=TRUE, results=hide>>=
-abf.r.win <- windowValues(x = abf.data$adjusted.ratio,
-             positions = abf.data$n.base,
-             chromosomes = abf.data$chromosome,
-             window = 1e6, overlap = 1,
-             weight = abf.data$depth.normal)
-@
-
-\begin{figure}[H]
-      \centering
-<<label=plotDepthProfile,fig=TRUE,width=6,height=4>>=
-
-plotWindows(abf.r.win[[1]], log2.plot = FALSE, 
-            ylab = "Depth ratio", xlab = "Position (bases)", 
-            main = names(abf.r.win)[1], las = 1, n.min = 1, 
-            ylim = c(0, 2.5))
-@
-      \caption{Depth ratio profile visualization over a single chromosome. }
-      \label{fig:SingleCNProfview}
+      \caption{Display of depth.ratio bias in relation of GC content (left), and resulting normalization effect (right). }
+      \label{fig:GCfig}
 \end{figure}
 
+\section{Analysing sequencing with \textit{sequenza}}
 
-\subsection{Next, the B-allele frequencies}
+The R package \textit{sequenza} offers an ensemble of functions and models that can be used to design customized workflows and analysis.
+However we provide a golden standard procedure, aimed to quickly perform and satisfy the majority of the cases, and therefore to easily introduce the user to use sequenza for their own data.
+The analysis is mainly divided in 3 separate steps:
+\begin{itemize}
+\item Extract the relevant information from the raw \textit{ABfreq} file.
+\item Fit the \textit{sequenza} model to infer cellularity and ploidy (dna.index).
+\item Apply the estimated parameter to detect CNV variant alleles
+\end{itemize}
 
-The column \textit{ref.zygosity} contains the zygosity derived from the germline sample. the possible values are \textit{het} for heterozygous positions and \textit{hom} for homozygous positions.
-<<label=HetSepqring, echo=TRUE>>=
-abf.hom  <- abf.data$ref.zygosity == 'hom'
-abf.het  <- abf.data[!abf.hom, ]
+\subsection{Extract the information from the \textit{ABfreq} file.}
+The function \textit{sequenza.extract} is designed to efficiently access the raw ABfreq data and take care of normalization steps. The argument provide the ability of customize a set of action listed below:
+\begin{itemize}
+\item binning depth ratio and B allele frequency in a desired window size (allowing a desired number of overlapping windows);
+\item performing a fast, allele specific segmentation using the \textit{copynumber} package;
+\item filter mutation by frequency and noise.
+\end{itemize}
+
+<<label=sequenzaExtract, echo=TRUE, results=hide>>=
+test <- sequenza.extract(data.file)
+names(test)
 @
+After the raw data is processed, the size of the data is considerably reduced. For instance the object resulting from \textit{sequenza.extract} can be stored as a R object within a size contained in few megabytes, even for whole genome sequencing data. 
 
-Summarize the BAF by binning the data in overlapping genomic windows (including only those positions called heterozygous in the normal sample):
-<<label=BAFWindowing, echo=TRUE, results=hide>>=
-abf.b.win <- windowValues(x = abf.het$Bf,
-             positions = abf.het$n.base,
-             chromosomes = abf.het$chromosome,
-             window = 1e6, overlap = 1,
-             weight = round(x = abf.het$good.s.reads, digits = 0))
-@
+The result of this first step consist in a list of lists. All the sub-lists have a different information subdivided by chromosome. Every list share the same chromosome order.
 
-\begin{figure}[H]
-      \centering
-<<label=plotBAFProfile,fig=TRUE,width=6,height=4>>=
-plotWindows(abf.b.win[[1]], ylim = c(0, 0.5), 
-           main = names(abf.r.win)[1], xlab = "Position (bases)",
-           ylab = "B allele frequency", n.min = 10)
-@
-      \caption{B-allele frequency profile visualization over a single chromosome.}
-      \label{fig:SingleBAFProfview}
-\end{figure}
+\subsubsection{Plot chromosome view with mutations, BAF, depth ratio and segments}
 
-\section{Allele-specific segmentation}
-
-\subsection{Find genomic breakpoints}
-
-To find breakpoints we use the allele-specific segmentation algorithm from the \textit{copynumber} package \cite{BMCcopynumber}.
-<<label=ASCPF, echo=TRUE>>=
-breaks <- find.breaks(abf.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))
-head(breaks)
-@
-
-Now obtain the segment values:
-<<label=so.segs, echo=TRUE>>=
-seg.s1 <- segment.breaks(abf.data, breaks = breaks)
-@
-
-\section{Select mutations by mutation frequency}
-I the genotype file (the \textit{abfreq} file) the mutation are detected as homozygous position with a decreased frequency of the germline nucleotide. A set of nucleotide not present in the germline is present with the relative frequency in the column \textit{AB.sample}. Being a frequency derived by the number of reads covering the position, the accuracy of the measurement is depending on the depth in the considered position.
-In order to filter the mutations the function \textit{mutation.table} allow to filter the present mutation to a define level of frequency, a desired number of reads depth, and a desired number of mutated nucleotide per position. Additionally it is possible to swap the \textit{adjusted.ratio} column with the corresponding value after segmentation.
-<<label=doF, echo=TRUE>>=
-mut.tab <- mutation.table(abf.data, mufreq.treshold = 0.15, 
-                          min.reads = 40, max.mut.types = 1,
-                          min.type.freq = 0.9, segments = seg.s1)
-@
-
-However it is optional, without providing the segmented data the \textit{adjusted.ratio} would remains unchanged.
-<<label=doF, echo=TRUE>>=
-mut.tab.no.seg <- mutation.table(abf.data, mufreq.treshold = 0.15, 
-                          min.reads = 40, max.mut.types = 1,
-                          min.type.freq = 0.9)
-@
-<<label=doF, echo=TRUE>>=
-dim(mut.tab)
-
-head(mut.tab)
-
-head(mut.tab.no.seg)
-@
-
-\section{Plot chromosome view with mutations, BAF, depth ratio and segments}
-
-The visualization can be made by chromosome, using binned data and segmented data. Optionally can be inserted the mutations table as in figure \ref{fig:3panelsPlot} and the estimated parameters to draw the resulting model lines as in figure \ref{fig:crhomViewWithCP} 
+Each chromosome can be visualize using the function \textit{chromosome.view} as in figure \ref{fig:3panelsPlot}. The same function can be used to visualize the data after the estimation of cellularity and dna.index parameters as in figure \ref{fig:crhomViewWithCP} 
 \begin{figure}[H]
       \centering
 <<label=3panelsPlot,fig=TRUE,width=6,height=6>>=
 
-chromosome.view(mut.tab = mut.tab[mut.tab$chromosome == "1",], baf.windows = abf.b.win[[1]], 
-                ratio.windows = abf.r.win[[1]], min.N.ratio = 1,
-                segments = seg.s1[seg.s1$chromosome == "1",], main = "Chromosome 1")
+chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]], 
+                ratio.windows = test$ratio[[1]], min.N.ratio = 1,
+                segments = test$segments[[1]], main = test$chromosomes[1])
 @ 
       \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position.}
       \label{fig:3panelsPlot}
 \end{figure}
 
 
-\section{Inference of cellularity and DNA-index}
+\subsection{Inference of cellularity and ploidy (DNA index)}
 
-The parameter estimation is performed on the segmented data, using BAF and depth ratio information.
-In order to avoid to catch errors due to the heterogeneity of the sample, we can filter the segments smaller then a certain amount. For instance, we can be confident that segments bigger then few megabases have enough data points to usually insure a correct measure. Alternatively it could be possible to exclude chromosomal regions usually know to be problematic, as the region close to the telomeres and also near the centromere 
-<<label=filterSegs, echo=TRUE>>=
-seg.filtered <- seg.s1[(seg.s1$end.pos - seg.s1$start.pos) > 10e6, ]
+After the raw data is conveniently processed, we can apply the Bayesian inference implemented in the package.
+The function \textit{sequenza.fit} perform the inference using the calculated B allele frequency and depth ratio of the obtained segments. The method can be explored in more detail by looking the manual pages for the function \textit{baf.model.fit}.
+
+<<label=sequenzaFit, echo=TRUE, results=hide>>=
+CP <- sequenza.fit(test)
 @
+The result is a list in the format \textit{list(x ,y, z)} directly usable by standard graphical function, like \textit{image}. However we provide few customized functions do better display and explore the results, detect the confidence intervals, and finally retrieve the point estimate.
+\subsubsection{Confidence intervals, confidence region and point estimate}
 
-Every segment is evaluated against the model lines using the resulting density of a binomial distribution and the possible values of the model. In order to perform every segment needs to be associate with a sample size, to generate the distribution function. For practical reason the sample size can not be in the order of the size of the segment in nucleotide (millions), So we use the size of the segment in megabases, added to an arbitrary offset (eg 150), to allow each segment to generate a proper distribution.
-<<label=segsWeight, echo=TRUE>>=
-weights.seg  <- 150 + round((seg.filtered$end.pos - seg.filtered$start.pos) / 1e6, 0)
-@
-
-The genome wide average depth ratio, should be a value close to 1, after normalization. However, since in this example we only consider chromosome 1, we have a different value (I will add one or more chr to make the avg became 1...). 
-<<label=avg.depth.ratio>>=
-avg.depth.ratio <- mean(gc.stats$adj[,2])
-avg.depth.ratio
-@
-
-The function \textit{baf.model.fit} evaluate the segmented data to a set of selected value of cellularity and DNA index. Using the implemented model to calculate the theoretic points it returning an x,y,z list containing a matrix z whit the log likelihood for the combinations of the two parameters, a vector x containing all the evaluated DNA index values and a vector y containing all the evaluated cellularity value.
-<<label=BAFmodelFIT, echo=TRUE, results=hide>>=
-CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio, 
-                    weight.ratio = weights.seg,
-                    weight.Bf = weights.seg,
-                    avg.depth.ratio = avg.depth.ratio,
-                    cellularity = seq(0.1,1,0.01), 
-                    dna.index = seq(0.5,3,0.05), mc.cores = 4)                   
-@
-
+The object resulting from \textit{sequenza.fit} have two vectors, x and y, indicating respectively the tested values of dna.index and cellularity, and a matrix z with x columns and y rows, containing the estimated log-likelihood.
 It is possible to calculate the confidence intervals for the two parameters using the function \textit{get.ci}
-
 <<label=ConfIntCP, echo=TRUE>>=
 cint <- get.ci(CP)
 @
 
-As well it is possible to plot the likelihood over the combination of the two parameters, highlighting the point estimate and lines delimiting the confidence region.
+As well it is possible to plot the likelihood over the combinations of the two parameters, highlighting the point estimate and the confidence region.
 \begin{figure}[H]
       \centering
 <<label=CPplot,fig=TRUE,width=6,height=6>>=
 cp.plot(CP)
 cp.plot.contours(CP, add = TRUE, likThresh = c(0.5, 0.75, 0.95, 0.99))
 @ 
-      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index. The color indicates the log-likelihood of the corresponding cellularity/DNA-index values.}
+      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA index. The color indicates the log-likelihood of the corresponding cellularity/DNA index values.}
       \label{fig:cpPlot}
 \end{figure}
 
-
-Alternatively it is possible to draw the likelihood distribution for each parameter, using the information retrieved by the \textit{get.ci} function.
+Exploring the result for cellularity and dna.index separately, it is possible to draw the likelihood distribution for each parameter. The information is returned by the \textit{get.ci} function.
 \begin{figure}[H]
       \centering
 <<label=CPplotCI,fig=TRUE,width=6,height=6>>=
 par(mfrow = c(2,2))
 cp.plot(CP)
+cp.plot.contours(CP, add = TRUE)
 plot(cint$values.y, ylab = "Cellularity",
      xlab = "likelihood", type = "n")
 select <- cint$confint.y[1] <= cint$values.y[,2] & cint$values.y[,2] <= cint$confint.y[2]
@@ -386,70 +306,69 @@ abline(v = cint$max.x, lty = 2, lwd = 0.5)
       \label{fig:cpPlotCI}
 \end{figure}
 
-\section{Call CNVs and mutations using the estimated parameters}
+\subsection{Call CNVs and mutations using the estimated parameters}
 
+The point estimate value correspond to the point of maximum likelihood, detected after the confidence interval computation: 
 <<label=seParam, eval=TRUE>>=
 cellularity <- cint$max.y
 cellularity
 dna.index <- cint$max.x
 dna.index
 @
+In addition we need to calculate the average normalized depth ratio, used to set a value for the baseline copy number. 
+<<label=avgDepth, eval=TRUE>>=
+avg.depth.ratio <- mean(test$gc$adj[, 2])
+@
 
-\subsection{Detect mutated alleles}
+\subsubsection{Detect variant alleles (mutations)}
 
+To detect variant alleles we use a mutation frequency model, implemented in the function \textit{mufreq.bayes}, with the estimated cellularity and dna.index parameters:
 <<label=mmufBayes, eval=TRUE>>=
-mut.tab.clean <- na.exclude(mut.tab)
-mut.alleles <- mufreq.bayes(mufreq = mut.tab.clean$F, depth.ratio = mut.tab.clean$adjusted.ratio,
+mut.tab     <- na.exclude(do.call(rbind, test$mutations))
+mut.alleles <- mufreq.bayes(mufreq = mut.tab$F, depth.ratio = mut.tab$adjusted.ratio,
                             cellularity = cellularity, dna.index = dna.index,
                             avg.depth.ratio = 1)
 
 head(mut.alleles)
-head(cbind(mut.tab.clean[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
+head(cbind(mut.tab[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
 @
 
-\subsection{Detect Copy number variation}
-
+The result consists in four values for every imputed mutation: \textit{CNr} Is the provided copy number of the normal sample at the given position (default = 2); \textit{CNt} is the estimated copy number of the tumor at the given position; \textit{Mt} is the estimated numbers of alleles carrying the mutation; \textit{L} is the log-likelihood of the model fit.;
+\subsubsection{Detect copy number variations}
+To detect copy number variations we use a B allele frequency model, implemented in the function \textit{baf.bayes}, with the estimated parameters of cellularity and dna.index:
 <<label=bafBayes, eval=TRUE>>=
-cn.alleles <- baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
+seg.tab     <- na.exclude(do.call(rbind, test$segments))
+cn.alleles <- baf.bayes(Bf = seg.tab$Bf, depth.ratio = seg.tab$depth.ratio,
                         cellularity = cellularity, dna.index = dna.index,
-                        avg.depth.ratio = 1)
-
-seg.s1.cn <- cbind(seg.s1, cn.alleles)
-head(seg.s1.cn)
+                        avg.depth.ratio = avg.depth.ratio)
+head(cn.alleles)
+seg.tab <- cbind(seg.tab, cn.alleles)
+head(seg.tab)
 @
+The result consists in four values for every imputed segment: \textit{CNt} is the estimated copy number of the tumor of the given segment; \textit{A} is the estimated numbers of A alleles; \textit{B} is the estimated numbers of B alleles; \textit{L} is the log-likelihood of the model fit.;
+\subsection{Visualize detected copy number changes and variant alleles}
 
-\section{Visualize detected copy number}
-
+To visualize the data after detection CNV and variant alleles, it is possible to use the \textit{chromosome.view}. In order to draw the relative model points (and evaluate how the estimated model fits the real data) more information are needed compared to figure \ref{fig:3panelsPlot}:
+\begin{itemize}
+\item the segment need to have the columns relative to the copy number variation calling, as well  
+\item the estimated value of cellularity and dna.index.
+\item the value of the average normalized depth ratio
+\end{itemize}
 \begin{figure}[H]
       \centering
 <<label=chrViewWithCP,fig=TRUE,width=6,height=6>>=
-
-chromosome.view(mut.tab = mut.tab[mut.tab$chromosome == "1",], baf.windows = abf.b.win[[1]], 
-                ratio.windows = abf.r.win[[1]],  min.N.ratio = 1,
-                segments = seg.s1.cn[seg.s1.cn$chromosome == "1",], main = "Chromosome 1",
+chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]], 
+                ratio.windows = test$ratio[[1]],  min.N.ratio = 1,
+                segments = seg.tab[seg.tab$chromosome == test$chromosomes[1],],
+                main = test$chromosomes[1],
                 cellularity = cellularity, dna.index = dna.index,
-                avg.depth.ratio = 1)
+                avg.depth.ratio = avg.depth.ratio)
 @ 
-      \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted line indicate different copy number/allelic state. }
+      \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted line indicate different copy number/allele state. }
       \label{fig:crhomViewWithCP}
 \end{figure}
 
 %\newpage
-\begin{figure}[H]
-      \centering
-<<label=chrView17WithCP,fig=TRUE,width=6,height=6>>=
-
-chromosome.view(mut.tab = mut.tab[mut.tab$chromosome == "17",], baf.windows = abf.b.win[[17]], 
-                ratio.windows = abf.r.win[[17]],  min.N.ratio = 1,
-                segments = seg.s1.cn[seg.s1.cn$chromosome == "17",], main = "Chromosome 17",
-                cellularity = cellularity, dna.index = dna.index,
-                avg.depth.ratio = 1)
-@ 
-      \caption{Plots of Mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted line indicate different copy number/allelic state. }
-      \label{fig:crhomView17WithCP}
-\end{figure}
-
-
 %%%% bibliography
 \bibliographystyle{plain}
 \bibliography{sequenza}
