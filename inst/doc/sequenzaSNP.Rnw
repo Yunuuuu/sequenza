@@ -185,6 +185,28 @@ chromosome.view(baf.windows = snp.b.win[[16]],
       \label{fig:crhomViewNoMutCP16}
 \end{figure}
 
+\begin{figure}[H]
+      \centering
+<<label=genomeViewCNtSNP, fig=TRUE, width=7, height=3>>=
+
+genome.view(seg.cn = segmented.snp, info.type = "CNt")
+legend("bottomright", bty="n", c("Tumor copy number"),col = c("red"), 
+       inset = c(0, -0.4), pch=15, xpd = TRUE)
+@
+      \caption{Genome whide copy number profile obtained from one SNP array.}
+      \label{fig:genomeViewCNtSNP}
+\end{figure}
+
+\begin{figure}[H]
+      \centering
+<<label=genomeViewABSNP, fig=TRUE, width=7, height=3>>=
+genome.view(seg.cn = segmented.snp, info.type = "AB")
+legend("bottomright", bty = "n", c("A-allele","B-allele"), col= c("red", "blue"), 
+       inset = c(0, -0.45), pch = 15, xpd = TRUE)
+@
+      \caption{Genome whide A anf B alleles profile, obtained from one SNP array.}
+      \label{fig:genomeViewABSNP}
+\end{figure}
 %\newpage
 
 \end{document}

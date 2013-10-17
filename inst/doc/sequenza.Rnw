@@ -372,6 +372,31 @@ chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]],
       \label{fig:crhomViewWithCP}
 \end{figure}
 
+
+\begin{figure}[H]
+      \centering
+<<label=genomeViewCNt, fig=TRUE, width=7, height=3>>=
+
+genome.view(seg.cn = seg.tab, info.type = "CNt")
+legend("bottomright", bty="n", c("Tumor copy number"),col = c("red"), 
+       inset = c(0, -0.4), pch=15, xpd = TRUE)
+@
+      \caption{Genome whide copy number profile obtained from exome sequencing.}
+      \label{fig:genomeViewCNt}
+\end{figure}
+
+\begin{figure}[H]
+      \centering
+<<label=genomeViewAB, fig=TRUE, width=7, height=3>>=
+genome.view(seg.cn = seg.tab, info.type = "AB")
+legend("bottomright", bty = "n", c("A-allele","B-allele"), col= c("red", "blue"), 
+       inset = c(0, -0.45), pch = 15, xpd = TRUE)
+@
+      \caption{Genome whide A anf B alleles profile obtained from exome sequencing.}
+      \label{fig:genomeViewAB}
+\end{figure}
+
+
 %\newpage
 %%%% bibliography
 \bibliographystyle{plain}
