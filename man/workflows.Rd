@@ -13,7 +13,7 @@
                     min.type.freq = 0.9)
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
            cellularity = seq(0.1,1,0.01), dna.index = seq(0.5,3,0.05),
-           priors.labels = "2", priors.values = 2, mc.cores = 4)                    
+           priors.labels = "2", priors.values = 2, mc.cores = getOption("mc.cores", 2L))                    
 }
 
 \arguments{
