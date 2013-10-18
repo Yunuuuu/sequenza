@@ -45,7 +45,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
 
 sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
                          cellularity = seq(0.1,1,0.01), dna.index = seq(0.5,3,0.05),
-                         priors.labels = "2", priors.values = 2, mc.cores = 4){
+                         priors.labels = "2", priors.values = 2, mc.cores = getOption("mc.cores", 2L)){
    segs.all      = do.call(rbind, sequenza.extract$segments)
    mut.all       = do.call(rbind, sequenza.extract$mutations)
    mut.all       = na.exclude(mut.all)

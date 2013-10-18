@@ -170,7 +170,7 @@ shannon.types <- function(types.mat) {
 
 mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01), 
                           dna.index = seq(0.7, 4, by = 0.01),
-                          mc.cores = 2, ...) {
+                          mc.cores = getOption("mc.cores", 2L), ...) {
    
    require(parallel)
    result <- expand.grid(dna.index = dna.index, cellularity = cellularity, 
@@ -194,7 +194,7 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
 
 baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01), 
                           dna.index = seq(0.7, 4, by = 0.01),
-                          mc.cores = 2, ...) {
+                          mc.cores = getOption("mc.cores", 2L), ...) {
    
    require(parallel)
    result <- expand.grid(dna.index = dna.index, cellularity = cellularity, 
