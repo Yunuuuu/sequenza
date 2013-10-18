@@ -87,7 +87,7 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     weight.Bf = weights.seg,
                     avg.depth.ratio = avg.depth.ratio,
                     cellularity = seq(0.1,1,0.01), 
-                    dna.index = seq(0.5,3,0.05), mc.cores = 4)  
+                    dna.index = seq(0.5,3,0.05))  
                     
 confint <- get.ci(CP)
 dna.index   <- confint$max.x
