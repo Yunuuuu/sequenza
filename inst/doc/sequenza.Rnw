@@ -50,11 +50,11 @@ This document details a typical analysis of matched tumor-normal exome sequence 
 \item Memory: Minimum 4GB of RAM.  Recommended >8GB.
 \item Disk space: 1.5 GB for sample 
 \item R version: 2.15.1 
-\item Python version: 2.7; rpy2 for running sequenza R functions from python. 
+\item Python version: 2.7; rpy2 is required to run sequenza R functions from the python command line programs. 
 \end{itemize}
 
 \subsection{Installation}
-In order to install sequenza, you can select obtain the package from the nearest CRAN mirror doing:
+In order to install sequenza, you can select download the package from the nearest CRAN mirror doing:
 
 <<echo=FALSE>>=
   options(width = 60, strict.width = "wrap")
@@ -63,8 +63,8 @@ In order to install sequenza, you can select obtain the package from the nearest
 <<label=instLib, echo=TRUE, eval=FALSE>>=
 install.packages("sequenza")
 @
-\subsection{Workflow Overview}
-A typical  workflow by Sequenza on pre-aligned sequencing files(BAM) is as follow:
+\subsection{Workflow overview}
+A typical workflow developed with Sequenza on pre-aligned sequencing files(BAM) is structured as follow:
 \begin{enumerate}
 \item Convert pileup to \textit{ABfreq} format 
 \item GC normalization
@@ -78,11 +78,11 @@ In order to obtain precise mutational and aberration patterns in a tumor sample,
 \begin{enumerate}
 \item A bam file or a derived pileup file from the tumor specimen.
 \item A bam file or a derived pileup file from the normal specimen.
-\item A FASTA reference genomic sequence file (optional, for GC-content correction, and to transform bam to pileup if needed.)
+\item A FASTA reference genomic sequence file (to extract GC-content information, and to transform bam to pileup if needed.)
 \end{enumerate}
 We recommend using pre-processed and quality filtered BAM files to obtain pileup calls for both samples. 
 
-Pileup files can be generated using \texttt{samtools} (ref). The genome sequence file can be obtained from (url).
+Pileup files can be generated using \texttt{samtools}\cite{Li2009}. The genome sequence file can be obtained from (url).
 \begin{lstlisting}[style=BashInputStyle]
    samtools mpileup -f hg19.fasta -Q 20 normal.bam | gzip > normal.pileup.gz
    samtools mpileup -f hg19.fasta -Q 20 tumor.bam | gzip > tumor.pileup.gz
@@ -121,7 +121,7 @@ If you don't have yet the pileup, or you are not interested on storing the pileu
    rm normal.fifo tumor.fifo
 \end{lstlisting}
 
-\section{Exploring the \textit{ABfreq} file and GC-correction}
+\section{Exploring the \textit{ABfreq} file and GC-correction details}
 
 After the aligned sequence data have been pre-processed,\textit{sequenza} R package would handle all the normalization and analysis steps. So the following part of this vignette will take place in R.
 
@@ -223,7 +223,7 @@ The R package \textit{sequenza} offers an ensemble of functions and models that 
 The function \textit{sequenza.extract} is designed to efficiently access the raw ABfreq data and take care of normalization steps. The argument provide the ability of customize a set of action listed below:
 \begin{itemize}
 \item binning depth ratio and B allele frequency in a desired window size (allowing a desired number of overlapping windows);
-\item performing a fast, allele specific segmentation using the \textit{copynumber} package;
+\item performing a fast, allele specific segmentation using the \textit{copynumber} package\cite{BMCcopynumber};
 \item filter mutation by frequency and noise.
 \end{itemize}
 
