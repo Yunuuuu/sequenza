@@ -565,7 +565,7 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out):
    robjects.r('assign')(x = tag + '_segments_list', value = segments_list)
    robjects.r('save')(list = tag + '_segments_list', file = subdir + '/' + tag + '_segments_list.Rdata')
 
-def RPy2doAllSequenza(data_dir, is_male = True, tag = None):
+def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
    '''
    Load the information stored from the functions above and infer cellularit/ploidy
    and save plots and table of mutations and CNV calls
@@ -599,20 +599,20 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None):
    weights_seg = robjects.r.round(segs_len.ro / 1e6, 0).ro + 150
    robjects.r('''
    wrapBafBayes <- function (Bf, depth_ratio , weight_ratio, weight_Bf,
-                             avg_depth_ratio,  cellularity, priors_label, priors_value,
+                             avg_depth_ratio,  cellularity, priors_table,
                              dna_index, mc_cores, ...) {
                     baf.model.fit(Bf = Bf, depth.ratio = depth_ratio,
                     weight.ratio = weight_ratio, weight.Bf = weight_Bf,
                     avg.depth.ratio = avg_depth_ratio, cellularity = cellularity,
-                    priors.label = priors_label, priors.value = priors_value ,
-                    dna.index = dna_index, mc.cores = mc_cores)
+                    dna.index = dna_index, priors.table = priors_table,
+                    mc.cores = mc_cores)
    }
    ''')
    CP  = robjects.r('wrapBafBayes')(Bf = seg_test.rx(True, 'Bf'), depth_ratio = seg_test.rx(True, 'depth.ratio'),
                     weight_ratio = weights_seg.rx(filt_test).ro * 2,
                     weight_Bf = weights_seg.rx(filt_test), avg_depth_ratio = avg_depth_ratio,
-                    cellularity = robjects.r.seq(0.1, 1, 0.01) , priors_label = 2, priors_value = 2,
-                    dna_index = robjects.r.seq(0.5, 3, 0.05), mc_cores = 16, ratio_priority = False)
+                    cellularity = robjects.r.seq(0.1, 1, 0.01) , priors_table = robjects.DataFrame({'CN':2, 'value' : 2}),
+                    dna_index = robjects.r.seq(0.5, 3, 0.05), mc_cores = ncores, ratio_priority = False)
 
    cint = sequenza.get_ci(CP)
 
@@ -769,7 +769,7 @@ def merge_pileups(parser, subparser):
                    help='The second pileup, will show as the last columns set')
    return parser.parse_args()
 
-def squeezeABfreq(parser, subparser):
+def sequenzaExtract(parser, subparser):
    subparser.add_argument('--abfreq', dest = 'abfreq', required = True,
                    help='An existing abfreq file')
    subparser.add_argument('-o', '--out', dest = 'dir', default = "./",
@@ -780,13 +780,15 @@ def squeezeABfreq(parser, subparser):
                    help='Boolen flag indicating if to loop over chromosomes one by one (default), or load all the file in memory')
    return parser.parse_args()
 
-def doAllSequenza(parser, subparser):
+def sequenzaFit(parser, subparser):
    subparser.add_argument('--dir', dest = 'dir', required = True,
                    help='The directory where the data to load are stored')
    subparser.add_argument('-t', '--tag', dest = 'tag', default = None,
                    help='Tag indicating the prefix of the data, if not specified it is assumed as the name of the contanitor directory')
    subparser.add_argument('--is-male', dest = 'isMale', action='store_true', default = False,
                    help='Boolen flag indicating if the sequencing data are from a male or female, and consequently properly handle chromosome X and Y')
+   subparser.add_argument('-p', dest = 'ncpu', type = int, default = 4,
+                   help='The number of core to use when performing the Bayesian inference. Default 4.')
    return parser.parse_args()
 
 def main():
@@ -803,8 +805,8 @@ def main():
    parser_gc_window  = subparsers.add_parser('GC-windows', help = 'Given a fasta file and a window size it computes the GC percentage across the sequences, and returns a file in the same format as gc5Base from UCSC')
    parser_merge_pileups = subparsers.add_parser('merge-pileups', help = 'Merging two pileups, it finds the common positions and return an mpileup file adding the second pilep as last 3 columns.')
    if RPY2 == True:
-      parser_squeezeAB  = subparsers.add_parser('squeezeABfreq', help = 'Uses the R sequenza package to extract and save meaningful information from an ABfreq file')
-      parser_doAllSequenza = subparsers.add_parser('doAllSequenza', help = 'Uses the R sequenza package to infer purity, ploidy and annotate mutation and CNV.')
+      parser_squeezeAB  = subparsers.add_parser('sequenzaExtract', help = 'Uses the R sequenza package to extract and save meaningful information from an ABfreq file')
+      parser_doAllSequenza = subparsers.add_parser('sequenzaFit', help = 'Uses the R sequenza package to infer purity, ploidy and annotate mutation and CNV.')
    try:
       used_module =  sys.argv[1]
       if used_module == "pileup2acgt":
@@ -892,12 +894,12 @@ def main():
             for line in pup:
                print('\t'.join(map(str, line)) + '\n')
 
-      elif RPY2 == True and used_module == "squeezeABfreq":
-         args = squeezeABfreq(parser, parser_squeezeAB)
+      elif RPY2 == True and used_module == "sequenzaExtract":
+         args = sequenzaExtract(parser, parser_squeezeAB)
          RPy2sqeezeABfreq(args.abfreq, args.loop, args.tag, check_dir(args.dir))
-      elif RPY2 == True and used_module == "doAllSequenza":
-         args = doAllSequenza(parser, parser_doAllSequenza)
-         RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag)
+      elif RPY2 == True and used_module == "sequenzaFit":
+         args = sequenzaFit(parser, parser_doAllSequenza)
+         RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag, args.ncpu)
       else:
          return parser.parse_args()
 
