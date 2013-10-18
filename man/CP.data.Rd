@@ -1,14 +1,16 @@
-\name{CP.example}
-\alias{CP.example}
-\alias{CPsnp.example}
+\name{CP}
+\alias{CP}
+\alias{CP.snp}
 
 \title{Cellularity and dna.index results sample.}
 
 \description{
-  Example of objects resulting from the Bayesian estimation over a set of \code{cellualrity} and \code{dna.index} parameters. 
+  Examples of objects resulting from the Bayesian estimation over a set of \code{cellualrity} and \code{dna.index} parameters. 
 }
 
 \usage{
   data(CP.example)
+  str(CP)
   data(CPsnp.example)
+  str(CP.snp)
 }
