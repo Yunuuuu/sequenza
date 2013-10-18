@@ -6,7 +6,8 @@
 %\VignettePackage{sequenza}
 %\VignettePackage{SNP}
 
-\documentclass[12pt]{article}
+\documentclass[10pt,a4paper]{article}
+\usepackage{a4wide}
 \usepackage{hyperref}
 \usepackage{subfigure}
 \usepackage{listings}
@@ -16,13 +17,6 @@
 \newcommand{\Rfunction}[1]{{\texttt{#1}}}
 \newcommand{\Robject}[1]{{\texttt{#1}}}
 \newcommand{\Rpackage}[1]{{\textit{#1}}}
-
-\textwidth=6.2in
-\textheight=8.5in
-\oddsidemargin=0.2in
-\evensidemargin=0.2in
-\headheight=0in
-\headsep=0in
 
 \author{Francesco Favero\footnote{favero@cbs.dtu.dk}, Aron C. Eklund}
 
@@ -106,11 +100,11 @@ seg.i  <- segment.breaks(sample.i, breaks = breaks)
 <<label=adjustSegs, eval=TRUE>>=
 
 weights.snp   <- 150 + round((seg.i$end.pos - seg.i$start.pos)/1e6 , 0)
-filter.size   <- (seg.i$end.pos - seg.i$start.pos) >= 3e6
+filter.size   <- (seg.i$end.pos - seg.i$start.pos) >= 10e6
+avg.unlogR <- mean(sample.i$adjusted.ratio, na.rm = TRUE)
 @
 
-<<label=CPforSNP, eval = TRUE, results=hide>>=
-avg.unlogR <- mean(sample.i$adjusted.ratio, na.rm = TRUE)
+<<label=CPforSNP, eval = FALSE, results=hide>>=
 CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         depth.ratio = seg.i$depth.ratio[filter.size], 
                         weight.ratio = weights.snp[filter.size],
@@ -121,6 +115,9 @@ CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         priors.labels = 2, priors.values = 2)
 @
 
+<<label=loadCPforSNP, eval = TRUE, echo=FALSE>>=
+data(CPsnp.example)
+@
 <<label=getCPparamSNP, eval = TRUE>>=
 cint <- get.ci(CP.snp)
 

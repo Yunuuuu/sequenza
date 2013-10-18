@@ -257,9 +257,14 @@ chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]],
 After the raw data is conveniently processed, we can apply the Bayesian inference implemented in the package.
 The function \textit{sequenza.fit} perform the inference using the calculated B allele frequency and depth ratio of the obtained segments. The method can be explored in more detail by looking the manual pages for the function \textit{baf.model.fit}.
 
-<<label=sequenzaFit, echo=TRUE, results=hide>>=
+<<label=sequenzaFit, echo=TRUE, eval=FALSE, results=hide>>=
 CP <- sequenza.fit(test)
 @
+
+<<label=loadCP, echo=FALSE, results=hide>>=
+data(CP.example)
+@
+
 The result is a list in the format \textit{list(x ,y, z)} directly usable by standard graphical function, like \textit{image}. However we provide few customized functions do better display and explore the results, detect the confidence intervals, and finally retrieve the point estimate.
 \subsubsection{Confidence intervals, confidence region and point estimate}
 
