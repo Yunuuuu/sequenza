@@ -32,7 +32,7 @@
   \item{priors.labels}{Label for the copy number state priors.}
   \item{priors.values}{Value for the copy number state priors. Default priors is 1 for every copy number state.}
   \item{ratio.priority}{Boolean, if true only the depth ratio would be considered to determine the copy number state, while the Bf value would select the numbers of B-allele.}
-  \item{skew.baf}{The observed B-allele frequency often does not converge to the 0.5 frequency, for normal diploid positions. This argument indicate the value of the percentile of all the observed B-allele frequency to skew the theoric value below 0.5. Default 0.95}
+  \item{skew.baf}{The observed B-allele frequency often does not converge to the 0.5 frequency, for normal diploid positions. This argument indicate at which percentile of the observed B-allele frequency to skew the theoretic value below 0.5.}
 }
 
 \value{

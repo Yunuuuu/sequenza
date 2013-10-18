@@ -10,13 +10,13 @@
 
 \usage{
 gc.sample.stats(file, gz = TRUE)
-gc.norm(ratio, gc)
+gc.norm(x, gc)
 }
 
 \arguments{
   \item{file}{A file in the abfreq format.}
-  \item{ratio}{A vector containing depth ratios}
-  \item{gc}{A vector corresponding to \code{ratio} with the relative GC-content information}
+  \item{x}{A vector of values in relation with the GC-content.}
+  \item{gc}{A vector corresponding to \code{x} with the relative GC-content information.}
   \item{gz}{Boolean, indicating if the file is compressed as gzip file or not. Default TRUE.}
 }
 
@@ -35,7 +35,7 @@ data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza"
 # read all the chromosomes:
 abf.data  <- read.abfreq(data.file)
 # Normalize coverage by GC-content
-gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
+gc.stats <- gc.norm(x = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)
 gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
 abf.data$adjusted.ratio <- abf.data$depth.ratio / 

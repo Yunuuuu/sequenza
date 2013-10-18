@@ -20,12 +20,12 @@ read.acgt(file, colClasses = c('character', 'integer', 'character', 'integer',
 \arguments{
 \item{file}{file name}
 \item{nrows}{number of rows to reads from the files. Default -1, all rows.}
-\item{fast}{Boolean, if true the file would be pre-parsed to count the number of rows; in some cases this can speed up the file reading. Default FALSE.}
+\item{fast}{Boolean, if true the file would be pre-parsed to count the number of rows; in some cases this can speed up the file reading.}
 \item{gz}{Boolean if the input file is gzipped or not.}
-\item{header}{Boolean to specify if the file have the header or not. Default TRUE.}
+\item{header}{Boolean to specify if the file have the header or not.}
 \item{colClasses}{Class of the columns expected in the file. Default is to match the acgt and the abfreq format.}           
-\item{chr.name}{If chromosome name is specified, only the selected chromosome would be extracted instead of the whole file. Default NULL.}
-\item{n.lines}{A vector of two numbes specifing first and last file line to read. If the n.lines is specified, only the selected portion of file would be used. It depends to the \code{sed} UNIX commands. Default NULL.}
+\item{chr.name}{If chromosome name is specified, only the selected chromosome would be extracted instead of the whole file.}
+\item{n.lines}{A vector of two numbes specifing first and last file line to read. If the n.lines is specified, only the selected portion of file would be used. It depends to the \code{sed} UNIX commands.}
 \item{...}{Any arguments accepted by \code{read.delim}, or \code{read.abfreq} for the \code{read.acgt} command.}
 }
 

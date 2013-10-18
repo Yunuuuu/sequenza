@@ -9,15 +9,15 @@
 
 \usage{
   mufreq.model.fit(cellularity = seq(0.3, 1, by = 0.01),
-                   dna.index = seq(0.7, 4, by = 0.01), mc.cores = 2, ...)
+                   dna.index = seq(0.7, 4, by = 0.01), mc.cores = getOption("mc.cores", 2L), ...)
   baf.model.fit(cellularity = seq(0.3, 1, by = 0.01),
-                dna.index = seq(0.7, 4, by = 0.01), mc.cores = 2, ...)                    
+                dna.index = seq(0.7, 4, by = 0.01), mc.cores = getOption("mc.cores", 2L), ...)                    
 }
 
 \arguments{
-  \item{cellularity}{Vector of values of cellularity parameters to be tested. Default = seq(0.3, 1, by = 0.01)}
-  \item{dna.index}{Vector of values of DNA-index parameters to be tested. Default = seq(0.7, 4, by = 0.01)}
-  \item{mc.cores}{number of core to use, defined as in the \code{parallel} packages. Default 2.}
+  \item{cellularity}{Vector of values of cellularity parameters to be tested.}
+  \item{dna.index}{Vector of values of DNA-index parameters to be tested.}
+  \item{mc.cores}{number of core to use, defined as in the \code{parallel} packages.}
   \item{...}{Any argument accepted by \code{mufreq.bayes} or \code{baf.bayes}}
 }
 

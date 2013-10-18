@@ -5,7 +5,8 @@
 %\VignetteKeywords{Cancer sequencing}
 %\VignettePackage{sequenza}
 
-\documentclass[12pt]{article}
+\documentclass[10pt,a4paper]{article}
+\usepackage{a4wide}
 \usepackage{hyperref}
 \usepackage{subfigure}
 \usepackage{listings}
@@ -25,13 +26,6 @@
 \newcommand{\Rfunction}[1]{{\texttt{#1}}}
 \newcommand{\Robject}[1]{{\texttt{#1}}}
 \newcommand{\Rpackage}[1]{{\textit{#1}}}
-
-\textwidth=6.2in
-\textheight=8.5in
-\oddsidemargin=0.2in
-\evensidemargin=0.2in
-\headheight=0in
-\headsep=0in
 
 \author{Francesco Favero\footnote{favero@cbs.dtu.dk}, Aron C. Eklund}
 
@@ -61,6 +55,11 @@ This document details a typical analysis of matched tumor-normal exome sequence 
 
 \subsection{Installation}
 In order to install sequenza, you can select obtain the package from the nearest CRAN mirror doing:
+
+<<echo=FALSE>>=
+  options(width = 60, strict.width = "wrap")
+@
+
 <<label=instLib, echo=TRUE, eval=FALSE>>=
 install.packages("sequenza")
 @
@@ -93,7 +92,7 @@ Pileup files can be generated using \texttt{samtools} (ref). The genome sequence
 
 For convenience and efficiency we have implemented pre-processing algorithms in an standalone (not called from R) Python program. Although, the program is provided with the package; it's exact location can be found like this:
 
-<<label=findexec, echo=TRUE>>=
+<<label=findexec, echo=TRUE, eval=FALSE>>=
 system.file("exec", "sequenza-utils.py", package="sequenza")
 @
 You may wish to copy this program to a location on your path.
@@ -131,11 +130,14 @@ library("sequenza")
 @
 \subsection{Read the file}
 In the package we provide an example file, to find the complete path of the example data file:
-<<label=setFile, echo=TRUE>>=
+<<label=setFile, echo=TRUE, eval=FALSE>>=
 data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
 data.file
 @
 
+<<label=setFile2, echo=FALSE, eval=TRUE>>=
+data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+@
 The ABfreq file can be read all at once, but processing one chromosome at a time is less demanding on computational resources and might be preferable for small resource system, or when processing WGS data.
 
 Read only the data corresponding to chromosome 1:
@@ -149,7 +151,7 @@ abf.data <- read.abfreq(data.file)
 @
 
 <<>>==
-str(abf.data)
+str(abf.data, vec.len = 2)
 @
 
 It is also provided a way to read the file even faster, after mapping the chromosomes location in the file, it is possible to select the coordinate (in terms of from line x to line y) of the file to read. see the man page of \textit{read.abfreq} for an example.

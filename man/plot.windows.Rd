@@ -14,15 +14,15 @@ plotWindows(abf.window, m.lty = 1, m.lwd = 3,
 
 \arguments{
   \item{abf.window}{A matrix in the list object produced by \code{windows.value}}
-  \item{m.lty}{The type of lines to use for the segments indicating the mean values. Default 1.}
-  \item{m.lwd}{The width of the segments indicating the mean values. Default 3.}
-  \item{m.col}{The color of the segments indicating the mean values. Default "black".}
-  \item{q.bg}{The color to use to fill the background between the 0.25 and 0.75 quartiles for each values. Default "lightblue"}
-  \item{log2.plot}{Boolean arguments, it would scale the value in log2 if TRUE. Default FALSE.}
-  \item{n.min}{Filter the points to plot by the minimum number of observation required. Integer, default 1. }
+  \item{m.lty}{The type of lines to use for the segments indicating the mean values.}
+  \item{m.lwd}{The width of the segments indicating the mean values.}
+  \item{m.col}{The color of the segments indicating the mean values.}
+  \item{q.bg}{The color to use to fill the background between the 0.25 and 0.75 quartiles for each values.}
+  \item{log2.plot}{Boolean arguments, it would scale the value in log2 if TRUE.}
+  \item{n.min}{Integer to filter the points to plot by the minimum number of observation required.}
   \item{xlim}{\code{xlim} of the plot}
   \item{ylim}{\code{ylim} of the plot}
-  \item{add}{Boolean, If TRUE the plot will be added to an existing opened device. Default FALSE}
+  \item{add}{Boolean, If TRUE the plot will be added to an existing opened device.}
   \item{...}{Any other argument accepted by the function \code{plot}.}
 }
 

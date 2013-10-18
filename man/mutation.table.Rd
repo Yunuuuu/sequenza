@@ -43,7 +43,7 @@ abf.data  <- read.abfreq(data.file)
 abf.data$good.s.reads <- abf.data$depth.sample * 
                          abf.data$sample.reads.above.quality
 # Normalize coverage by GC-content
-gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
+gc.stats <- gc.norm(x = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)
 gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
 abf.data$adjusted.ratio <- abf.data$depth.ratio / 

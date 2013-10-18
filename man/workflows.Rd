@@ -4,7 +4,7 @@
 \title{Use sequenza to estimate tumor purity and ploidy.}
 
 \description{
-  Efficiently extract the information from raw data, perform the Bayesian estimation of cellularity and ploidy.
+  Main interface of the program, aim to standardize and simplify \code{sequenza} use..
 }
 
 \usage{
@@ -18,23 +18,23 @@
 
 \arguments{
   \item{file}{An ABfreq file.}
-  \item{gz}{Boolean indicating if the file is in the gzip format. Default TRUE.}
+  \item{gz}{Boolean indicating if the file is in the gzip format.}
   \item{window}{Size of the window to be gathered. Smaller window would take more time to be compute.}
-  \item{overlap}{Integer defining the number of overlapping windows. Default 0, no overlap.}
+  \item{overlap}{Integer defining the number of overlapping windows.}
   \item{gamma, kmin}{Arguments passed to \code{aspcf} from the \code{copynumber} package.}
   \item{mufreq.treshold}{Mutation frequency threshold.}
   \item{min.reads}{Minimal number of reads above the quality threshold to accept the mutation call.}
   \item{max.mut.types}{Maximum number of mutation type per position. Integer from 1 to 3 (since the base are only 4). Default 3, accept "noisy" mutation calls.}
   \item{min.type.freq}{Minimal frequency of aberrant types.}
   \item{sequenza.extract}{A list obtained from the \code{sequenza.extract} function.}
-  \item{female}{Boolean indicating if the sample is male or female, to properly handle the X and Y chromosomes. Default TRUE.}
-  \item{segment.filter}{Threshold in base pairs to filter out the noise caused by short segment while testing for cellularity and ploidy. Will not effect the segmentation results. Default 1e7 bases.}
+  \item{female}{Boolean indicating if the sample is male or female, to properly handle the X and Y chromosomes.}
+  \item{segment.filter}{Threshold in base pairs to filter out the noise caused by short segment while testing for cellularity and ploidy. Will not effect the segmentation results.}
   \item{XY}{Vector containing the character used for the X and Y chromosome. Default c(X = "X", Y = "Y").}
-  \item{cellularity}{Vector of values of cellularity parameters to be tested. Default = seq(0.3, 1, by = 0.01)}
-  \item{dna.index}{Vector of values of DNA-index parameters to be tested. Default = seq(0.7, 4, by = 0.01)}
+  \item{cellularity}{Vector of values of cellularity parameters to be tested.}
+  \item{dna.index}{Vector of values of DNA-index parameters to be tested.}
   \item{priors.labels}{Label for the copy number state priors.}
   \item{priors.values}{Value for the copy number state priors. Default priors is 1 for every copy number state.}
-  \item{mc.cores}{number of core to use, defined as in the \code{parallel} packages. Default 2.}
+  \item{mc.cores}{number of core to use, defined as in the \code{parallel} packages.}
 }
 
 \details{

@@ -11,9 +11,9 @@
 }
 
 \arguments{
-  \item{CNt.min}{Minimum copy number in the tumor. Default 1.}
-  \item{CNt.max}{Maximum copy number in the tumor. Default 7.}
-  \item{CNr}{Copy number of the reference sample. Default 2.}
+  \item{CNt.min}{Minimum copy number in the tumor.}
+  \item{CNt.max}{Maximum copy number in the tumor.}
+  \item{CNr}{Copy number of the reference sample.}
 }
 
 \value{
