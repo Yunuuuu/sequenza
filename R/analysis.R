@@ -66,8 +66,8 @@ read.acgt <- function (file, colClasses = c('character', 'integer', 'character',
    read.abfreq(file = file , colClasses = colClasses, ...)
 }
 
-gc.norm <- function (ratio, gc) {
-   dr.by.gc <- split(ratio, gc)
+gc.norm <- function (x, gc) {
+   dr.by.gc <- split(x, gc)
    raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
    dr.by.gc.median <- sapply(dr.by.gc, median, na.rm = TRUE)
    dr.by.gc.mean <- sapply(dr.by.gc, mean, na.rm = TRUE)
@@ -83,7 +83,7 @@ gc.sample.stats <- function (file, gz = TRUE) {
    } else {
       abf.data <- read.delim(pipe(paste('cut -f 1,6,10', file)), colClasses = colClasses)
    }
-   gc.stats <- gc.norm(ratio = abf.data$depth.ratio,
+   gc.stats <- gc.norm(x = abf.data$depth.ratio,
                        gc = abf.data$GC.percent)
    chr.ord  <- unique(abf.data$chromosome)
    chr.dim  <- lapply(X = split(abf.data$chromosome, abf.data$chromosome), FUN = length)

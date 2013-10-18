@@ -520,7 +520,7 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out):
       else:
          print("loading all the file in memory")
          abf_data = sequenza.read_abfreq(abfreq, fast = True, gz = is_gz)
-         gc_stats = sequenza.gc_norm(ratio = abf_data.rx(True, 'depth.ratio'), gc = abf_data.rx(True, 'GC.percent'))
+         gc_stats = sequenza.gc_norm(x = abf_data.rx(True, 'depth.ratio'), gc = abf_data.rx(True, 'GC.percent'))
          gc_vect  = robjects.r.setNames(gc_stats.rx2('raw').rx(True, '50%'), gc_stats.rx2('gc.values'))
          chr_vect = robjects.r.unique(abf_data.rx(True, 'chromosome'))
          chr_vect = robjects.r('as.character')(chr_vect)
