@@ -112,7 +112,7 @@ CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         avg.depth.ratio = avg.unlogR,
                         cellularity = seq(0.1,1,0.01), 
                         dna.index = seq(0.5,3,0.05),
-                        priors.labels = 2, priors.values = 2)
+                        priors.table = data.frame(CN = 2, value = 2))
 @
 
 <<label=loadCPforSNP, eval = TRUE, echo=FALSE>>=

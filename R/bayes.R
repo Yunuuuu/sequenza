@@ -36,7 +36,7 @@ depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model) {
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.index, avg.depth.ratio,
                          weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, 
-                         CNr = 2, priors.labels = CNt.min:CNt.max, priors.values = 1) {
+                         CNr = 2, priors.table = data.frame(CN = CNt.min:CNt.max, value = 1)) {
 
    mufreq.tab <- data.frame(F = mufreq, ratio = depth.ratio,
                             weight.mufreq = weight.mufreq, weight.ratio = weight.ratio)
@@ -44,12 +44,10 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.index, avg.depth.
    mufreq.depth.ratio <- cbind(types, model.points(cellularity = cellularity, dna.index = dna.index,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
    rows.x             <- 1:nrow(mufreq.tab)
-   
-   priors.tags <- data.frame(label = priors.labels, value = priors.values)
-   
+      
    priors <- rep(1, nrow(mufreq.depth.ratio))
-   for (i in 1:length(priors.labels)) {
-      priors[mufreq.depth.ratio$CNt == priors.tags$label[i]] <- priors.tags$value[i]
+   for (i in 1:nrow(priors.table)) {
+      priors[mufreq.depth.ratio$CNt == priors.table$CN[i]] <- priors.table$value[i]
    }
    priors <- priors / sum(priors)   
    
@@ -93,8 +91,8 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, dna.index, avg.depth.
 
 baf.bayes <- function(Bf, depth.ratio, cellularity, dna.index, avg.depth.ratio,
                       weight.Bf = 100, weight.ratio = 100, CNt.min = 0,
-                      CNt.max = 7, CNr = 2, priors.labels = CNt.min:CNt.max,
-                      priors.values = 1, ratio.priority = FALSE, skew.baf = 0.95) {
+                      CNt.max = 7, CNr = 2, priors.table = data.frame(CN = CNt.min:CNt.max,
+                      value = 1), ratio.priority = FALSE, skew.baf = 0.95) {
    
    mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
                             weight.Bf = weight.Bf, weight.ratio = weight.ratio)
@@ -114,11 +112,9 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, dna.index, avg.depth.ratio,
    #                             model.pts[, 4:5])
    rows.x             <- 1:nrow(mufreq.tab)
    
-   priors.tags <- data.frame(label = priors.labels, value = priors.values)
-   
    priors <- rep(1, nrow(model.pts))
-   for (i in 1:length(priors.labels)) {
-      priors[model.pts$CNt == priors.tags$label[i]] <- priors.tags$value[i]
+   for (i in 1:nrow(priors.table)) {
+      priors[model.pts$CNt == priors.table$CN[i]] <- priors.table$value[i]
    }
    priors <- priors / sum(priors)
    

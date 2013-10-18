@@ -13,7 +13,7 @@
                     min.type.freq = 0.9)
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
            cellularity = seq(0.1,1,0.01), dna.index = seq(0.5,3,0.05),
-           priors.labels = "2", priors.values = 2, mc.cores = getOption("mc.cores", 2L))                    
+           priors.table = data.frame(CN = 2, value = 2), mc.cores = getOption("mc.cores", 2L))                    
 }
 
 \arguments{
@@ -32,8 +32,7 @@
   \item{XY}{Vector containing the character used for the X and Y chromosome. Default c(X = "X", Y = "Y").}
   \item{cellularity}{Vector of values of cellularity parameters to be tested.}
   \item{dna.index}{Vector of values of DNA-index parameters to be tested.}
-  \item{priors.labels}{Label for the copy number state priors.}
-  \item{priors.values}{Value for the copy number state priors. Default priors is 1 for every copy number state.}
+  \item{priors.table}{A data frame containing the columns \code{CN} and \code{value}, respectively indicating the copy number and the corresponding weight. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
   \item{mc.cores}{number of core to use, defined as in the \code{parallel} packages.}
 }
 
