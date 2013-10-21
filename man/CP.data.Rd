@@ -8,7 +8,7 @@
   Examples of objects resulting from the Bayesian estimation over a set of \code{cellualrity} and \code{dna.index} parameters. 
 }
 
-\usage{
+\examples{
   data(CP.example)
   str(CP)
   data(CPsnp.example)
