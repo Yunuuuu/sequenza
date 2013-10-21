@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{sequenza usage example}
+%\VignetteIndexEntry{Sequenza user guide}
 %\VignetteDepends{sequenza}
 %\VignetteKeywords{LOH}
 %\VignetteKeywords{Heterogenity}
@@ -37,7 +37,7 @@
 \tableofcontents
 
 \section{Abstract}
-Deep sequence of tumor DNA along with corresponding normal DNA can provide a valuable perspective on the mutations and aberrations that characterize the tumor. However, analysis of this data can be impeded by tumor cellularity and heterogeneity and by unwieldy data. Here we describe the \textit{sequenza} software system, which comprises a fast python-based pre-processor and an R-based analysis package. Sequenza enables the efficient estimation of tumor cellularity and ploidy, and generation of copy number, loss-of-heterozygosity, and mutation frequency profiles. 
+Deep sequence of tumor DNA along with corresponding normal DNA can provide a valuable perspective on the mutations and aberrations that characterize the tumor. However, analysis of this data can be impeded by tumor cellularity and heterogeneity and by unwieldy data. Here we describe \textit{Sequenza}, which comprises a fast python-based pre-processor and an R-based analysis package. \textit{Sequenza} enables the efficient estimation of tumor cellularity and ploidy, and generation of copy number, loss-of-heterozygosity, and mutation frequency profiles. 
 
 This document details a typical analysis of matched tumor-normal exome sequence data using \textit{sequenza}.
 
@@ -237,7 +237,7 @@ The result of this first step consist in a list of lists. All the sub-lists have
 
 \subsubsection{Plot chromosome view with mutations, BAF, depth ratio and segments}
 
-Each chromosome can be visualize using the function \textit{chromosome.view} as in figure \ref{fig:3panelsPlot}. The same function can be used to visualize the data after the estimation of \textit{cellularity} and \textit{dna.index} parameters as in Figure \ref{fig:chromViewWithCP}.
+Each chromosome can be visualize using the function \textit{chromosome.view} as in figure \ref{fig:3panelsPlot}. The same function can be used to visualize the data after the estimation of \textit{cellularity} and \textit{dna.index} parameters as in Figure \ref{fig:crhomViewWithCP}.
 
 \begin{figure}[H]
       \centering
