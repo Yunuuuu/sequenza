@@ -1,10 +1,10 @@
 Package: sequenza
 Title:   Analysis and visualization of tumor sequencing data.
-Description: This package provides tools to analyze NGS data, including cellularity and ploidy estimation; mutation and copy number detection and quantification; detection of mono-allelic expression and allelic/subclonal mutation classification.
-Version: 0.0.15
-Date: 2013-07-11
+Description: This package provides tools to analyze NGS data, including cellularity and ploidy estimation; mutation and copy number detection and quantification;
+Version: 0.0.16
+Date: 2013-11-23
 Author: Francesco Favero, Aron C. Eklund
 Maintainer: Francesco Favero <favero@cbs.dtu.dk>
 Depends: R (>= 2.15.1), beeswarm, copynumber, parallel, squash
 Suggests: 
-License: Apache License (== 2.0)
+License: GPL-2|GPL-3
