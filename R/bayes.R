@@ -168,7 +168,6 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
                           dna.index = seq(0.7, 4, by = 0.01),
                           mc.cores = getOption("mc.cores", 2L), ...) {
    
-   require(parallel)
    result <- expand.grid(dna.index = dna.index, cellularity = cellularity, 
                          KEEP.OUT.ATTRS = FALSE) 
    
@@ -192,7 +191,6 @@ baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
                           dna.index = seq(0.7, 4, by = 0.01),
                           mc.cores = getOption("mc.cores", 2L), ...) {
    
-   require(parallel)
    result <- expand.grid(dna.index = dna.index, cellularity = cellularity, 
                          KEEP.OUT.ATTRS = FALSE) 
    

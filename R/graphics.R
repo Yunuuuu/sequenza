@@ -1,5 +1,4 @@
 cp.plot <- function (cp.table, ...) {
-   require(squash)
    #colorgram(x = cp.table$x, y = cp.table$y, z = log(cp.table$z), 
    #    colFn = heat, map = map, outlier = outlier, las = 1, 
    #    xlab = "DNA-index", ylab = "Cellularity", zlab = "log-likelihood", 
@@ -12,7 +11,6 @@ cp.plot <- function (cp.table, ...) {
 
 cp.plot.contours <- function(cp.table, likThresh = c(0.95), 
                              col = palette(), legend.pos = 'bottomright', pch = 18, ...) {
-   require(squash)
    znormsort <- sort(cp.table$z, decreasing = TRUE)
    znormcumLik <- cumsum(znormsort)
    n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
@@ -62,7 +60,6 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95),
 # }
 
 # plot.gc.depth <- function(d.values, gc.contents, ...) {
-#    require(beeswarm)
 #    gc.values <- sort(unique(gc.contents))
 #    d.list <- list()
 #    #sizevect <- rep(0,length(gc.values))

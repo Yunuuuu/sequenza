@@ -255,7 +255,6 @@ mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, max.
 }
 
 find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...) {
-   require(copynumber)
    chromosome <- gsub(x = abf.baf$chromosome, pattern = "chr", replacement = "")
    logR = data.frame(chrom = chromosome, 
                      pos = abf.baf$n.base,
