@@ -7,4 +7,5 @@ Author: Francesco Favero, Aron C. Eklund
 Maintainer: Francesco Favero <favero@cbs.dtu.dk>
 Depends: R (>= 2.15.1), beeswarm, copynumber, parallel, squash
 Suggests: 
-License: GPL-2|GPL-3
+License: file LICENSE
+License_restricts_use: yes
