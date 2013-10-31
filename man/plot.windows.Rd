@@ -3,7 +3,7 @@
 \title{Plot the specified windowed chromosome.}
 
 \description{
-  \code{plotWindows} is a convenient plot function that consent to visualize a specified chromosome attribute using the matrix produced by the function \code{windows.value}.
+  \code{plotWindows} is a convenient plot function that visualizes a specified chromosome attribute using the matrix produced by the function \code{windowValues}.
 }
 
 \usage{
@@ -13,17 +13,17 @@ plotWindows(abf.window, m.lty = 1, m.lwd = 3,
 }
 
 \arguments{
-  \item{abf.window}{A matrix in the list object produced by \code{windows.value}}
-  \item{m.lty}{The type of lines to use for the segments indicating the mean values.}
-  \item{m.lwd}{The width of the segments indicating the mean values.}
-  \item{m.col}{The color of the segments indicating the mean values.}
-  \item{q.bg}{The color to use to fill the background between the 0.25 and 0.75 quartiles for each values.}
-  \item{log2.plot}{Boolean arguments, it would scale the value in log2 if TRUE.}
-  \item{n.min}{Integer to filter the points to plot by the minimum number of observation required.}
-  \item{xlim}{\code{xlim} of the plot}
-  \item{ylim}{\code{ylim} of the plot}
-  \item{add}{Boolean, If TRUE the plot will be added to an existing opened device.}
-  \item{...}{Any other argument accepted by the function \code{plot}.}
+  \item{abf.window}{A matrix of base-pair windos and corresponding statistics to be plotted. A list of such matrices can be output from \code{windowValues}}
+  \item{m.lty}{The line type used for plotting mean values.}
+  \item{m.lwd}{The line width used for plotting mean values.}
+  \item{m.col}{The line color used for plotting mean values.}
+  \item{q.bg}{The background color for the area between the 0.25 and 0.75 quartiles.}
+  \item{log2.plot}{Boolean, if TRUE values are log2 scaled.}
+  \item{n.min}{The minimum number of observations required for a point to be plotted.}
+  \item{xlim}{Range of the x axis.}
+  \item{ylim}{Range of the y axis.}
+  \item{add}{Boolean, if TRUE the plot will be added to an existing opened device.}
+  \item{...}{Any other arguments accepted by \code{plot}.}
 }
 
 \seealso{

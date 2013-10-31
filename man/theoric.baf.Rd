@@ -3,10 +3,10 @@
 \alias{theoretical.mufreq}
 \alias{theoretical.depth.ratio}
 
-\title{Calculate the numeric value of the model points}
+\title{Calculates cellularity-dependent model points}
 
 \description{
-  Calculate the numeric value of the model point given the parameters of cellularity and DNA-content. 
+  Calculates the theoretically expected values of BAF, mutation frequency or depth ratio for given values of cellularity, DNA-content and copy number. 
 }
 
 \usage{
@@ -17,24 +17,24 @@ theoretical.mufreq(cellularity, CNr = 2, CNt = 2, Mt = 1)
 }
 
 \arguments{
-  \item{CNr}{Copy number of the reference (usually a normal non-tumor sample).}
-  \item{CNt}{Copy number of aberrant sample (usually cancer sample).}
-  \item{Mt}{Number of alleles carrying the mutation.}
-  \item{cellularity}{Tumor fraction of the sample.}
-  \item{dna.index}{Ratio of the total tumor DNA versus the total normal DNA.}
-  \item{copy.number.ratio}{Ratio of the copy number in the aberrant sample versus the normal reference copy number.}
-  \item{avg.depth.ratio}{The average value of the normalized depth ratio.}
+  \item{CNr}{copy number in the normal sample.}
+  \item{CNt}{copy number in the tumor sample.}
+  \item{Mt}{number of alleles carrying the mutation.}
+  \item{cellularity}{fraction of tumor cells in the sample.}
+  \item{dna.index}{ratio between total DNA content in a tumor cell and a normal cell.}
+  \item{copy.number.ratio}{ratio between copy number in the tumor sample and the reference copy number.}
+  \item{avg.depth.ratio}{average normalized depth ratio.}
 }
 
 \details{
-  The B-allele frequency value is depending of the normal contamination (or tumor cellularity), and on the ratio of B-alleles and A-alleles. Given a value of cellularity and the total copy number of the tumor, the function \code{theoretical.baf} returns the possible configuration of A and B allele frequency and the corresponding theoretic value. The \code{data.frame} produced by the function contains four columns: \code{A} number of A-alleles, \code{B} number of B-alleles, \code{BAF} the B-allele frequency value (always between 0 and 0.5), \code{CNt} the total copy-number state (it is always the sum of A+B).
+  The observed B-allele frequency, depth ratio and mutation frequency are affected by the cellularity of the tumor sample, which is the inverse of the degree of contamination by normal cells.
+  Three functions are included, which for a given cellularity produce the values of B-allele frequency, mutation frequency or depth ratio that can be theoretically expected. 
   
-  The ratio of read depth in a specific position, tumor versus normal, is proportional to the tumor copy number state. The value is depending on the normal contamination, the ploidy of the tumor gebnome, and the local copy number.
-  The function \code{theoretical.depth.ratio} return the theoretic depth ratio, given the values of \code{cellularity}, \code{dna.index}, the ratio between the tumor copy number and the normal copy number (normal copy number is 2 for all the chromosome except X and Y in male) and the average value of depth ratio.
+  \code{theoretical.baf} returns a dataframe with the possible copy numbers of A and B alleles, along with their corresponding B-allele frequency and the total copy number state (always the sum of A+B). 
   
-  The mutation frequency is depending on the tumor purity and on the number of alleles carrying the mutation.
-  By Increasing the copy number states increases as well the number of alleles that might be mutated. So for every N copy number, we can have N+1 possible mutation frequencies (considering also 0 as none of the alleles can be mutated).
-  The function \code{theoretical.mufreq} return the value of the corresponding mutation frequency, given the values of \code{cellularity}, the copy number of the normal cell (\code{CNr}), the copy number of the tumor (\code{CNt}) at that position and the numbers of mutated alleles (\code{Mt}). 
+  \code{theoretical.depth.ratio} returns the theoretical depth ratio at a single specific position, given values of cellularity, dna.index, the ratio between the tumor copy number and the normal copy number at that position, and the average depth ratio of the sample.
+  
+  \code{theoretical.mufreq} returns the theoretical mutation frequency at a single specific position, given values of cellularity, copy number in the normal and tumor samples at that position, and the number of mutated alleles.
 }
 
 \seealso{

@@ -14,7 +14,7 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRU
   \item{x}{The value to be windowed.}
   \item{positions}{base-pairs position.}
   \item{chromosomes}{Names or numbers of the chromosome.}
-  \item{window}{Size of the window to be gathered. Smaller window would take more time to be compute.}
+  \item{window}{size of windows used when plotting mean and quartile ranges of depth ratios and B-allele frequencies. Smaller windows will take more time to compute.}
   \item{overlap}{Integer defining the number of overlapping windows. Default is 0, no overlap.}
   \item{verbose}{Display information about the chromosome being processed?}
   \item{weight}{The weight to be assigned to each \code{x} value, usually related to the depth of reads.}

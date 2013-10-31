@@ -1,9 +1,9 @@
 \name{types.matrix}
 \alias{types.matrix}
-\title{Crate a data.frame of types tags}
+\title{Creates a dataframe of type tags}
 
 \description{
-  Types tags are quick way to identify a position by its copy number status and number of mutated alleles. this function helps on create a matrix of possible types.
+  Type tags are a utensil to distinguish genomic positions by their copy number state and the number of mutated alleles. This function creates a dataframe of all possible type tags, given the copy number of the normal sample and the range of possible copy numbers in the tumor sample.
 }
 
 \usage{
@@ -11,18 +11,19 @@
 }
 
 \arguments{
-  \item{CNt.min}{Minimum copy number in the tumor.}
-  \item{CNt.max}{Maximum copy number in the tumor.}
-  \item{CNr}{Copy number of the reference sample.}
+  \item{CNt.min}{minimum copy number in the tumor.}
+  \item{CNt.max}{maximum copy number in the tumor.}
+  \item{CNr}{copy number of the normal sample.}
 }
 
 \value{
-\item{CNr}{Number of alleles in the normal sample.}
-\item{CNt}{Numbers of allele in the aberrant sample}
-\item{Mt}{Number of mutated alleles}
+\code{types.matrix} returns a dataframe with the following columns:
+\item{CNr}{number of alleles in the normal sample.}
+\item{CNt}{numbers of alleles in the aberrant sample}
+\item{Mt}{number of mutated alleles}
 }
 \details{
-  \code{types.matrix} would return all the combinations of mutated allele from the minimum copy number state \code{CNt.min} to the maximum copy number \code{CNt.max}
+    A type tag consists of 3 integers signifying the copy number in the normal and tumor samples and the number of mutated alleles. \code{types.matrix} returns all the possible type tags that can be created within the given range of tumor copy numbers.
 }
 
 \seealso{

@@ -4,7 +4,7 @@
 \title{Use sequenza to estimate tumor purity and ploidy.}
 
 \description{
-  Main interface of the program, aim to standardize and simplify \code{sequenza} use..
+  The main interface of the package, to run several of the functions of \code{sequenza} in a standardized pipeline.
 }
 
 \usage{
@@ -17,28 +17,27 @@
 }
 
 \arguments{
-  \item{file}{An ABfreq file.}
-  \item{gz}{Boolean indicating if the file is in the gzip format.}
-  \item{window}{Size of the window to be gathered. Smaller window would take more time to be compute.}
-  \item{overlap}{Integer defining the number of overlapping windows.}
-  \item{gamma, kmin}{Arguments passed to \code{aspcf} from the \code{copynumber} package.}
-  \item{mufreq.treshold}{Mutation frequency threshold.}
-  \item{min.reads}{Minimal number of reads above the quality threshold to accept the mutation call.}
-  \item{max.mut.types}{Maximum number of mutation type per position. Integer from 1 to 3 (since the base are only 4). Default 3, accept "noisy" mutation calls.}
-  \item{min.type.freq}{Minimal frequency of aberrant types.}
-  \item{sequenza.extract}{A list obtained from the \code{sequenza.extract} function.}
-  \item{female}{Boolean indicating if the sample is male or female, to properly handle the X and Y chromosomes.}
-  \item{segment.filter}{Threshold in base pairs to filter out the noise caused by short segment while testing for cellularity and ploidy. Will not effect the segmentation results.}
-  \item{XY}{Vector containing the character used for the X and Y chromosome. Default c(X = "X", Y = "Y").}
-  \item{cellularity}{Vector of values of cellularity parameters to be tested.}
-  \item{dna.index}{Vector of values of DNA-index parameters to be tested.}
-  \item{priors.table}{A data frame containing the columns \code{CN} and \code{value}, respectively indicating the copy number and the corresponding weight. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
-  \item{mc.cores}{number of core to use, defined as in the \code{parallel} packages.}
+  \item{file}{an ABfreq file.}
+  \item{gz}{logical. If TRUE (the default) the function expects a gzipped file.}
+  \item{window}{size of windows used when plotting mean and quartile ranges of depth ratios and B-allele frequencies. Smaller windows will take more time to compute.}
+  \item{overlap}{integer specifying the number of overlapping windows.}
+  \item{gamma, kmin}{arguments passed to \code{aspcf} from the \code{copynumber} package.}
+  \item{mufreq.treshold}{mutation frequency threshold.}
+  \item{min.reads}{minimal number of reads above the quality threshold to accept the mutation call.}
+  \item{max.mut.types}{maximal number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 bases). Default is 3, to accept "noisy" mutation calls.}
+  \item{min.type.freq}{minimal frequency of aberrant types.}
+  \item{sequenza.extract}{a list of objects as output from the \code{sequenza.extract} function.}
+  \item{female}{logical, indicating whether the sample is male or female, to properly handle the X and Y chromosomes. Implementation only works for the human normal karyotype.}
+  \item{segment.filter}{threshold segment length (in base pairs) to filter out short segments, that can cause noise when fitting the cellularity and ploidy parameters. The threshold will not affect the allele-specific segmentation.}
+  \item{XY}{character vector of length 2 specifying the labels used for the X and Y chromosomes. Defaults to c(X = "X", Y = "Y").}
+  \item{cellularity}{vector of values to test as cellularity parameter.}
+  \item{dna.index}{vector of values to test as DNA-index parameter.}
+  \item{priors.table}{data frame containing the columns \code{CN} and \code{value}, respectively indicating the copy number and the corresponding weight. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
+  \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
 }
 
 \details{
-   The function \code{sequenza.extract} take care of efficiently read the raw data, normalize the depth.ratio considering the CG-content bias, the allele specific segmentation, filtering noisy mutations and binning the raw data. And it returns all the computed object in a single list object.
-   Every object is itself a list, containing all the relative information, divided chromosome by chromosome.
+   The function \code{sequenza.extract} utilizes a range of functions from the sequenza package to read the raw data, normalize the depth.ratio for GC-content bias, perform allele-specific segmentation, filter for noisy mutations and binning of the raw data for plotting. The computed objects are returned as a single list object. This object can be given to  \code{sequenza.fit}, which uses \code{baf.model.fit} to calculate the log-likelihood for all pairs of the ploidy and cellularity parameters.
 }
 
 \seealso{
