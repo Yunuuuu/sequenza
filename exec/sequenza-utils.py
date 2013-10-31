@@ -182,27 +182,28 @@ class GCmultiPileups:
    Add GC-content to the pilup, and still make an iterable object
    '''
    def __init__(self,multiPileups,gc):
-      self.mpileup = multiPileups
-      self.gc      = gc
-      self = next_gcfile(self)
+      self.gc          = gc
+      self             = next_gcfile(self)
+      self.mpileup     = multiPileups
+      self._last_chromosome = None          
    _sentinel        = object()
    def next(self):
+      self.pile_line   = self.mpileup.next()
       going_on = True
-      pile_line = self.mpileup.next()
       while going_on:
-         if self._chromosome == pile_line[0]:
+         if self._chromosome == self.pile_line[0]:
             self._last_chromosome = self._chromosome
-            if pile_line[1] >= self._last_window_s and pile_line[1] < self._last_window_e:
-               pile_line.append(self._last_GC.strip())
+            if self.pile_line[1] >= self._last_window_s and self.pile_line[1] < self._last_window_e:
+               self.pile_line.append(self._last_GC.strip())
+               return self.pile_line
                going_on = False
-               return pile_line
-            elif pile_line[1] < self._last_window_s:
-               pile_line = self.mpileup.next()
-            elif pile_line[1] >= self._last_window_e:
+            elif self.pile_line[1] < self._last_window_s:
+               self.pile_line = self.mpileup.next()
+            elif self.pile_line[1] >= self._last_window_e:
                self = next_gcfile(self)
          else:
-            if self._last_chromosome != self._chromosome:
-               pile_line = self.mpileup.next()
+            if self._last_chromosome != self._chromosome and self._last_chromosome != None:
+               self.pile_line = self.mpileup.next()
             else:
                self = next_gcfile(self)
    '''
@@ -360,7 +361,7 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                      no_zero_bases = ":".join(map(str,no_zero_bases))
                   #homoz_p2 = p2_mu[2 + i]/sum_p2
                   # chromosome, n_base, base_ref, depth_normal, depth_sample, depth.ratio, Af, Bf, ref.zygosity, GC-content, percentage reads above quality, AB.ref, AB.tum
-                  line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(homoz_p2, 3), 0, 'hom', gc, round(sum_p2/float(p2_mu[1]), 2), bases_list[i], no_zero_bases]
+                  line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(homoz_p2, 3), 0, 'hom', gc, int(sum_p2), bases_list[i], no_zero_bases]
                   return line_out
                else:
                   pass
@@ -380,10 +381,10 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                         het_a_p2 = p2_mu[2 + i]/sum_p2
                         het_b_p2 = p2_mu[2 + ii]/sum_p2
                         if  het_a_p2 >= het_b_p2:
-                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, round(sum_p2/float(p2_mu[1]), 2), bases_list[i]+bases_list[ii], "."]
+                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], "."]
                            return line_out
                         elif het_a_p2 < het_b_p2:
-                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, round(sum_p2/float(p2_mu[1]), 2), bases_list[i]+bases_list[ii], "."]
+                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], "."]
                            return line_out
                   else:
                      pass
@@ -524,8 +525,6 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out):
          gc_vect  = robjects.r.setNames(gc_stats.rx2('raw').rx(True, '50%'), gc_stats.rx2('gc.values'))
          chr_vect = robjects.r.unique(abf_data.rx(True, 'chromosome'))
          chr_vect = robjects.r('as.character')(chr_vect)
-      abf_data = robjects.r.cbind(abf_data, good_s_reads   = abf_data.rx(True, 'depth.sample').ro * abf_data.rx(True, 'sample.reads.above.quality'))
-      abf_data.names[-1] = 'good.s.reads'
       abf_data = robjects.r.cbind(abf_data, adjusted_ratio = robjects.r.round(abf_data.rx(True, 'depth.ratio').ro / gc_vect.rx(robjects.r('as.character')(abf_data.rx(True, 'GC.percent'))), 3))
       abf_data.names[-1] = 'adjusted.ratio'
       abf_hom  = abf_data.rx(True, 'ref.zygosity').ro == 'hom'
@@ -853,7 +852,7 @@ def main():
       elif used_module == "pileup2abfreq":
          args = pileup2abfreq(parser, parser_pileup2abfreq)
          with xopen('-', "wb") as fileout:
-            out_header = ["chromosome", "n.base", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "ref.zygosity", "GC.percent", "sample.reads.above.quality", "AB.germline", "AB.sample"]
+            out_header = ["chromosome", "n.base", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "ref.zygosity", "GC.percent", "good.s.reads", "AB.germline", "AB.sample"]
             p1 = args.reference
             p2 = args.sample
             gc = args.gc

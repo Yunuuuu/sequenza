@@ -11,7 +11,6 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    for (chr in chr.vect){
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
       abf.data   <- read.abfreq(file, gz = gz, n.lines = c(file.lines$start, file.lines$end))
-      abf.data$good.s.reads   <- abf.data$depth.sample * abf.data$sample.reads.above.quality
       abf.data$adjusted.ratio <- round(abf.data$depth.ratio / gc.vect[as.character(abf.data$GC.percent)], 3)
       abf.hom <- abf.data$ref.zygosity == 'hom'
       abf.het <- abf.data[!abf.hom, ]

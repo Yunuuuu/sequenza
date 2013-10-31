@@ -45,7 +45,7 @@ The remaining 10 columns contains the following information:
 8  \tab \code{Bf} \tab B-allele frequency observed in the aberrant sample;\cr
 9  \tab \code{ref.zygosity} \tab zigosity of the reference sample at the position. AA or BB is indicated by "hom", AB and BA are indicated with "het";\cr
 10  \tab \code{GC.percent} \tab genomic GC-content percent at the specific position, calculate on a fix nucleotide window from the reference genome;\cr
-11  \tab \code{sample.reads.above.quality} \tab percentage (in decimal) of reads that passed the quality threshold (threshold specified in the pre-processing software);\cr
+11  \tab \code{good.s.reads} \tab numbers of reads that passed the quality threshold (threshold specified in the pre-processing software);\cr
 12  \tab \code{AB.germline} \tab base of pairs found in the germline genome;\cr
 13  \tab\code{AB.sample} \tab base of pairs found in the aberrant sample genome;
 }
