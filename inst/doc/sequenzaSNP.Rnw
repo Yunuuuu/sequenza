@@ -105,7 +105,7 @@ avg.unlogR <- mean(sample.i$adjusted.ratio, na.rm = TRUE)
 @
 
 <<label=CPforSNP, eval = FALSE, results=hide>>=
-CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
+CPsnp.example <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         depth.ratio = seg.i$depth.ratio[filter.size], 
                         weight.ratio = weights.snp[filter.size],
                         weight.Bf = weights.snp[filter.size],
@@ -119,7 +119,7 @@ CP.snp <- baf.model.fit(Bf = seg.i$Bf[filter.size],
 data(CPsnp.example)
 @
 <<label=getCPparamSNP, eval = TRUE>>=
-cint <- get.ci(CP.snp)
+cint <- get.ci(CPsnp.example)
 
 cellularity <- cint$max.y
 dna.index   <- cint$max.x
@@ -130,8 +130,8 @@ dna.index   <- cint$max.x
 \begin{figure}[H]
       \centering
 <<label=CPplotSNP,fig=TRUE,width=6,height=6>>=
-cp.plot(CP.snp)
-cp.plot.contours(CP.snp, add = TRUE)
+cp.plot(CPsnp.example)
+cp.plot.contours(CPsnp.example, add = TRUE)
 @ 
       \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/DNA-index combinations.}
       \label{fig:cpPlotSNP}

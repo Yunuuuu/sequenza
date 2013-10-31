@@ -60,8 +60,7 @@ gc.stats <- gc.sample.stats(data.file)
 gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
 # Read only one chromosome:
 abf.data  <- read.abfreq(data.file, chr.name = 1)
-abf.data$good.s.reads <- abf.data$depth.sample * 
-                         abf.data$sample.reads.above.quality
+
 # Correct the coverage of the loaded chromosome:
 abf.data$adjusted.ratio <- abf.data$depth.ratio / 
                            gc.vect[as.character(abf.data$GC.percent)]

@@ -40,8 +40,7 @@ mut.fractions(AB.sample, Af)
 data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
 abf.data  <- read.abfreq(data.file)
 # Detect how many reads passed the quality treshold
-abf.data$good.s.reads <- abf.data$depth.sample * 
-                         abf.data$sample.reads.above.quality
+
 # Normalize coverage by GC-content
 gc.stats <- gc.norm(x = abf.data$depth.ratio,
                     gc = abf.data$GC.percent)

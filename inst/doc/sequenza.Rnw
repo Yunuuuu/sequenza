@@ -158,13 +158,7 @@ The files can be read even faster, after mapping the chromosomes location in the
 
 \subsection{Quality control and normalization}
 
-Each aligned base, in the next generation sequencing, is associated with a quality score. The \textit{sequenza-utils} software is capable of filtering the base with a quality score lower then a specified value (default, 20). The rate of reads that have passed the filter in returned the column \textit{sample.reads.above.quality}, while the \textit{depth.sample} column contains the raw depth indicated in the pileup (from samtools).
-The product :
-<<label=goodReads, echo=TRUE>>=
-abf.data$good.s.reads <- abf.data$depth.sample * 
-                         abf.data$sample.reads.above.quality
-@
-This will roughly indicate the actual number of reads that passes the quality filter for each position. The column \textit{good.s.reads} (good sample reads) is required in many function in a usual \textit{sequenza} workflow.
+Each aligned base, in the next generation sequencing, is associated with a quality score. The \textit{sequenza-utils} software is capable of filtering the base with a quality score lower then a specified value (default, 20). The number of reads that have passed the filter in returned the column \textit{good.s.reads}, while the \textit{depth.sample} column contains the raw depth indicated in the pileup (from samtools).
 
 \subsection{GC-normalization}
 
@@ -258,7 +252,7 @@ After the raw data is conveniently processed, we can apply the Bayesian inferenc
 The function \textit{sequenza.fit} perform the inference using the calculated B allele frequency and depth ratio of the obtained segments. The method can be explored in more detail by looking the manual pages for the function \textit{baf.model.fit}.
 
 <<label=sequenzaFit, echo=TRUE, eval=FALSE, results=hide>>=
-CP <- sequenza.fit(test)
+CP.example <- sequenza.fit(test)
 @
 
 <<label=loadCP, echo=FALSE, results=hide>>=
@@ -271,7 +265,7 @@ The result is a list in the format \textit{list(x ,y, z)} directly usable by sta
 The object resulting from \textit{sequenza.fit} have two vectors, x and y, indicating respectively the tested values of dna.index and cellularity, and a matrix z with x columns and y rows, containing the estimated log-likelihood.
 Confidence intervals for these two parameters can be calculated using the function \textit{get.ci}.
 <<label=ConfIntCP, echo=TRUE>>=
-cint <- get.ci(CP)
+cint <- get.ci(CP.example)
 @
 
 It is also possible to plot the likelihood over the combinations of the two parameters, highlighting the point estimate and the confidence region.
@@ -279,8 +273,8 @@ It is also possible to plot the likelihood over the combinations of the two para
 \begin{figure}[H]
       \centering
 <<label=CPplot,fig=TRUE,width=6,height=6>>=
-cp.plot(CP)
-cp.plot.contours(CP, add = TRUE, likThresh = c(0.999))
+cp.plot(CP.example)
+cp.plot.contours(CP.example, add = TRUE, likThresh = c(0.999))
 @ 
  \caption{Result from the Bayesian inference over the defined range of cellularity and DNA index. Color intensity indicates the log-likelihood of corresponding cellularity/DNA index values.}
       \label{fig:cpPlot}
@@ -291,8 +285,8 @@ By exploring the result for  \textit{cellularity} and \textit{dna.index} separat
       \centering
 <<label=CPplotCI,fig=TRUE,width=6,height=6>>=
 par(mfrow = c(2,2))
-cp.plot(CP)
-cp.plot.contours(CP, add = TRUE)
+cp.plot(CP.example)
+cp.plot.contours(CP.example, add = TRUE)
 plot(cint$values.y, ylab = "Cellularity",
      xlab = "likelihood", type = "n")
 select <- cint$confint.y[1] <= cint$values.y[,2] &

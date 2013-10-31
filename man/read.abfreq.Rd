@@ -45,7 +45,7 @@ The remaining 10 columns contain the following information:
 8  \tab \code{Bf} \tab B-allele frequency observed in the tumor sample;\cr
 9  \tab \code{ref.zygosity} \tab zygosity of the reference sample. "hom" corresponds to AA or BB, whereas "het" corresponds to AB or BA;\cr
 10  \tab \code{GC.percent} \tab GC-content (percent), calculated from the reference genome in fixed nucleotide windows ;\cr
-11  \tab \code{sample.reads.above.quality} \tab fraction of reads that passed the quality threshold (threshold specified in the pre-processing software);\cr
+11  \tab \code{good.s.reads} \tab number of reads that passed the quality threshold (threshold specified in the pre-processing software);\cr
 12  \tab \code{AB.germline} \tab base found in the germline sample;\cr
 13  \tab\code{AB.sample} \tab base found in the tumor sample;
 }
