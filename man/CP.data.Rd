@@ -1,4 +1,6 @@
-\name{CP}
+\name{CP.example}
+\alias{CPsnp.example}
+\alias{CP.example}
 \alias{CP}
 \alias{CP.snp}
 
@@ -10,7 +12,7 @@
 
 \examples{
   data(CP.example)
-  str(CP)
+  str(CP,example)
   data(CPsnp.example)
-  str(CP.snp)
+  str(CPsnp.example)
 }
