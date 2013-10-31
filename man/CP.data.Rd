@@ -12,7 +12,7 @@
 
 \examples{
   data(CP.example)
-  str(CP,example)
+  str(CP.example)
   data(CPsnp.example)
   str(CPsnp.example)
 }
