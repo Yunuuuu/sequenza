@@ -13,7 +13,7 @@ theoretical.mufreq <- function(cellularity, CNr = 2, CNt = 2, Mt = 1) {
 types.matrix <- function(CNt.min = 1, CNt.max = 7, CNr = 2) {
    cn.ratio.vect <- seq(from = CNt.min / CNr, to =  CNt.max / CNr, by = 1 / CNr)
    CNt           <- cn.ratio.vect * CNr
-   mut.comb      <- sapply(CNt, FUN = function(x) seq(from = 0, to = x))
+   mut.comb      <- lapply(CNt, FUN = function(x) seq(from = 0, to = x))
    times.muts    <- sapply(mut.comb, length)
    data.frame(CNr = CNr, CNt = rep(CNt, times = times.muts), 
               Mt = unlist(mut.comb))
