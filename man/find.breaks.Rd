@@ -1,7 +1,7 @@
 \name{find.breaks}
 \alias{find.breaks}
 \alias{segment.breaks}
-\title{Segment sequencing data using allele-specific copy number algorithm}
+\title{Segmentation of sequencing data using an allele-specific copy number algorithm}
 
 \description{
   This function uses \code{\link{aspcf}} from the package \code{copynumber} to segment depth ratio and B-allele frequency obtained from sequencing data.
@@ -13,15 +13,15 @@ segment.breaks(abf.tab, breaks)
 }
 
 \arguments{
-  \item{abf.baf}{An abfreq file containing only the heterozygous positions.}
-  \item{abf.tab}{A complete abfreq file.}  
-  \item{gamma, kmin, baf.thres, verbose}{Arguments passed to \code{aspcf}.}
-  \item{breaks}{breaks obtained with the function \code{find.breaks}.}
-  \item{...}{Additional arguments passed to \code{aspcf}.}
+  \item{abf.baf}{an ABfreq file containing only the heterozygous positions.}
+  \item{abf.tab}{a complete ABfreq file.}  
+  \item{gamma, kmin, baf.thres, verbose}{arguments passed to \code{aspcf}.}
+  \item{breaks}{breaks as output \code{find.breaks}.}
+  \item{...}{additional arguments passed to \code{aspcf}.}
 }
 
 \details{
-  \code{copynumber} is a package to perform an efficient segmentation of SNP-array data. The function \code{find.breaks} uses an allele specific algorithm to find break points. The default parameters are adjusted to behave better on sequencing data, but a careful choice of an optimal \code{gamma} value is advised.
+  \code{copynumber} is a package to perform efficient segmentation of SNP-array data. The function \code{find.breaks} uses an allele-specific algorithm from the \code{copynumber} package to find break points, where the default parameters have been optimized for sequencing data, but a careful choice of an optimal \code{gamma} value is advised.
 }
 
 \examples{

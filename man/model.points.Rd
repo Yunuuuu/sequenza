@@ -3,7 +3,7 @@
 \title{Generate mutation frequency and depth ratio model point at given cellularity and DNA-index value.}
 
 \description{
-  \code{model.points} function combines various theoretic model functions to easily generate a matrix of points with theoretical mutation frequency and depth ratio.
+  \code{model.points} combines \code{theoretical.mufreq} and \code{theoretical.depth.ratio} to model the theoretical mutation frequency and depth ratio based on given values of cellularity and DNA-index.
 }
 
 \usage{
@@ -11,18 +11,19 @@ model.points(cellularity = 0.5, dna.index = 1, types = cbind(CNr = 2, CNt = 2, M
              avg.depth.ratio = 1)}
 
 \arguments{
-  \item{cellularity}{A specified value (from 0 to 1) indicating the purity for the given tumor sample.}
-  \item{dna.index}{A specified value (starting from 0.5) indicating the DNA index in the tumor sample. eg.: dna.index = 1 means diploid tumor genome.}
-  \item{types}{desired types matrix obtained with the function \code{\link{types.matrix}}.}
-  \item{avg.depth.ratio}{The average value of the normalized depth ratio.}
+  \item{cellularity}{fraction of tumor cells in the sample.}
+  \item{dna.index}{ratio between total DNA content in a tumor cell and a normal cell.}
+  \item{types}{matrix with the sets of copy numbers and number of mutated alleles over which to model mutation frequency and depth ratio. The matrix can be generated with \code{\link{types.matrix}}.}
+  \item{avg.depth.ratio}{average normalized depth ratio.}
 }
 \value{
-  \item{mufreq}{Theoretical value of mutation frequency at the corresponding "type tag".}
-  \item{depth.ratio}{Theoretical value of depth ratio at the corresponding "type tag".}
+A matrix of two columns:
+  \item{mufreqs}{modelled values of mutation frequency for the given types.}
+  \item{depth.ratio}{modelled values of depth ratio for the given types.}
 }
 
 \details{
-  \code{model.points} generate the values of the given types tag. To learn more about the types see the manual for the function \code{\link{types.matrix}}.
+  \code{model.points} generates the theoretical values of mutation frequency and depth ratio for the given type tags. To learn more about type tags see \code{\link{types.matrix}}.
 }
 
 \seealso{
@@ -31,11 +32,13 @@ model.points(cellularity = 0.5, dna.index = 1, types = cbind(CNr = 2, CNt = 2, M
 
 \examples{
 
-# Simulate a cellularity of 0.5, DNA index of 1 and types from min CNt 0 and max = 4 on an originally diploid chromosome:
+# Simulate a cellularity of 0.5, DNA-index of 1 and types from min CNt 0 and max = 4 on
+an originally diploid chromosome:
 types <- types.matrix(CNt.min = 0, CNt.max = 4, CNr = 2)
 cbind(types, model.points(cellularity = 0.5, dna.index = 1,
                           types = types, avg.depth.ratio = 1))
-# Simulate a cellularity of 0.5, DNA index of 1 and types from min CNt 0 and max = 4 on an originally monoallelic chromosome:
+# Simulate a cellularity of 0.5, DNA-index of 1 and types from min CNt 0 and max = 4 on
+an originally monoallelic chromosome:
 types <- types.matrix(CNt.min = 0, CNt.max = 4, CNr = 1)
 cbind(types, model.points(cellularity = 0.5, dna.index = 1,
                           types = types, avg.depth.ratio = 1))

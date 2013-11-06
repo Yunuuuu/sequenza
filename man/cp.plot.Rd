@@ -14,12 +14,12 @@
 }
 
 \arguments{
-  \item{cp.table}{A matrix obtained using \code{baf.model.fit} or \code{mufreq.model.fit}.}
-  \item{likThresh}{Vector containing selected likelihood tresholds.}
-  \item{col}{Vector of colours.}
-  \item{legend.pos}{Position for the legend in the function \code{cp.plot.contours}.}
-  \item{pch}{Charachter used to draw the extimated point in the \code{cp.plot.contour} function.}
-  \item{...}{Additional arguments accepted by the function \code{colorgram} for \code{cp.plot}, or \code{countours} for \code{cp.plot.contours}.}
+  \item{cp.table}{matrix, as output from \code{baf.model.fit} or \code{mufreq.model.fit}.}
+  \item{likThresh}{vector of selected likelihood tresholds.}
+  \item{col}{vector of colours.}
+  \item{legend.pos}{position for placing the legend in \code{cp.plot.contours}.}
+  \item{pch}{charachter used to draw the estimated point in \code{cp.plot.contour}.}
+  \item{...}{additional arguments accepted by the function \code{colorgram} for \code{cp.plot}, or \code{countours} for \code{cp.plot.contours}.}
 }
 
 

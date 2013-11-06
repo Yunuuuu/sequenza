@@ -1,9 +1,9 @@
 \name{windowValues}
 \alias{windowValues}
-\title{Binning the data on within windows of a specified size}
+\title{Bins sequencing data for plotting}
 
 \description{
-  Given value with corresponding genomic position with chromosomes and positions information, the function will return a list containing as much matrices as the chromosomes in the input vector. Each matrix would contains base-pair windows describing the chromosome, for each window the weighted mean, 25 and 75\% quartiles of the input values and the number of observation are reported.
+  Given a variable with corresponding genomic positions, the function bins the values in windows of a specified size and calculates weighted mean and 25th and 75th percentile for each window, which is useful for plotting with \code{plotWindows}.
 }
 
 \usage{
@@ -11,22 +11,28 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRU
              weight = rep.int( x = 1, times = length(x)), start.coord = 1)
 }
 \arguments{
-  \item{x}{The value to be windowed.}
-  \item{positions}{base-pairs position.}
-  \item{chromosomes}{Names or numbers of the chromosome.}
-  \item{window}{size of windows used when plotting mean and quartile ranges of depth ratios and B-allele frequencies. Smaller windows will take more time to compute.}
-  \item{overlap}{Integer defining the number of overlapping windows. Default is 0, no overlap.}
-  \item{verbose}{Display information about the chromosome being processed?}
-  \item{weight}{The weight to be assigned to each \code{x} value, usually related to the depth of reads.}
-  \item{start.coord}{The coordinate to start computing the windows. If NULL, the first position available would be considered.}
+  \item{x}{variable to be windowed.}
+  \item{positions}{base-pair positions.}
+  \item{chromosomes}{names or numbers of the chromosomes.}
+  \item{window}{size of windows used for binning data. Smaller windows will take more time to compute.}
+  \item{overlap}{integer defining the number of overlapping windows. Default is 0, no overlap.}
+  \item{verbose}{logical, indicating whether to print information about the chromosome being processed.}
+  \item{weight}{weights to be assigned to each value of \code{x}, usually related to the read depth.}
+  \item{start.coord}{coordinate at which to start computing the windows. If NULL, will start at the first position available.}
 }
 
 \details{
-  Sequencing data produces a big amount of data difficult to be handled by standard graphic representation. In addition, sample analyzed with older machines and with low or middle depth of coverage (20x to 50x), measures like read depth are subject of big variations, unrelated to biological reasons. Using \code{windowValues} it is possible to reduce either the amount of data as well the measure noise.
+  DNA sequencing produces an amount of data too large to be handled by standard graphical devices. In addition, for samples analyzed with older machines and with low or middle coverage (20x to 50x), measures such as read depth are subject to big variations due to technical noise. Using \code{windowValues} prior to plotting reduces the amount of data that will be plotted, and reduces noise.
+
+  The output of \code{windowValues} can be used as input for \code{plotWindows}.
+}
+
+\value{
+  a list of matrices, one per chromosome. Each matrix contains base-pair windows covering the chromosome, and for each window the weighted mean, 25th and 75th percentiles of the input values, and the number of data points within each window.
 }
 
 \seealso{
-  \code{plot.windows}, \code{mutation.table}
+  \code{plotWindows}, \code{mutation.table}
 }
 
 \examples{

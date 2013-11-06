@@ -2,10 +2,10 @@
 \alias{gc.sample.stats}
 \alias{gc.norm}
 
-\title{Correct the depth of coverage ratio value considering the biases derived from GC-contents.}
+\title{Normalize depth ratio values for GC-content bias}
 
 \description{
-  Detect GC-contents driven bias, collect chromosomes coordinate in the file to improve I/O performance. 
+  Detects and bias in the depth ratio values driven by varying GC-content. 
 }
 
 \usage{
@@ -14,17 +14,29 @@ gc.norm(x, gc)
 }
 
 \arguments{
-  \item{file}{A file in the ABfreq format.}
-  \item{x}{A vector of values in relation with the GC-content.}
-  \item{gc}{A vector corresponding to \code{x} with the relative GC-content information.}
-  \item{gz}{Boolean, indicating if the file is compressed as gzip file or not. Default TRUE.}
+  \item{file}{name of a file in the ABfreq format.}
+  \item{x}{vector of values to be normalized by GC-content, typically depth ratio values.}
+  \item{gc}{vector of relative GC-content values for x.}
+  \item{gz}{logical. If TRUE (the default) the function expects a gzipped file.}
 }
 
 \details{
-  The function \code{gc.norm} given a vector of values \code{x} and a corresponding vector of GC-percentage, \code{gc.value}, performs some statistic on the relationship between the value imputed and the GC-content. The function returns a list object with two matrices: \code{raw} and \code{adj}, containing respectively the quartiles information for each GC percentage provided of the raw and the median-normalized data; and three vectors: \code{gc.values}, \code{raw.mean}, \code{raw.median}, containing respectively the values of the CG\% and corresponding mean or median value of \code{x}.
-  The function \code{gc.sample.stats} reads the content of the whole file and compute the  \code{gc.norm} on the depth.ratio. In addition it compute statistics on the file contents to effectively access single chromosome reading.
-  Such information is included in the list object returned by the function, in the matrix \code{file.metrics}.
+  \code{gc.norm} detects bias in \code{x} driven by \code{gc}. Specifically, for each value of \code{gc}, summary statistics are calculated for the corresponding values of \code{x}. These statistics can then be used to normalize \code{x} for \code{gc}.
+  
+  \code{gc.sample.stats} extracts depth ratio and GC-content from an ABfreq file, and then uses \code{gc.norm} on the results.
+
 }
+
+\value{
+A list with the following elements:
+  \item{raw}{quartiles of \code{x} for each value of \code{gc}}
+  \item{adj}{median-normalized values of \code{raw}}
+  \item{gc.values}{vector of different GC-content values observed}
+  \item{raw.mean}{mean of \code{x} for each value of \code{gc}}
+  \item{raw.median}{median \code{x} for each value of \code{gc}}
+  \item{file.metrics}{only from \code{gc.sample.stats}.}
+}
+
 
 \examples{
 

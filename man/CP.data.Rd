@@ -4,10 +4,10 @@
 \alias{CP}
 \alias{CP.snp}
 
-\title{Cellularity and dna.index results sample.}
+\title{Example of cellularity and dna.index results.}
 
 \description{
-  Examples of objects resulting from the Bayesian estimation over a set of \code{cellualrity} and \code{dna.index} parameters. 
+  Examples of objects resulting from the Bayesian estimation over a set of cellularity and dna.index parameters. 
 }
 
 \examples{

@@ -2,10 +2,10 @@
 \alias{chromosome.view}
 \alias{genome.view}
 
-\title{Graphically represent multiple chromosomal features in parallel}
+\title{A graphical representation of multiple chromosomal features in parallel}
 
 \description{
-  Graphically represent multiple chromosomal features in parallel.
+  A graphical representation of multiple chromosomal features in parallel.
 }
 
 \usage{
@@ -19,31 +19,31 @@ genome.view(seg.cn, info.type = "AB", ...)
 }
 
 \arguments{
-  \item{baf.windows}{Matrix containing the windowed B-allele frequency values for one chromosome.}
-  \item{ratio.windows}{Matrix containing the windowed depth ratios value for one chromosome.}
-  \item{mut.tab}{Mutation table of one single chromosome. If specified the mutation would be drawn in a top panel. \code{mut.tab} must be generated from the \code{mutation.table} command.}
-  \item{segments}{Segmentation for one single chromosome. If specified the segment for B-allele frequency and depth ratio would be displayed with a red line.}
-  \item{min.N.baf}{Minimum amount of observations in a BAF window to be plotted.}
-  \item{min.N.ratio}{Minimum amount of observations in a depth ratio window to be plotted.}
-  \item{CNr}{Copy number of the germline genome. }
-  \item{vlines}{Boolean if TRUE the plot would include dotted vertical lines corresponding to breaks.}
-  \item{cellularity}{Value of the estimated \code{cellularity} parameter.}
-  \item{dna.index}{Value of the estimated \code{dna.index} parameter.}
-  \item{avg.depth.ratio}{The average value of the normalized depth ratio.}
-  \item{main}{Main title of the plot.}
-  \item{legend.inset}{The inset argument to pass to the \code{legend} function Define the distance of the mutation legend from the plot border.}
-  \item{BAF.style}{The style to visualize the theoretical thresholds for the B allele frequency panel. Possible values are "lines", "blocks", "none". Default is "none".}
-  \item{model.lwd}{Width of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
-  \item{model.lty}{Line type of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
-  \item{model.col}{Color of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
-  \item{x.chr.space}{Step in megabase on the positions to visualize on the x-axis.}
-  \item{seg.cn}{Genome wide segments, with the columns A, B and CNt.}
-  \item{info.type}{Information to plot in \code{genome.view}. Available options are "CNt" to draw the copy numbers and "AB" (default) to draw the two alleles.}
-  \item{...}{Optional arguments from \code{plot}.}
+  \item{baf.windows}{matrix containing the windowed B-allele frequency values for one chromosome.}
+  \item{ratio.windows}{matrix containing the windowed depth ratio values for one chromosome.}
+  \item{mut.tab}{mutation table of one chromosome. If specified, the mutations will be drawn in a top panel. \code{mut.tab} must be output from the \code{mutation.table} function.}
+  \item{segments}{segmentation for one chromosome. If specified, the segmented B-allele frequency and depth ratio values will be shown as red lines.}
+  \item{min.N.baf}{minimum number of observations required in a BAF window for plotting.}
+  \item{min.N.ratio}{minimum number of observations required in a depth ratio window for plotting.}
+  \item{CNr}{copy number of the germline genome. }
+  \item{vlines}{logical, if TRUE the plot will include dotted vertical lines corresponding to segment breaks.}
+  \item{cellularity}{fraction of tumor cells in the sample.}
+  \item{dna.index}{value of the estimated \code{dna.index} parameter.}
+  \item{avg.depth.ratio}{the average value of the normalized depth ratio.}
+  \item{main}{main title of the plot.}
+  \item{legend.inset}{the inset argument to pass to the \code{legend} function. Defines the distance between the mutation legend and the plot border.}
+  \item{BAF.style}{the style to visualize the theoretical thresholds for the B allele frequency panel. Possible values are "lines", "blocks", "none". Default is "none".}
+  \item{model.lwd}{width of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
+  \item{model.lty}{line type of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
+  \item{model.col}{color of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
+  \item{x.chr.space}{step in megabase on the positions to visualize on the x-axis.}
+  \item{seg.cn}{genome wide segments, with the columns A, B and CNt.}
+  \item{info.type}{information to plot in \code{genome.view}. Available options are "CNt" to draw the copy numbers and "AB" (default) to draw the two alleles.}
+  \item{...}{optional arguments passed to \code{plot}.}
 }
 
 \details{
-  \code{chromosome.view} is a convenient plotting function using \code{plot.windows} and some handy \code{par} parameter, to nicely display the sequencing results, and the model fitting.
+  \code{chromosome.view} is a convenient plotting function using \code{plot.windows} and some handy \code{par} parameters, to display the raw sequencing results along with the model fitting.
 }
 
 \seealso{

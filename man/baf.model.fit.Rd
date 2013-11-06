@@ -4,33 +4,35 @@
 \title{Model fitting using Bayesian inference}
 
 \description{
-  Compute the log-likelihood distribution for the specified range of cellularity and DNA-index parameters
+  Computes the log-likelihood distribution for the specified range of cellularity and DNA-index parameters
 }
 
 \usage{
   mufreq.model.fit(cellularity = seq(0.3, 1, by = 0.01),
-                   dna.index = seq(0.7, 4, by = 0.01), mc.cores = getOption("mc.cores", 2L), ...)
+                   dna.index = seq(0.7, 4, by = 0.01),
+                   mc.cores = getOption("mc.cores", 2L), ...)
   baf.model.fit(cellularity = seq(0.3, 1, by = 0.01),
-                dna.index = seq(0.7, 4, by = 0.01), mc.cores = getOption("mc.cores", 2L), ...)                    
+                dna.index = seq(0.7, 4, by = 0.01),
+                mc.cores = getOption("mc.cores", 2L), ...)                    
 }
 
 \arguments{
-  \item{cellularity}{Vector of values of cellularity parameters to be tested.}
-  \item{dna.index}{Vector of values of DNA-index parameters to be tested.}
-  \item{mc.cores}{number of core to use, defined as in the \code{parallel} packages.}
-  \item{...}{Any argument accepted by \code{mufreq.bayes} or \code{baf.bayes}}
+  \item{cellularity}{vector of cellularity parameter values to be tested.}
+  \item{dna.index}{vector of DNA-index parameter values to be tested.}
+  \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
+  \item{...}{any argument accepted by \code{mufreq.bayes} or \code{baf.bayes}.}
 }
 
 \value{
-  \item{dna.index}{Values of dna.index tested}
-  \item{cellularity}{Values of cellularity tested}
-  \item{L}{Log-likelihood of the pair cellularity/dna.index tested}
+  \item{dna.index}{tested values of the DNA-index parameter}
+  \item{cellularity}{values of cellularity tested}
+  \item{L}{log-likelihood of each pair of cellularity/dna.index parameters.}
 }
 
 \details{
-  \code{baf.model.fit} uses the function \code{baf.bayes} to infer the log-likelihood of model-fitting using the possible combinations of cellularity and DNA-index values provided in the arguments.
-  Similarly \code{mufreq.model.fit} fit the mutation/depth ratio model using the function \code{mufreq.bayes}.
-  \code{baf.model.fit} Is generally used to infer cellularity and dna.index on segmented chromosomes, while \code{mufreq.model.fit} can be also used to estimate the same parameters from mutations, and in addition can be useful to roughly estimate sub-clonal fractions. Be aware  that the mutation frequency is more sensible to sampling bias, and is generally more noisy compared to the segmented B-allele frequency. 
+  \code{baf.model.fit} uses the function \code{baf.bayes} to infer the log-likelihood of the model fit using the possible combinations of cellularity and DNA-index values provided in the arguments.
+  Similarly \code{mufreq.model.fit} fits the mutation/depth ratio model using the function \code{mufreq.bayes}.
+  \code{baf.model.fit} is generally used to infer cellularity and dna.index on segmented chromosomes, while \code{mufreq.model.fit} can also be used to estimate those parameters from mutations, and in addition can be useful to give a rough estimate of sub-clonal fractions. Be aware  that the mutation frequency is more sensitive to sampling bias, and is generally more noisy compared to the segmented B-allele frequency. 
 }
 
 \seealso{

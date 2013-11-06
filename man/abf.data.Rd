@@ -4,7 +4,7 @@
 \title{ABfreq file example.}
 
 \description{
-  Example of ABfreq file: This data is representative of an exome-sequenced tumor sample, e.g. as one would obtain from the TCGA.
+  Example of ABfreq file: This data is representative of an exome-sequenced tumor sample, e.g. as could be obtained from TCGA.
 }
 
 \usage{

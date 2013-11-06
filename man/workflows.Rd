@@ -32,7 +32,7 @@
   \item{XY}{character vector of length 2 specifying the labels used for the X and Y chromosomes. Defaults to c(X = "X", Y = "Y").}
   \item{cellularity}{vector of values to test as cellularity parameter.}
   \item{dna.index}{vector of values to test as DNA-index parameter.}
-  \item{priors.table}{data frame containing the columns \code{CN} and \code{value}, respectively indicating the copy number and the corresponding weight. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
+  \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
   \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
 }
 
