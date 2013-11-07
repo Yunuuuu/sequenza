@@ -10,7 +10,7 @@
 \usage{
    cp.plot(cp.table, ...)
    cp.plot.contours(cp.table, likThresh = c(0.95),
-                    col = palette(), legend.pos = 'bottomright', pch = 18, ...)          
+                    col = palette(), legend.pos = "bottomright", pch = 18, ...)          
 }
 
 \arguments{
