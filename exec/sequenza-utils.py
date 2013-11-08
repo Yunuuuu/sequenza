@@ -564,11 +564,12 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out):
    robjects.r('assign')(x = tag + '_segments_list', value = segments_list)
    robjects.r('save')(list = tag + '_segments_list', file = subdir + '/' + tag + '_segments_list.Rdata')
 
-def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
+def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", ncores = 4, ratio_priority = False):
    '''
    Load the information stored from the functions above and infer cellularit/ploidy
    and save plots and table of mutations and CNV calls
    '''
+   xy = {'X':X, 'Y' : Y}
    if tag == None:
       tag = os.path.split(data_dir)[-1]
    obj_list = robjects.StrVector(('adj_GC.txt', 'raw_GC.txt', 'windows_Bf.Rdata', 'mutation_list.Rdata', 'windows_ratio.Rdata', 'segments_list.Rdata'))
@@ -588,10 +589,10 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
    segs_len      = segs_all.rx(True, 'end.pos').ro - segs_all.rx(True, 'start.pos')
    segs_filt     = segs_len.ro >= 10e6
    if is_male:
-      segs_is_xy = segs_all.rx(True, 'chromosome').ro == "X" or segs_all.rx(True, 'chromosome').ro == "Y"
-      mut_is_xy  = mut_all.rx(True, 'chromosome').ro == "X" or mut_all.rx(True, 'chromosome').ro == "Y"
+      segs_is_xy = segs_all.rx(True, 'chromosome').ro == xy["X"] or segs_all.rx(True, 'chromosome').ro == xy["Y"]
+      mut_is_xy  = mut_all.rx(True, 'chromosome').ro == xy["X"] or mut_all.rx(True, 'chromosome').ro == xy["Y"]
    else:
-      segs_is_xy = segs_all.rx(True, 'chromosome').ro == "Y"
+      segs_is_xy = segs_all.rx(True, 'chromosome').ro == xy["Y"]
    filt_test  = segs_is_xy.ro == False
    filt_test  = segs_filt.ro & filt_test
    seg_test   = segs_all.rx(filt_test, True)
@@ -599,19 +600,19 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
    robjects.r('''
    wrapBafBayes <- function (Bf, depth_ratio , weight_ratio, weight_Bf,
                              avg_depth_ratio,  cellularity, priors_table,
-                             dna_index, mc_cores, ...) {
+                             dna_index, mc_cores, ratio_priority, ...) {
                     baf.model.fit(Bf = Bf, depth.ratio = depth_ratio,
                     weight.ratio = weight_ratio, weight.Bf = weight_Bf,
                     avg.depth.ratio = avg_depth_ratio, cellularity = cellularity,
                     dna.index = dna_index, priors.table = priors_table,
-                    mc.cores = mc_cores)
+                    mc.cores = mc_cores, ratio.priority = ratio_priority)
    }
    ''')
    CP  = robjects.r('wrapBafBayes')(Bf = seg_test.rx(True, 'Bf'), depth_ratio = seg_test.rx(True, 'depth.ratio'),
                     weight_ratio = weights_seg.rx(filt_test).ro * 2,
                     weight_Bf = weights_seg.rx(filt_test), avg_depth_ratio = avg_depth_ratio,
                     cellularity = robjects.r.seq(0.1, 1, 0.01) , priors_table = robjects.DataFrame({'CN':2, 'value' : 2}),
-                    dna_index = robjects.r.seq(0.5, 3, 0.05), mc_cores = ncores, ratio_priority = False)
+                    dna_index = robjects.r.seq(0.5, 3, 0.05), mc_cores = ncores, ratio_priority = ratio_priority)
 
    cint = sequenza.get_ci(CP)
 
@@ -632,7 +633,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
       seg_res  = sequenza.baf_bayes(Bf = segs_all.rx(True, 'Bf').rx(segs_is_xy.ro == False),
                          depth_ratio = segs_all.rx(True, 'depth.ratio').rx(segs_is_xy.ro == False),
                          avg_depth_ratio = avg_depth_ratio,
-                         weight_ratio = 2*200,
+                         weight_ratio = 2*200, ratio_priority = ratio_priority,
                          weight_Bf = 200, CNt_max = 20,
                          cellularity = cint.rx2('max.y'),
                          dna_index = cint.rx2('max.x'), CNr = 2)
@@ -643,7 +644,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
       seg_res_xy  = sequenza.baf_bayes(Bf = segs_all.rx(True, 'Bf').rx(segs_is_xy),
                          depth_ratio = segs_all.rx(True, 'depth.ratio').rx(segs_is_xy),
                          avg_depth_ratio = avg_depth_ratio,
-                         weight_ratio = 2*200,
+                         weight_ratio = 2*200, ratio_priority = ratio_priority,
                          weight_Bf = 200, CNt_max = 20,
                          cellularity = cint.rx2('max.y'),
                          dna_index = cint.rx2('max.x'), CNr = 1)
@@ -657,7 +658,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
       seg_res  = sequenza.baf_bayes(Bf = segs_all.rx(True, 'Bf'),
                          depth_ratio = segs_all.rx(True, 'depth.ratio'),
                          avg_depth_ratio = avg_depth_ratio,
-                         weight_ratio = 2*200,
+                         weight_ratio = 2*200, ratio_priority = ratio_priority,
                          weight_Bf = 200, CNt_max = 20,
                          cellularity = cint.rx2('max.y'),
                          dna_index = cint.rx2('max.x'), CNr = 2)
@@ -674,7 +675,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
    robjects.r.pdf(data_dir +'/'+ tag + "_chromosome_view.pdf")
    for chrom in chr_vect:
       if is_male:
-         if chrom == "X" or chrom == "Y":
+         if chrom == xy["X"] or chrom == xy["Y"]:
             CNr = 1
          else:
             CNr = 2
@@ -686,7 +687,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, ncores = 4):
                       segments = seg_res.rx(seg_res.rx(True, 'chromosome').ro == chrom, True), mut_tab = mutation_list.rx2(chrom),
                       main = chrom, avg_depth_ratio = avg_depth_ratio, CNr = CNr)
    robjects.r('dev.off()')
-   res_seg_xy = seg_res.rx(True, 'chromosome').ro == 'Y'
+   res_seg_xy = seg_res.rx(True, 'chromosome').ro == xy["Y"]
 
 
    barscn = robjects.DataFrame({'size' : (seg_res.rx(True, 'end.pos').rx(res_seg_xy.ro == False).ro - seg_res.rx(True, 'start.pos').rx(res_seg_xy.ro == False)),
@@ -788,6 +789,12 @@ def sequenzaFit(parser, subparser):
                    help='Boolen flag indicating if the sequencing data are from a male or female, and consequently properly handle chromosome X and Y')
    subparser.add_argument('-p', dest = 'ncpu', type = int, default = 4,
                    help='The number of core to use when performing the Bayesian inference. Default 4.')
+   subparser.add_argument('-X', "--chrX", dest = 'X', type = str, default = "X",
+                   help='Character defining chromosome X. Default X.')
+   subparser.add_argument('-Y', "--chrY", dest = 'Y', type = str, default = "Y",
+                   help='Character defining chromosome Y. Default Y.')
+   subparser.add_argument('-r', "--only-ratio", dest = 'onlyratio', action='store_true', default = False,
+                   help='Do not take into account the BAF in the Bayesian inference, but only the depth ratio.')
    return parser.parse_args()
 
 def main():
@@ -898,7 +905,7 @@ def main():
          RPy2sqeezeABfreq(args.abfreq, args.loop, args.tag, check_dir(args.dir))
       elif RPY2 == True and used_module == "sequenzaFit":
          args = sequenzaFit(parser, parser_doAllSequenza)
-         RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag, args.ncpu)
+         RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag, args.X, args.Y, args.ncpu, args.onlyratio)
       else:
          return parser.parse_args()
 
