@@ -23,5 +23,7 @@ subclonal.matrix <- function(mut.tab, cellularity = seq(0.1, 1, 0.05), dna.index
                            })
                          })
   res <- do.call(rbind, res)
-  res/rowSums(res)
+  res <- res/rowSums(res)
+  colnames(res) <- cellularity
+  res
 }
