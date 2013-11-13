@@ -30,7 +30,11 @@ read.acgt(file, colClasses = c("character", "integer", "character", "integer",
 }
 
 \details{
-  ABfreq is a tab separated text file with column headers. The file has currently 13 columns. The first 3 columns are derived from the original \code{pileup} file and contain:
+\code{read.abfreq} is a function that allows to efficiently access a file by chromosome or by number of line. The specific content of a \code{ABfreq} file or an \code{acgt} is explained in the \code{value} section.
+}
+
+\value{
+ABfreq is a tab separated text file with column headers. The file has currently 13 columns. The first 3 columns are derived from the original \code{pileup} file and contain:
 \item{chromosome}{with the chromosome names}
 \item{n.base}{with the base positions}
 \item{base.ref}{with the base in the reference genome used (usually hg19). Note the \code{base.ref} is NOT the base of the germline.}
