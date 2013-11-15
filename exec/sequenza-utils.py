@@ -495,7 +495,7 @@ class DefaultHelpParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
-def RPy2sqeezeABfreq(abfreq, loop, tag, out):
+def RPy2sqeezeABfreq(abfreq, loop, tag, out, kmin, gamma):
    """
     Process an abfreq file and store the relvant (small and easy to re-acces) information
    """
@@ -531,7 +531,7 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out):
       abf_het  = abf_data.rx(abf_hom.ro != True, True)
       abf_r_win = sequenza.windowValues(x = abf_data.rx(True, 'adjusted.ratio'), positions = abf_data.rx(True, 'n.base'), chromosomes = abf_data.rx(True, 'chromosome'), window = 1e6, overlap = 1, weight = abf_data.rx(True, 'depth.normal'))
       abf_b_win = sequenza.windowValues(x = abf_het.rx(True, 'Bf'), positions = abf_het.rx(True, 'n.base'), chromosomes = abf_het.rx(True, 'chromosome'), window = 1e6, overlap = 1, weight = robjects.r.round(abf_het.rx(True, 'good.s.reads'), 0))
-      breaks = sequenza.find_breaks(abf_het, gamma = 80, kmin = 10, baf_thres = robjects.FloatVector((0, 0.5)))
+      breaks = sequenza.find_breaks(abf_het, gamma = gamma, kmin = kmin, baf_thres = robjects.FloatVector((0, 0.5)))
       seg_s1 = sequenza.segment_breaks(abf_data, breaks = breaks)
       mut_tab = sequenza.mutation_table(abf_data, mufreq_treshold = 0.10, min_reads = 40, max_mut_types = 1, min_type_freq = 0.9, segments = seg_s1)
       gc.collect()
@@ -564,7 +564,7 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out):
    robjects.r('assign')(x = tag + '_segments_list', value = segments_list)
    robjects.r('save')(list = tag + '_segments_list', file = subdir + '/' + tag + '_segments_list.Rdata')
 
-def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", ncores = 4, ratio_priority = False):
+def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", ncores = 4, ratio_priority = False, segment_filter = 10e6, priors = {'CN':[1,2,3,4], 'value' : [1,2,1,1]}):
    '''
    Load the information stored from the functions above and infer cellularit/ploidy
    and save plots and table of mutations and CNV calls
@@ -587,7 +587,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
    mut_all       = robjects.r('do.call')('rbind', mutation_list)
    mut_all       = robjects.r('na.exclude')(mut_all)
    segs_len      = segs_all.rx(True, 'end.pos').ro - segs_all.rx(True, 'start.pos')
-   segs_filt     = segs_len.ro >= 10e6
+   segs_filt     = segs_len.ro >= segment_filter
    if is_male:
       segs_is_xy = segs_all.rx(True, 'chromosome').ro == xy["X"] or segs_all.rx(True, 'chromosome').ro == xy["Y"]
       mut_is_xy  = mut_all.rx(True, 'chromosome').ro == xy["X"] or mut_all.rx(True, 'chromosome').ro == xy["Y"]
@@ -611,7 +611,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
    CP  = robjects.r('wrapBafBayes')(Bf = seg_test.rx(True, 'Bf'), depth_ratio = seg_test.rx(True, 'depth.ratio'),
                     weight_ratio = weights_seg.rx(filt_test).ro * 2,
                     weight_Bf = weights_seg.rx(filt_test), avg_depth_ratio = avg_depth_ratio,
-                    cellularity = robjects.r.seq(0.1, 1, 0.01) , priors_table = robjects.DataFrame({'CN':2, 'value' : 2}),
+                    cellularity = robjects.r.seq(0.1, 1, 0.01) , priors_table = robjects.DataFrame({'CN':robjects.IntVector(priors["CN"]), 'value' : robjects.IntVector(priors["value"])}),
                     dna_index = robjects.r.seq(0.5, 3, 0.05), mc_cores = ncores, ratio_priority = ratio_priority)
 
    cint = sequenza.get_ci(CP)
@@ -770,31 +770,46 @@ def merge_pileups(parser, subparser):
    return parser.parse_args()
 
 def sequenzaExtract(parser, subparser):
-   subparser.add_argument('--abfreq', dest = 'abfreq', required = True,
+   parser_io      = subparser.add_argument_group(title='Input and output',description='Input ABfreq files and output options.')
+   parser_segment = subparser.add_argument_group(title='Segmentation',description='Option to control the segmentation.')
+   parser_misc    = subparser.add_argument_group(title='Misc',description='Miscellaneous options.')
+   parser_io.add_argument('--abfreq', dest = 'abfreq', required = True,
                    help='An existing abfreq file')
-   subparser.add_argument('-o', '--out', dest = 'dir', default = "./",
+   parser_io.add_argument('-o', '--out', dest = 'dir', default = "./",
                    help='Path where to make the directory containing the processed data')
-   subparser.add_argument('-t', '--tag', dest = 'tag', required = True,
+   parser_io.add_argument('-t', '--tag', dest = 'tag', required = True,
                    help='Tag to name the directory and the prefix of the generated files')
-   subparser.add_argument('--no-loop', dest = 'loop', action='store_false', default = True,
+   parser_segment.add_argument('-k', '--kmin', dest = 'kmin', type = int, default = 10,
+                   help='minimum number of position per segment. default 10 (WGS is suggested to set to 500 or so)')
+   parser_segment.add_argument('-g', '--gamma', dest = 'gamma', type = int, default = 80,
+                   help='gamma parapeter for the segmentation, higher is less sensible smaller is more. default 80')                   
+   parser_misc.add_argument('--no-loop', dest = 'loop', action='store_false', default = True,
                    help='Boolen flag indicating if to loop over chromosomes one by one (default), or load all the file in memory')
    return parser.parse_args()
 
 def sequenzaFit(parser, subparser):
-   subparser.add_argument('--dir', dest = 'dir', required = True,
+   parser_io      = subparser.add_argument_group(title='Input',description='Input options.')
+   parser_gender  = subparser.add_argument_group(title='Gender',description='Option to control the gender and X/Y chromosome.')
+   parser_model   = subparser.add_argument_group(title='Model',description='Options to control the Bayesian inference.')
+   parser_perf    = subparser.add_argument_group(title='Performance',description='Options to control performance.')
+   parser_io.add_argument('--dir', dest = 'dir', required = True,
                    help='The directory where the data to load are stored')
-   subparser.add_argument('-t', '--tag', dest = 'tag', default = None,
+   parser_io.add_argument('-t', '--tag', dest = 'tag', default = None,
                    help='Tag indicating the prefix of the data, if not specified it is assumed as the name of the contanitor directory')
-   subparser.add_argument('--is-male', dest = 'isMale', action='store_true', default = False,
+   parser_gender.add_argument('--is-male', dest = 'isMale', action='store_true', default = False,
                    help='Boolen flag indicating if the sequencing data are from a male or female, and consequently properly handle chromosome X and Y')
-   subparser.add_argument('-p', dest = 'ncpu', type = int, default = 4,
+   parser_perf.add_argument('-p', dest = 'ncpu', type = int, default = 4,
                    help='The number of core to use when performing the Bayesian inference. Default 4.')
-   subparser.add_argument('-X', "--chrX", dest = 'X', type = str, default = "X",
+   parser_gender.add_argument('-X', "--chrX", dest = 'X', type = str, default = "X",
                    help='Character defining chromosome X. Default X.')
-   subparser.add_argument('-Y', "--chrY", dest = 'Y', type = str, default = "Y",
+   parser_gender.add_argument('-Y', "--chrY", dest = 'Y', type = str, default = "Y",
                    help='Character defining chromosome Y. Default Y.')
-   subparser.add_argument('-r', "--only-ratio", dest = 'onlyratio', action='store_true', default = False,
+   parser_model.add_argument('-r', "--only-ratio", dest = 'onlyratio', action='store_true', default = False,
                    help='Do not take into account the BAF in the Bayesian inference, but only the depth ratio.')
+   parser_model.add_argument('-f', "--segment-filter", dest = 'segfilt', type = float, default = 10e6,
+                   help='Size in base-pair, to filter the segments to use in the Bayesian inference. Default 10e6.')
+   parser_model.add_argument('-l', "--priors", dest = 'priors', type = dict, default = {'CN' :[1, 2, 3, 4], 'value' : [1, 2, 1, 1]},
+                   help='Set the priors on the copy-number. Default 2 on CN = 2, 1 for all the other CN state.')                    
    return parser.parse_args()
 
 def main():
@@ -902,10 +917,10 @@ def main():
 
       elif RPY2 == True and used_module == "sequenzaExtract":
          args = sequenzaExtract(parser, parser_squeezeAB)
-         RPy2sqeezeABfreq(args.abfreq, args.loop, args.tag, check_dir(args.dir))
+         RPy2sqeezeABfreq(args.abfreq, args.loop, args.tag, check_dir(args.dir), args.kmin, args.gamma)
       elif RPY2 == True and used_module == "sequenzaFit":
          args = sequenzaFit(parser, parser_doAllSequenza)
-         RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag, args.X, args.Y, args.ncpu, args.onlyratio)
+         RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag, args.X, args.Y, args.ncpu, args.onlyratio, args.segfilt, args.priors)
       else:
          return parser.parse_args()
 
