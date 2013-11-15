@@ -4,10 +4,9 @@ theoretical.depth.ratio <- function(cellularity = 0.5, dna.index = 1, copy.numbe
 }
 
 theoretical.mufreq <- function(cellularity, CNr = 2, CNt = 2, Mt = 1) {
-   copy.ratio <- CNt / CNr
-   cell.fract <- 1 / cellularity
-   mut.factor <- Mt / CNr
-   mut.factor/(copy.ratio + cell.fract - 1)
+   normal.alleles <- (CNt-Mt)*cellularity + CNr*(1-cellularity)
+   all.alleles    <- (CNt*cellularity) + CNr*(1-cellularity)
+   1 - (normal.alleles/all.alleles)
 }
 
 types.matrix <- function(CNt.min = 1, CNt.max = 7, CNr = 2) {
