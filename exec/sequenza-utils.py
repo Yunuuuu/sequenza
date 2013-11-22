@@ -600,11 +600,11 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
    robjects.r('''
    wrapBafBayes <- function (Bf, depth_ratio , weight_ratio, weight_Bf,
                              avg_depth_ratio,  cellularity, priors_table,
-                             dna_index, mc_cores, ratio_priority, ...) {
+                             ploidy, mc_cores, ratio_priority, ...) {
                     baf.model.fit(Bf = Bf, depth.ratio = depth_ratio,
                     weight.ratio = weight_ratio, weight.Bf = weight_Bf,
                     avg.depth.ratio = avg_depth_ratio, cellularity = cellularity,
-                    ploidy = dna_index, priors.table = priors_table,
+                    ploidy = ploidy, priors.table = priors_table,
                     mc.cores = mc_cores, ratio.priority = ratio_priority)
    }
    ''')
@@ -612,7 +612,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
                     weight_ratio = weights_seg.rx(filt_test).ro * 2,
                     weight_Bf = weights_seg.rx(filt_test), avg_depth_ratio = avg_depth_ratio,
                     cellularity = robjects.r.seq(0.1, 1, 0.01) , priors_table = robjects.DataFrame({'CN':robjects.IntVector(priors["CN"]), 'value' : robjects.IntVector(priors["value"])}),
-                    dna_index = robjects.r.seq(0.5, 3, 0.05), mc_cores = ncores, ratio_priority = ratio_priority)
+                    ploidy = robjects.r.seq(1, 7, 0.1), mc_cores = ncores, ratio_priority = ratio_priority)
 
    cint = sequenza.get_ci(CP)
 
@@ -636,10 +636,10 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
                          weight_ratio = 2*200, ratio_priority = ratio_priority,
                          weight_Bf = 200, CNt_max = 20,
                          cellularity = cint.rx2('max.y'),
-                         dna_index = cint.rx2('max.x'), CNr = 2)
+                         ploidy = cint.rx2('max.x'), CNr = 2)
       mut_alleles = sequenza.mufreq_bayes(mufreq = mut_all.rx(True, 'F').rx(mut_is_xy.ro == False),
                                           depth_ratio = mut_all.rx(True, 'adjusted.ratio').rx(mut_is_xy.ro == False),
-                                          cellularity = cint.rx2('max.y'), dna_index = cint.rx2('max.x'),
+                                          cellularity = cint.rx2('max.y'), ploidy = cint.rx2('max.x'),
                                           avg_depth_ratio = avg_depth_ratio, CNr = 2, CNt_max = 20)
       seg_res_xy  = sequenza.baf_bayes(Bf = segs_all.rx(True, 'Bf').rx(segs_is_xy),
                          depth_ratio = segs_all.rx(True, 'depth.ratio').rx(segs_is_xy),
@@ -647,10 +647,10 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
                          weight_ratio = 2*200, ratio_priority = ratio_priority,
                          weight_Bf = 200, CNt_max = 20,
                          cellularity = cint.rx2('max.y'),
-                         dna_index = cint.rx2('max.x'), CNr = 1)
+                         ploidy = cint.rx2('max.x'), CNr = 1)
       mut_alleles_xy = sequenza.mufreq_bayes(mufreq = mut_all.rx(True, 'F').rx(mut_is_xy),
                                              depth_ratio = mut_all.rx(True, 'adjusted.ratio').rx(mut_is_xy),
-                                             cellularity = cint.rx2('max.y'), dna_index = cint.rx2('max.x'),
+                                             cellularity = cint.rx2('max.y'), ploidy = cint.rx2('max.x'),
                                              avg_depth_ratio = avg_depth_ratio, CNr = 1, CNt_max = 20)
       seg_res = robjects.r.cbind(robjects.r.rbind(segs_all.rx(segs_is_xy.ro == False,True),segs_all.rx(segs_is_xy, True)), robjects.r.rbind(seg_res, seg_res_xy))
       mut_res = robjects.r.cbind(robjects.r.rbind(mut_all.rx(mut_is_xy.ro == False,True), mut_all.rx(mut_is_xy, True)), robjects.r.rbind(mut_alleles, mut_alleles_xy))
@@ -661,10 +661,10 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
                          weight_ratio = 2*200, ratio_priority = ratio_priority,
                          weight_Bf = 200, CNt_max = 20,
                          cellularity = cint.rx2('max.y'),
-                         dna_index = cint.rx2('max.x'), CNr = 2)
+                         ploidy = cint.rx2('max.x'), CNr = 2)
       mut_alleles = sequenza.mufreq_bayes(mufreq = mut_all.rx(True, 'F'),
                                           depth_ratio = mut_all.rx(True, 'adjusted.ratio'),
-                                          cellularity = cint.rx2('max.y'), dna_index = cint.rx2('max.x'),
+                                          cellularity = cint.rx2('max.y'), ploidy = cint.rx2('max.x'),
                                           avg_depth_ratio = avg_depth_ratio, CNr = 2, CNt_max = 20)
       seg_res = robjects.r.cbind(segs_all, seg_res)
       mut_res = robjects.r.cbind(mut_all, mut_alleles)
@@ -683,7 +683,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
          CNr = 2
       sequenza.chromosome_view(baf_windows = windows_Bf.rx2(chrom),
                       ratio_windows = windows_ratio.rx2(chrom), min_N_ratio = 1,
-                      cellularity = cint.rx('max.y')[0][0], dna_index = cint.rx('max.x')[0][0],
+                      cellularity = cint.rx('max.y')[0][0], ploidy = cint.rx('max.x')[0][0],
                       segments = seg_res.rx(seg_res.rx(True, 'chromosome').ro == chrom, True), mut_tab = mutation_list.rx2(chrom),
                       main = chrom, avg_depth_ratio = avg_depth_ratio, CNr = CNr)
    robjects.r('dev.off()')
