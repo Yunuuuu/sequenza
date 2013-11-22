@@ -11,7 +11,7 @@
 
 \usage{
 theoretical.baf(CNr, CNt, cellularity)
-theoretical.depth.ratio(cellularity = 0.5, dna.index = 1, copy.number.ratio = 1.5, avg.depth.ratio = 1)
+theoretical.depth.ratio(cellularity = 0.5, ploidy = 1, copy.number.ratio = 1.5, avg.depth.ratio = 1)
 theoretical.mufreq(cellularity, CNr = 2, CNt = 2, Mt = 1)
 
 }
@@ -21,7 +21,7 @@ theoretical.mufreq(cellularity, CNr = 2, CNt = 2, Mt = 1)
   \item{CNt}{copy number in the tumor sample.}
   \item{Mt}{number of alleles carrying the mutation.}
   \item{cellularity}{fraction of tumor cells in the sample.}
-  \item{dna.index}{ratio between total DNA content in a tumor cell and a normal cell.}
+  \item{ploidy}{ratio between total DNA content in a tumor cell and a normal cell.}
   \item{copy.number.ratio}{ratio between copy number in the tumor sample and the reference copy number.}
   \item{avg.depth.ratio}{average normalized depth ratio.}
 }
@@ -32,7 +32,7 @@ theoretical.mufreq(cellularity, CNr = 2, CNt = 2, Mt = 1)
   
   \code{theoretical.baf} returns a dataframe with the possible copy numbers of A and B alleles, along with their corresponding B-allele frequency and the total copy number state (always the sum of A+B). 
   
-  \code{theoretical.depth.ratio} returns the theoretical depth ratio at a single specific position, given values of cellularity, dna.index, the ratio between the tumor copy number and the normal copy number at that position, and the average depth ratio of the sample.
+  \code{theoretical.depth.ratio} returns the theoretical depth ratio at a single specific position, given values of cellularity, ploidy, the ratio between the tumor copy number and the normal copy number at that position, and the average depth ratio of the sample.
   
   \code{theoretical.mufreq} returns the theoretical mutation frequency at a single specific position, given values of cellularity, copy number in the normal and tumor samples at that position, and the number of mutated alleles.
 }

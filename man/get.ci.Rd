@@ -15,9 +15,9 @@
 }
 
 \value{
-  \item{values.x}{matrix of dna.index values with respective likelihood.}
-  \item{confint.x}{boundaries of the confidence interval of the estimated dna.index.}
-  \item{max.x}{point estimate of the dna.index value that has the maximum likelihood.}
+  \item{values.x}{matrix of ploidy values with respective likelihood.}
+  \item{confint.x}{boundaries of the confidence interval of the estimated ploidy.}
+  \item{max.x}{point estimate of the ploidy value that has the maximum likelihood.}
   \item{values.y}{matrix of cellularity values with respective likelihood.}
   \item{confint.y}{boundaries of the confidence interval of the estimated cellularity.}
   \item{max.y}{point estimate of the cellularity value that has the maximum likelihood.}

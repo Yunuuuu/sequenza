@@ -1,5 +1,5 @@
-theoretical.depth.ratio <- function(cellularity = 0.5, dna.index = 1, copy.number.ratio = 1.5, avg.depth.ratio = 1) {
-   cellu.copy.term <- (1 - cellularity) + (copy.number.ratio * cellularity / dna.index)
+theoretical.depth.ratio <- function(cellularity = 0.5, ploidy = 2, CNr = 2, CNt = 2, avg.depth.ratio = 1, normal.ploidy = 2) {
+   cellu.copy.term <- (1 - cellularity) + (CNt/CNr * cellularity / (ploidy/normal.ploidy))
    avg.depth.ratio * cellu.copy.term
 }
 
@@ -18,12 +18,12 @@ types.matrix <- function(CNt.min = 1, CNt.max = 7, CNr = 2) {
               Mt = unlist(mut.comb))
 }
 
-model.points <- function(cellularity = 0.5, dna.index = 1,
+model.points <- function(cellularity = 0.5, ploidy = 2,
                          types = cbind(CNr = 2, CNt = 2, Mt = 1),
                          avg.depth.ratio = 1) {
    mufreqs     <-  theoretical.mufreq(cellularity = cellularity , CNr = types[, 1], CNt = types[, 2], Mt = types[, 3])
-   depth.ratio <-  theoretical.depth.ratio(cellularity = cellularity, dna.index = dna.index,
-                                       copy.number.ratio = types[, 2] / types[, 1],
+   depth.ratio <-  theoretical.depth.ratio(cellularity = cellularity, ploidy = ploidy,
+                                       CNt = types[, 2], CNr = types[, 1],
                                        avg.depth.ratio = avg.depth.ratio)
    cbind(mufreqs,depth.ratio)
 }
@@ -63,9 +63,9 @@ theoretical.baf <- function(CNr, CNt, cellularity) {
    as.data.frame(do.call(rbind,res))
 }
 
-baf.model.points <- function (cellularity, dna.index, avg.depth.ratio,
+baf.model.points <- function (cellularity, ploidy, avg.depth.ratio,
                                CNr = 2, CNt.min = 1, CNt.max = 4) {
-   mufreq.depth.ratio <- model.points(cellularity = cellularity, dna.index = dna.index, 
+   mufreq.depth.ratio <- model.points(cellularity = cellularity, ploidy = ploidy, 
                                       types = cbind(CNr = CNr, CNt = CNt.min:CNt.max, Mt = 0),
                                       avg.depth.ratio = avg.depth.ratio)
    model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])

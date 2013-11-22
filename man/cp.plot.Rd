@@ -1,10 +1,10 @@
 \name{cp.plot}
 \alias{cp.plot}
 \alias{cp.plot.contours}
-\title{Plot log-likelihood for the tested values of cellularity and DNA-index}
+\title{Plot log-likelihood for the tested values of cellularity and ploidy}
 
 \description{
-  This function uses the \code{colorgram} function from the package \code{squash} to plot log-likelihood for the tested combinations of cellularity and DNA-index
+  This function uses the \code{colorgram} function from the package \code{squash} to plot log-likelihood for the tested combinations of cellularity and ploidy
 }
 
 \usage{
@@ -62,7 +62,7 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     weight.Bf = weights.seg,
                     avg.depth.ratio = avg.depth.ratio,
                     cellularity = seq(0.1,1,0.01),
-                    dna.index = seq(0.5,3,0.05))  
+                    ploidy = seq(0.5,3,0.05))  
                     
 #plot the results
 cp.plot(CP)

@@ -12,7 +12,7 @@
                     mufreq.treshold = 0.10, min.reads = 40, max.mut.types = 1,
                     min.type.freq = 0.9)
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
-           cellularity = seq(0.1,1,0.01), dna.index = seq(0.5,3,0.05),
+           cellularity = seq(0.1,1,0.01), ploidy = seq(0.5,3,0.05),
            priors.table = data.frame(CN = 2, value = 2), mc.cores = getOption("mc.cores", 2L))                    
 }
 
@@ -31,7 +31,7 @@
   \item{segment.filter}{threshold segment length (in base pairs) to filter out short segments, that can cause noise when fitting the cellularity and ploidy parameters. The threshold will not affect the allele-specific segmentation.}
   \item{XY}{character vector of length 2 specifying the labels used for the X and Y chromosomes. Defaults to c(X = "X", Y = "Y").}
   \item{cellularity}{vector of values to test as cellularity parameter.}
-  \item{dna.index}{vector of values to test as DNA-index parameter.}
+  \item{ploidy}{vector of values to test as ploidy parameter.}
   \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
   \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
 }

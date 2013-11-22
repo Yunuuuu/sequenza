@@ -4,35 +4,35 @@
 \title{Model fitting using Bayesian inference}
 
 \description{
-  Computes the log-likelihood distribution for the specified range of cellularity and DNA-index parameters
+  Computes the log-likelihood distribution for the specified range of cellularity and ploidy parameters
 }
 
 \usage{
   mufreq.model.fit(cellularity = seq(0.3, 1, by = 0.01),
-                   dna.index = seq(0.7, 4, by = 0.01),
+                   ploidy = seq(0.7, 4, by = 0.01),
                    mc.cores = getOption("mc.cores", 2L), ...)
   baf.model.fit(cellularity = seq(0.3, 1, by = 0.01),
-                dna.index = seq(0.7, 4, by = 0.01),
+                ploidy = seq(0.7, 4, by = 0.01),
                 mc.cores = getOption("mc.cores", 2L), ...)                    
 }
 
 \arguments{
   \item{cellularity}{vector of cellularity parameter values to be tested.}
-  \item{dna.index}{vector of DNA-index parameter values to be tested.}
+  \item{ploidy}{vector of ploidy parameter values to be tested.}
   \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
   \item{...}{any argument accepted by \code{mufreq.bayes} or \code{baf.bayes}.}
 }
 
 \value{
-  \item{dna.index}{tested values of the DNA-index parameter}
+  \item{ploidy}{tested values of the ploidy parameter}
   \item{cellularity}{values of cellularity tested}
-  \item{L}{log-likelihood of each pair of cellularity/dna.index parameters.}
+  \item{L}{log-likelihood of each pair of cellularity/ploidy parameters.}
 }
 
 \details{
-  \code{baf.model.fit} uses the function \code{baf.bayes} to infer the log-likelihood of the model fit using the possible combinations of cellularity and DNA-index values provided in the arguments.
+  \code{baf.model.fit} uses the function \code{baf.bayes} to infer the log-likelihood of the model fit using the possible combinations of cellularity and ploidy values provided in the arguments.
   Similarly \code{mufreq.model.fit} fits the mutation/depth ratio model using the function \code{mufreq.bayes}.
-  \code{baf.model.fit} is generally used to infer cellularity and dna.index on segmented chromosomes, while \code{mufreq.model.fit} can also be used to estimate those parameters from mutations, and in addition can be useful to give a rough estimate of sub-clonal fractions. Be aware  that the mutation frequency is more sensitive to sampling bias, and is generally more noisy compared to the segmented B-allele frequency. 
+  \code{baf.model.fit} is generally used to infer cellularity and ploidy on segmented chromosomes, while \code{mufreq.model.fit} can also be used to estimate those parameters from mutations, and in addition can be useful to give a rough estimate of sub-clonal fractions. Be aware  that the mutation frequency is more sensitive to sampling bias, and is generally more noisy compared to the segmented B-allele frequency. 
 }
 
 \seealso{
@@ -75,10 +75,10 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     weight.Bf = weights.seg,
                     avg.depth.ratio = avg.depth.ratio,
                     cellularity = seq(0.1,1,0.01), 
-                    dna.index = seq(0.5,3,0.05))  
+                    ploidy = seq(0.5,3,0.05))  
                     
 confint <- get.ci(CP)
-dna.index   <- confint$max.x
+ploidy   <- confint$max.x
 cellularity <- confint$max.y
 
    }                 

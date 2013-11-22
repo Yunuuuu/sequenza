@@ -1,18 +1,18 @@
 \name{model.points}
 \alias{model.points}
-\title{Generate mutation frequency and depth ratio model point at given cellularity and DNA-index value.}
+\title{Generate mutation frequency and depth ratio model point at given cellularity and ploidy value.}
 
 \description{
-  \code{model.points} combines \code{theoretical.mufreq} and \code{theoretical.depth.ratio} to model the theoretical mutation frequency and depth ratio based on given values of cellularity and DNA-index.
+  \code{model.points} combines \code{theoretical.mufreq} and \code{theoretical.depth.ratio} to model the theoretical mutation frequency and depth ratio based on given values of cellularity and ploidy.
 }
 
 \usage{
-model.points(cellularity = 0.5, dna.index = 1, types = cbind(CNr = 2, CNt = 2, Mt = 1),
+model.points(cellularity = 0.5, ploidy = 1, types = cbind(CNr = 2, CNt = 2, Mt = 1),
              avg.depth.ratio = 1)}
 
 \arguments{
   \item{cellularity}{fraction of tumor cells in the sample.}
-  \item{dna.index}{ratio between total DNA content in a tumor cell and a normal cell.}
+  \item{ploidy}{ratio between total DNA content in a tumor cell and a normal cell.}
   \item{types}{matrix with the sets of copy numbers and number of mutated alleles over which to model mutation frequency and depth ratio. The matrix can be generated with \code{\link{types.matrix}}.}
   \item{avg.depth.ratio}{average normalized depth ratio.}
 }
@@ -32,15 +32,15 @@ A matrix of two columns:
 
 \examples{
 
-# Simulate a cellularity of 0.5, DNA-index of 1 and types from min CNt 0 and max = 4 on
+# Simulate a cellularity of 0.5, ploidy of 1 and types from min CNt 0 and max = 4 on
 an originally diploid chromosome:
 types <- types.matrix(CNt.min = 0, CNt.max = 4, CNr = 2)
-cbind(types, model.points(cellularity = 0.5, dna.index = 1,
+cbind(types, model.points(cellularity = 0.5, ploidy = 1,
                           types = types, avg.depth.ratio = 1))
-# Simulate a cellularity of 0.5, DNA-index of 1 and types from min CNt 0 and max = 4 on
+# Simulate a cellularity of 0.5, ploidy of 1 and types from min CNt 0 and max = 4 on
 an originally monoallelic chromosome:
 types <- types.matrix(CNt.min = 0, CNt.max = 4, CNr = 1)
-cbind(types, model.points(cellularity = 0.5, dna.index = 1,
+cbind(types, model.points(cellularity = 0.5, ploidy = 1,
                           types = types, avg.depth.ratio = 1))
 
 }

@@ -1,11 +1,11 @@
 cp.plot <- function (cp.table, ...) {
    #colorgram(x = cp.table$x, y = cp.table$y, z = log(cp.table$z), 
    #    colFn = heat, map = map, outlier = outlier, las = 1, 
-   #    xlab = "DNA-index", ylab = "Cellularity", zlab = "log-likelihood", 
+   #    xlab = "ploidy", ylab = "Cellularity", zlab = "log-likelihood", 
    #    ...)
    colorgram(x = cp.table$x, y = cp.table$y, z = matrix(rank(cp.table$z),
                                                         nrow = nrow(cp.table$z)), colFn = colorRampPalette(c('white', 'lightblue')),
-             las = 1, xlab = "DNA index", ylab = "Cellularity", zlab = "Rank likelihood",
+             las = 1, xlab = "Ploidy", ylab = "Cellularity", zlab = "Rank likelihood",
              ...)
 }
 
@@ -19,7 +19,7 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95),
    
    contour(cp.table, levels = znormsort[n], col = col,
            drawlabels = FALSE,
-           xlab= "DNA index", ylab = "Cellularity", ...)
+           xlab= "Ploidy", ylab = "Cellularity", ...)
    max.xy <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
    points(x = cp.table$x[max.xy[, "row"]],
           y = cp.table$y[max.xy[, "col"]], pch = pch)
@@ -31,7 +31,7 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95),
    invisible(LikThresh)
 }
 
-# plot.fit.model <- function(mufreq.tab, cellularity, dna.index, chr23 = "XY",
+# plot.fit.model <- function(mufreq.tab, cellularity, ploidy, chr23 = "XY",
 #                            cn.ratio.range = c(0.5:2), avg.depth.ratio = avg.depth.ratio,
 #                            cex.m = 1, cex.d = 1, ...) {
 #    xy.index   <- mufreq.tab$chr == "chrX" | mufreq.tab$chr == "chrY"
@@ -48,14 +48,14 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95),
 #          points(x = mufreq.tab$F[xy.index], y = mufreq.tab$adjusted.ratio[xy.index], pch = 19, col = "blue")
 #       }
 #    }
-#    points.fit <-model.points(cellularity = cellularity, dna.index = dna.index,
+#    points.fit <-model.points(cellularity = cellularity, ploidy = ploidy,
 #                              types = types, avg.depth.t = avg.depth.t,
 #                              avg.depth.r = avg.depth.r)
 #    points(points.fit,pch = 19, col = "red", cex = cex.m)
 #    if (length(which(xy.index)) >= 1 & chr23 == "XY") {
-#       legend("bottomright", c("Male chr X/Y",paste(paste("C", cellularity,sep = " : "), paste("P", dna.index,sep = " : "), sep = "; ")), pch = 19, col = c("green","red"))
+#       legend("bottomright", c("Male chr X/Y",paste(paste("C", cellularity,sep = " : "), paste("P", ploidy,sep = " : "), sep = "; ")), pch = 19, col = c("green","red"))
 #    } else {
-#       legend("bottomright", paste(paste("C", cellularity,sep = " : "), paste("P", dna.index,sep = " : "), sep = "; "), pch = 19, col = "red")
+#       legend("bottomright", paste(paste("C", cellularity,sep = " : "), paste("P", ploidy,sep = " : "), sep = "; "), pch = 19, col = "red")
 #    }
 # }
 
@@ -93,7 +93,7 @@ plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
 
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,  min.N.baf = 1, min.N.ratio = 1e4,
                             main = "", vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0), BAF.style = "none",
-                            CNr = 2, cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24", model.col = 1,
+                            CNr = 2, cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24", model.col = 1,
                             x.chr.space = 10) {
    make.polygons <- function(segments, model.baf) {
       max.B      <- max(model.baf$B[model.baf$CNt == max(segments$CNt)])
@@ -133,7 +133,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       data.model <- NULL
    } else {
       if ("CNt" %in% colnames(segments)) {
-         if (length(c(cellularity, dna.index, avg.depth.ratio)) != 3) {
+         if (length(c(cellularity, ploidy, avg.depth.ratio)) != 3) {
             data.model <- NULL
          } else {
             data.model     <- list()
@@ -146,7 +146,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                data.model$baf <- rbind(c(0,0,1,0), data.model$baf)                  
             }   
             types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
-            data.model$muf <- cbind(types, model.points(cellularity = cellularity, dna.index = dna.index,
+            data.model$muf <- cbind(types, model.points(cellularity = cellularity, ploidy = ploidy,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
          }
       } else {
@@ -262,7 +262,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
 
 #genome.view <- function(baf.windows, ratio.windows, segments = NULL, main = "", 
 #                            min.N.baf = 1, min.N.ratio = 1e4, CNr = rep(2, length(ratio.windows)),
-#                            cellularity = NULL, dna.index = NULL, avg.depth.ratio = NULL) {
+#                            cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL) {
 #   chr.metrics <- list()
 #   for (i in 1:length(ratio.windows)) {
 #      chr.metrics[[i]] <- range(ratio.windows[[i]]$mean, na.rm = TRUE)

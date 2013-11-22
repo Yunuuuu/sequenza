@@ -111,7 +111,7 @@ CPsnp.example <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         weight.Bf = weights.snp[filter.size],
                         avg.depth.ratio = avg.unlogR,
                         cellularity = seq(0.1,1,0.01), 
-                        dna.index = seq(0.5,3,0.05),
+                        ploidy = seq(1,7,0.1),
                         priors.table = data.frame(CN = 2, value = 2))
 @
 
@@ -122,18 +122,18 @@ data(CPsnp.example)
 cint <- get.ci(CPsnp.example)
 
 cellularity <- cint$max.y
-dna.index   <- cint$max.x
+ploidy   <- cint$max.x
 @
 
 
-\subsection{Cellularity and DNA-index plot for SNP array}
+\subsection{Cellularity and ploidy plot for SNP array}
 \begin{figure}[H]
       \centering
 <<label=CPplotSNP,fig=TRUE,width=6,height=6>>=
 cp.plot(CPsnp.example)
 cp.plot.contours(CPsnp.example, add = TRUE)
 @ 
-      \caption{Result from the Bayesian inference over the defined range of cellularity and DNA-index from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/DNA-index combinations.}
+      \caption{Result from the Bayesian inference over the defined range of cellularity and ploidy from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/ploidy combinations.}
       \label{fig:cpPlotSNP}
 \end{figure}
 
@@ -146,7 +146,7 @@ snp.seg.cn <- baf.bayes(Bf = seg.i$Bf,
                         cellularity = cellularity,
                         weight.ratio = 2 * 300,
                         weight.Bf = 300, ratio.priority = FALSE,
-                        dna.index = dna.index, CNt.max = 10)
+                        ploidy = ploidy, CNt.max = 10)
 
 segmented.snp <- cbind(seg.i, snp.seg.cn)
 
@@ -162,7 +162,7 @@ head(segmented.snp[segmented.snp$chromosome == 1, ])
 chromosome.view(baf.windows = snp.b.win[[1]], 
                 ratio.windows = snp.r.win[[1]],  min.N.ratio = 1,
                 segments = segmented.snp[segmented.snp$chromosome == "1", ],
-                cellularity = cellularity, dna.index = dna.index,
+                cellularity = cellularity, ploidy = ploidy,
                 avg.depth.ratio = avg.unlogR, main = "1")
 @
       \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allele state. }
@@ -175,7 +175,7 @@ chromosome.view(baf.windows = snp.b.win[[1]],
 chromosome.view(baf.windows = snp.b.win[[16]], 
                 ratio.windows = snp.r.win[[16]],  min.N.ratio = 1,
                 segments = segmented.snp[segmented.snp$chromosome == "16", ],
-                cellularity = cellularity, dna.index = dna.index,
+                cellularity = cellularity, ploidy = ploidy,
                 avg.depth.ratio = avg.unlogR, main = "16")
 @
       \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allele state. }

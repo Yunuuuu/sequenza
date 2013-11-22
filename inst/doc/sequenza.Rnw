@@ -69,7 +69,7 @@ A typical workflow developed with Sequenza on pre-aligned sequencing files(BAM) 
 \item Convert pileup to \textit{ABfreq} format 
 \item GC normalization
 \item Allele-specific segmentation using the depth ratio and the B allele frequencies (BAFs)
-\item Infer cellularity and DNA-index by model fitting
+\item Infer cellularity and ploidy by model fitting
 \item Call CNV and variant alleles
 \end{enumerate}
 
@@ -209,7 +209,7 @@ The R package \textit{sequenza} offers an ensemble of functions and models that 
 
 \begin{itemize}
 \item Extract the relevant information from the raw \textit{ABfreq} file.
-\item Fit the \textit{sequenza} model to infer cellularity and ploidy (dna.index).
+\item Fit the \textit{sequenza} model to infer cellularity and ploidy (ploidy).
 \item Apply the estimated parameter to detect CNV variant alleles
 \end{itemize}
 
@@ -231,7 +231,7 @@ The result of this first step consist in a list of lists. All the sub-lists have
 
 \subsubsection{Plot chromosome view with mutations, BAF, depth ratio and segments}
 
-Each chromosome can be visualize using the function \textit{chromosome.view} as in figure \ref{fig:3panelsPlot}. The same function can be used to visualize the data after the estimation of \textit{cellularity} and \textit{dna.index} parameters as in Figure \ref{fig:crhomViewWithCP}.
+Each chromosome can be visualize using the function \textit{chromosome.view} as in figure \ref{fig:3panelsPlot}. The same function can be used to visualize the data after the estimation of \textit{cellularity} and \textit{ploidy} parameters as in Figure \ref{fig:crhomViewWithCP}.
 
 \begin{figure}[H]
       \centering
@@ -246,7 +246,7 @@ chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]],
 \end{figure}
 
 
-\subsection{Inference of cellularity and ploidy (DNA index)}
+\subsection{Inference of cellularity and ploidy (Ploidy)}
 
 After the raw data is conveniently processed, we can apply the Bayesian inference implemented in the package.
 The function \textit{sequenza.fit} perform the inference using the calculated B allele frequency and depth ratio of the obtained segments. The method can be explored in more detail by looking the manual pages for the function \textit{baf.model.fit}.
@@ -262,7 +262,7 @@ data(CP.example)
 The result is a list in the format \textit{list(x ,y, z)} directly usable by standard graphical function, like \textit{image}. However we provide few customized functions do better display and explore the results, detect the confidence intervals, and finally retrieve the point estimate.
 \subsubsection{Confidence intervals, confidence region and point estimate}
 
-The object resulting from \textit{sequenza.fit} have two vectors, x and y, indicating respectively the tested values of dna.index and cellularity, and a matrix z with x columns and y rows, containing the estimated log-likelihood.
+The object resulting from \textit{sequenza.fit} have two vectors, x and y, indicating respectively the tested values of ploidy and cellularity, and a matrix z with x columns and y rows, containing the estimated log-likelihood.
 Confidence intervals for these two parameters can be calculated using the function \textit{get.ci}.
 <<label=ConfIntCP, echo=TRUE>>=
 cint <- get.ci(CP.example)
@@ -276,11 +276,11 @@ It is also possible to plot the likelihood over the combinations of the two para
 cp.plot(CP.example)
 cp.plot.contours(CP.example, add = TRUE, likThresh = c(0.999))
 @ 
- \caption{Result from the Bayesian inference over the defined range of cellularity and DNA index. Color intensity indicates the log-likelihood of corresponding cellularity/DNA index values.}
+ \caption{Result from the Bayesian inference over the defined range of cellularity and Ploidy. Color intensity indicates the log-likelihood of corresponding cellularity/Ploidy values.}
       \label{fig:cpPlot}
 \end{figure}
 
-By exploring the result for  \textit{cellularity} and \textit{dna.index} separately, it is possible to draw the likelihood distribution for each parameter. The information is returned by the \textit{get.ci} function.
+By exploring the result for  \textit{cellularity} and \textit{ploidy} separately, it is possible to draw the likelihood distribution for each parameter. The information is returned by the \textit{get.ci} function.
 \begin{figure}[H]
       \centering
 <<label=CPplotCI,fig=TRUE,width=6,height=6>>=
@@ -296,7 +296,7 @@ polygon(y = c(cint$confint.y[1], cint$values.y[select, 2], cint$confint.y[2]),
 lines(cint$values.y)
 abline(h = cint$max.y, lty = 2, lwd = 0.5)  
 
-plot(cint$values.x, xlab = "DNA index",
+plot(cint$values.x, xlab = "Ploidy",
      ylab = "likelihood", type = "n")
 select <- cint$confint.x[1] <= cint$values.x[,1] &
           cint$values.x[,1] <= cint$confint.x[2]
@@ -306,7 +306,7 @@ lines(cint$values.x)
 abline(v = cint$max.x, lty = 2, lwd = 0.5)
 
 @ 
-      \caption{Plot of the log-likelihood with respective cellularity and DNA-index probability distribution and confidence intervals.}
+      \caption{Plot of the log-likelihood with respective cellularity and ploidy probability distribution and confidence intervals.}
       \label{fig:cpPlotCI}
 \end{figure}
 
@@ -316,8 +316,8 @@ The point estimate value correspond to the point of maximum likelihood, detected
 <<label=seParam, eval=TRUE>>=
 cellularity <- cint$max.y
 cellularity
-dna.index <- cint$max.x
-dna.index
+ploidy <- cint$max.x
+ploidy
 @
 In addition we need to calculate the average normalized depth ratio, used to set a value for the baseline copy number. 
 <<label=avgDepth, eval=TRUE>>=
@@ -332,7 +332,7 @@ To detect variant alleles, we use a mutation frequency model that is implemented
 mut.tab     <- na.exclude(do.call(rbind, test$mutations))
 mut.alleles <- mufreq.bayes(mufreq = mut.tab$F,
                             depth.ratio = mut.tab$adjusted.ratio,
-                            cellularity = cellularity, dna.index = dna.index,
+                            cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio)
 
 head(mut.alleles)
@@ -342,11 +342,11 @@ head(cbind(mut.tab[,c("chromosome","n.base","F","adjusted.ratio", "mutation")],
 
 The result comprises of four values for every imputed mutation: \textit{CNr} Is the provided copy number of the normal sample at the given position (default = 2); \textit{CNt} is the estimated copy number of the tumor at the given position; \textit{Mt} is the estimated numbers of alleles carrying the mutation; \textit{L} is the log-likelihood of the model fit.
 \subsubsection{Detect copy number variations}
-To detect copy number variations we use a B allele frequency model, implemented in the function \textit{baf.bayes}, with the estimated parameters of \textit{cellularity} and \textit{dna.index}:
+To detect copy number variations we use a B allele frequency model, implemented in the function \textit{baf.bayes}, with the estimated parameters of \textit{cellularity} and \textit{ploidy}:
 <<label=bafBayes, eval=TRUE>>=
 seg.tab     <- na.exclude(do.call(rbind, test$segments))
 cn.alleles <- baf.bayes(Bf = seg.tab$Bf, depth.ratio = seg.tab$depth.ratio,
-                        cellularity = cellularity, dna.index = dna.index,
+                        cellularity = cellularity, ploidy = ploidy,
                         avg.depth.ratio = avg.depth.ratio)
 head(cn.alleles)
 seg.tab <- cbind(seg.tab, cn.alleles)
@@ -359,17 +359,17 @@ The result comprises of four values for every imputed segment: \textit{CNt} is t
 To visualize the data after detection CNV and variant alleles, it is possible to use the \textit{chromosome.view}. In order to draw the relative model points (and to evaluate how the estimated model fits the real data) more information is needed compared to Figure \ref{fig:3panelsPlot}:
 \begin{itemize}
 \item Each segment must have the columns relative to the copy number variation calling. 
-\item \textit{Cellularity} and \textit{dna.index} estimates.
+\item \textit{Cellularity} and \textit{ploidy} estimates.
 \item Average normalized depth ratio.
 \end{itemize}
 \begin{figure}[H]
       \centering
 <<label=chrViewWithCP,fig=TRUE,width=6,height=6>>=
-chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]], 
-                ratio.windows = test$ratio[[1]],  min.N.ratio = 1,
-                segments = seg.tab[seg.tab$chromosome == test$chromosomes[1],],
-                main = test$chromosomes[1],
-                cellularity = cellularity, dna.index = dna.index,
+chromosome.view(mut.tab = test$mutations[[3]], baf.windows = test$BAF[[3]], 
+                ratio.windows = test$ratio[[3]],  min.N.ratio = 1,
+                segments = seg.tab[seg.tab$chromosome == test$chromosomes[3],],
+                main = test$chromosomes[3],
+                cellularity = cellularity, ploidy = ploidy,
                 avg.depth.ratio = avg.depth.ratio)
 @ 
       \caption{Plots of mutation (top), B-allele frequencies (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted line indicates different copy number/allele state.}

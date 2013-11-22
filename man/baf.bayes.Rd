@@ -4,15 +4,15 @@
 \title{Model allele-specific copy numbers with specified cellularity and DNA-content parameters}
 
 \description{
-  Given a pair of cellularity and DNA-index parameters, the function returns the most likely allele-specific copy numbers with the corresponding log-likelihood of the fit, for given values of B-allele frequency and depth ratio.
+  Given a pair of cellularity and ploidy parameters, the function returns the most likely allele-specific copy numbers with the corresponding log-likelihood of the fit, for given values of B-allele frequency and depth ratio.
 }
 
 \usage{
-  baf.bayes(Bf, depth.ratio, cellularity, dna.index, avg.depth.ratio,
+  baf.bayes(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
             weight.Bf = 100, weight.ratio = 100, CNt.min = 0, CNt.max = 7, CNr = 2,
             priors.table = data.frame(CN = CNt.min:CNt.max, value = 1), ratio.priority = FALSE,
             skew.baf = 0.95)
-  mufreq.bayes(mufreq, depth.ratio, cellularity, dna.index, avg.depth.ratio,
+  mufreq.bayes(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
             weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, CNr = 2,
             priors.table = data.frame(CN = CNt.min:CNt.max, value = 1))
 }
@@ -25,7 +25,7 @@
   \item{weight.mufreq}{vector of weights for the mutation frequency values.}  
   \item{weight.ratio}{vector of weights for the depth ratio values.}
   \item{cellularity}{fraction of tumor cells in the sample.}
-  \item{dna.index}{ratio between total DNA content in a tumor cell and a normal cell.}
+  \item{ploidy}{ratio between total DNA content in a tumor cell and a normal cell.}
   \item{avg.depth.ratio}{average normalized depth ratios.}
   \item{CNt.min}{minimum copy number to consider in the model.}
   \item{CNt.max}{maximum copy number to consider in the model.}
@@ -86,16 +86,16 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     weight.Bf = weights.seg,
                     avg.depth.ratio = avg.depth.ratio,
                     cellularity = seq(0.1,1,0.01), 
-                    dna.index = seq(0.5,3,0.05))  
+                    ploidy = seq(0.5,3,0.05))  
                     
 confint <- get.ci(CP)
-dna.index   <- confint$max.x
+ploidy   <- confint$max.x
 cellularity <- confint$max.y
 
 #detect copy number alteration on the segments:
 
 cn.alleles <- baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
-                        cellularity = cellularity, dna.index = dna.index,
+                        cellularity = cellularity, ploidy = ploidy,
                         avg.depth.ratio = 1)
 
 head(cbind(seg.s1, cn.alleles))
@@ -110,7 +110,7 @@ mut.tab.clean <- na.exclude(mut.tab)
 # Detect mutated alleles:
 mut.alleles <- mufreq.bayes(mufreq = mut.tab.clean$F,
                             depth.ratio = mut.tab.clean$adjusted.ratio,
-                            cellularity = cellularity, dna.index = dna.index,
+                            cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio)
 head(cbind(mut.tab.clean[,c("chromosome","n.base","F","adjusted.ratio", "mutation")], mut.alleles))
 

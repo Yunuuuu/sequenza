@@ -604,7 +604,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
                     baf.model.fit(Bf = Bf, depth.ratio = depth_ratio,
                     weight.ratio = weight_ratio, weight.Bf = weight_Bf,
                     avg.depth.ratio = avg_depth_ratio, cellularity = cellularity,
-                    dna.index = dna_index, priors.table = priors_table,
+                    ploidy = dna_index, priors.table = priors_table,
                     mc.cores = mc_cores, ratio.priority = ratio_priority)
    }
    ''')
@@ -621,7 +621,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
    sequenza.cp_plot(CP)
    robjects.r.plot(cint.rx2('values.y'), ylab = "Cellularity", xlab = "Likelihood", type = "l")
    robjects.r.abline(h = cint.rx2('confint.y'), lty = 2, lwd = 0.5, col = "red")
-   robjects.r.plot(cint.rx2('values.x'), ylab = "DNA index", xlab = "Likelihood", type = "l")
+   robjects.r.plot(cint.rx2('values.x'), ylab = "Ploidy", xlab = "Likelihood", type = "l")
    robjects.r.abline(v = cint.rx2('confint.x'), lty = 2, lwd = 0.5, col = "red")
    robjects.r('dev.off()')
    robjects.r.pdf(data_dir +'/'+ tag + "_CP_contours.pdf")
@@ -699,7 +699,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
            ylab = "Percentage (%)", xlab = "copy number")
    robjects.r('dev.off()')
    res_ci_tab = robjects.DataFrame({'cellularity' : robjects.FloatVector((cint.rx2('confint.y')[0], cint.rx2('max.y')[0], cint.rx2('confint.y')[1])),
-                                     'dna.index' : robjects.FloatVector((cint.rx2('confint.x')[0], cint.rx2('max.x')[0], cint.rx2('confint.x')[1])),
+                                     'ploidy' : robjects.FloatVector((cint.rx2('confint.x')[0], cint.rx2('max.x')[0], cint.rx2('confint.x')[1])),
                                      'ploidy'      : robjects.r('weighted.mean')(x=robjects.r('as.integer')(cn_sizes.names), w = cn_sizes)})
    robjects.r('write.table')(res_ci_tab, data_dir +'/'+ tag + "_confints_CP.txt", col_names = True, row_names = False, sep = "\t")
 

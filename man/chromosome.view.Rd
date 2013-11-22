@@ -12,7 +12,7 @@
 chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
                 min.N.baf = 1, min.N.ratio = 10000, main = "", vlines = FALSE,
                 legend.inset = c(-20 * strwidth("a", units = "figure"), 0),
-                BAF.style = "none", CNr = 2, cellularity = NULL, dna.index = NULL,
+                BAF.style = "none", CNr = 2, cellularity = NULL, ploidy = NULL,
                 avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24",
                 model.col = 1, x.chr.space = 10)
 genome.view(seg.cn, info.type = "AB", ...)
@@ -28,7 +28,7 @@ genome.view(seg.cn, info.type = "AB", ...)
   \item{CNr}{copy number of the germline genome. }
   \item{vlines}{logical, if TRUE the plot will include dotted vertical lines corresponding to segment breaks.}
   \item{cellularity}{fraction of tumor cells in the sample.}
-  \item{dna.index}{value of the estimated \code{dna.index} parameter.}
+  \item{ploidy}{value of the estimated \code{ploidy} parameter.}
   \item{avg.depth.ratio}{the average value of the normalized depth ratio.}
   \item{main}{main title of the plot.}
   \item{legend.inset}{the inset argument to pass to the \code{legend} function. Defines the distance between the mutation legend and the plot border.}
@@ -109,15 +109,15 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     weight.Bf = weights.seg,
                     avg.depth.ratio = avg.depth.ratio,
                     cellularity = seq(0.1,1,0.01),
-                    dna.index = seq(0.5,3,0.05))  
+                    ploidy = seq(0.5,3,0.05))  
                     
 confint <- get.ci(CP)
-dna.index   <- confint$max.x
+ploidy   <- confint$max.x
 cellularity <- confint$max.y
 #detect copy number alteration on the segments:
 
 cn.alleles <- baf.bayes(Bf = seg.s1$Bf, depth.ratio = seg.s1$depth.ratio,
-                        cellularity = cellularity, dna.index = dna.index,
+                        cellularity = cellularity, ploidy = ploidy,
                         avg.depth.ratio = 1)
 
 seg.s1 <- cbind(seg.s1, cn.alleles)
@@ -128,7 +128,7 @@ chromosome.view(mut.tab = mut.tab[mut.tab$chromosome == "1",],
                 ratio.windows = abf.r.win[[1]], min.N.ratio = 1,
                 segments = seg.s1[seg.s1$chromosome == "1",],
                 main = "Chromosome 1", cellularity = cellularity,
-                dna.index = dna.index, avg.depth.ratio = 1,
+                ploidy = ploidy, avg.depth.ratio = 1,
                 BAF.style = "lines")
    }
 }
