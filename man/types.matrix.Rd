@@ -7,18 +7,18 @@
 }
 
 \usage{
-  types.matrix(CNt.min = 1, CNt.max = 7, CNr = 2)
+  types.matrix(CNt.min = 1, CNt.max = 7, CNn = 2)
 }
 
 \arguments{
   \item{CNt.min}{minimum copy number in the tumor.}
   \item{CNt.max}{maximum copy number in the tumor.}
-  \item{CNr}{copy number of the normal sample.}
+  \item{CNn}{copy number of the normal sample.}
 }
 
 \value{
 \code{types.matrix} returns a dataframe with the following columns:
-\item{CNr}{number of alleles in the normal sample.}
+\item{CNn}{number of alleles in the normal sample.}
 \item{CNt}{numbers of alleles in the aberrant sample}
 \item{Mt}{number of mutated alleles}
 }
@@ -32,9 +32,9 @@
 
 \examples{
   ## Generate matrix types from 0 to 4 copy number, being the non-tumor chromosome diploid.
-  types.matrix(CNt.min = 0, CNt.max = 4, CNr = 2 )
+  types.matrix(CNt.min = 0, CNt.max = 4, CNn = 2 )
   
   ## Generate matrix types from 0 to 4 copy number, being the non-tumor chromosome monoploid.
-  types.matrix(CNt.min = 0, CNt.max = 4, CNr = 1 )
+  types.matrix(CNt.min = 0, CNt.max = 4, CNn = 1 )
 
 }

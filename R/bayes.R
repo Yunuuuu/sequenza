@@ -36,11 +36,11 @@ depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model) {
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
                          weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, 
-                         CNr = 2, priors.table = data.frame(CN = CNt.min:CNt.max, value = 1)) {
+                         CNn = 2, priors.table = data.frame(CN = CNt.min:CNt.max, value = 1)) {
 
    mufreq.tab <- data.frame(F = mufreq, ratio = depth.ratio,
                             weight.mufreq = weight.mufreq, weight.ratio = weight.ratio)
-   types <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
+   types <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNn = CNn)
    mufreq.depth.ratio <- cbind(types, model.points(cellularity = cellularity, ploidy = ploidy,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
    rows.x             <- 1:nrow(mufreq.tab)
@@ -85,24 +85,24 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.rat
                                          priors = priors),
                                          SIMPLIFY = FALSE)
    types.L           <- do.call(rbind, types.L)
-   colnames(types.L) <- c("CNr","CNt","Mt", "L")
+   colnames(types.L) <- c("CNn","CNt","Mt", "L")
    types.L
 }
 
 baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
                       weight.Bf = 100, weight.ratio = 100, CNt.min = 0,
-                      CNt.max = 7, CNr = 2, priors.table = data.frame(CN = CNt.min:CNt.max,
+                      CNt.max = 7, CNn = 2, priors.table = data.frame(CN = CNt.min:CNt.max,
                       value = 1), ratio.priority = FALSE, skew.baf = 0.95) {
    
    mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
                             weight.Bf = weight.Bf, weight.ratio = weight.ratio)
    mufreq.depth.ratio <- model.points(cellularity = cellularity, ploidy = ploidy, 
-                                      types = cbind(CNr = CNr, CNt = CNt.min:CNt.max, Mt = 0),
+                                      types = cbind(CNn = CNn, CNt = CNt.min:CNt.max, Mt = 0),
                                       avg.depth.ratio = avg.depth.ratio)
    model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])
-   model.baf          <- theoretical.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
+   model.baf          <- theoretical.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity)
    if(CNt.min == 0) {
-      model.baf          <- as.data.frame(rbind(c(0, 0, 1/CNr, 0), model.baf))
+      model.baf          <- as.data.frame(rbind(c(0, 0, 1/CNn, 0), model.baf))
    }
    # B-allele freq are never 0.5, always smaller. work around on this bias
    model.baf$BAF[model.baf$BAF == 0.5] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$weight.Bf),

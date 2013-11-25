@@ -2,7 +2,7 @@ subclonal.matrix <- function(mut.tab, cellularity = seq(0.1, 1, 0.05), ploidy, a
   
   mut.types.list <- lapply(X = 1:nrow(mut.tab),
                            FUN = function(x) { 
-                             types.matrix(CNr = mut.tab[x, 'CNr'],
+                             types.matrix(CNn = mut.tab[x, 'CNn'],
                                           CNt.min = mut.tab[x, 'CNt'],
                                           CNt.max = mut.tab[x, 'CNt'])})
   mut.cloanlity <- function(F, depth.t, types, cellularity, ploidy, avg.depth.ratio) {

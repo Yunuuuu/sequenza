@@ -340,7 +340,7 @@ head(cbind(mut.tab[,c("chromosome","n.base","F","adjusted.ratio", "mutation")],
            mut.alleles))
 @
 
-The result comprises of four values for every imputed mutation: \textit{CNr} Is the provided copy number of the normal sample at the given position (default = 2); \textit{CNt} is the estimated copy number of the tumor at the given position; \textit{Mt} is the estimated numbers of alleles carrying the mutation; \textit{L} is the log-likelihood of the model fit.
+The result comprises of four values for every imputed mutation: \textit{CNn} Is the provided copy number of the normal sample at the given position (default = 2); \textit{CNt} is the estimated copy number of the tumor at the given position; \textit{Mt} is the estimated numbers of alleles carrying the mutation; \textit{L} is the log-likelihood of the model fit.
 \subsubsection{Detect copy number variations}
 To detect copy number variations we use a B allele frequency model, implemented in the function \textit{baf.bayes}, with the estimated parameters of \textit{cellularity} and \textit{ploidy}:
 <<label=bafBayes, eval=TRUE>>=

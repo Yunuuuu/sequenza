@@ -12,7 +12,7 @@
 chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
                 min.N.baf = 1, min.N.ratio = 10000, main = "", vlines = FALSE,
                 legend.inset = c(-20 * strwidth("a", units = "figure"), 0),
-                BAF.style = "none", CNr = 2, cellularity = NULL, ploidy = NULL,
+                BAF.style = "none", CNn = 2, cellularity = NULL, ploidy = NULL,
                 avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24",
                 model.col = 1, x.chr.space = 10)
 genome.view(seg.cn, info.type = "AB", ...)
@@ -25,7 +25,7 @@ genome.view(seg.cn, info.type = "AB", ...)
   \item{segments}{segmentation for one chromosome. If specified, the segmented B-allele frequency and depth ratio values will be shown as red lines.}
   \item{min.N.baf}{minimum number of observations required in a BAF window for plotting.}
   \item{min.N.ratio}{minimum number of observations required in a depth ratio window for plotting.}
-  \item{CNr}{copy number of the germline genome. }
+  \item{CNn}{copy number of the germline genome. }
   \item{vlines}{logical, if TRUE the plot will include dotted vertical lines corresponding to segment breaks.}
   \item{cellularity}{fraction of tumor cells in the sample.}
   \item{ploidy}{value of the estimated \code{ploidy} parameter.}

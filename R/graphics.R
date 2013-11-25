@@ -93,7 +93,7 @@ plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
 
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,  min.N.baf = 1, min.N.ratio = 1e4,
                             main = "", vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0), BAF.style = "none",
-                            CNr = 2, cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24", model.col = 1,
+                            CNn = 2, cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24", model.col = 1,
                             x.chr.space = 10) {
    make.polygons <- function(segments, model.baf) {
       max.B      <- max(model.baf$B[model.baf$CNt == max(segments$CNt)])
@@ -139,13 +139,13 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
             data.model     <- list()
             CNt.max        <- max(segments$CNt, na.rm = TRUE) + 1
             CNt.min        <- 0
-            data.model$baf <- theoretical.baf(CNr = CNr, CNt = CNt.max, cellularity = cellularity)
-            if (CNr == 2) {
+            data.model$baf <- theoretical.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity)
+            if (CNn == 2) {
                data.model$baf <- rbind(c(0,0,0.5,0), data.model$baf)
             } else {
                data.model$baf <- rbind(c(0,0,1,0), data.model$baf)                  
             }   
-            types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNr = CNr)
+            types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNn = CNn)
             data.model$muf <- cbind(types, model.points(cellularity = cellularity, ploidy = ploidy,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
          }
@@ -261,7 +261,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
 }
 
 #genome.view <- function(baf.windows, ratio.windows, segments = NULL, main = "", 
-#                            min.N.baf = 1, min.N.ratio = 1e4, CNr = rep(2, length(ratio.windows)),
+#                            min.N.baf = 1, min.N.ratio = 1e4, CNn = rep(2, length(ratio.windows)),
 #                            cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL) {
 #   chr.metrics <- list()
 #   for (i in 1:length(ratio.windows)) {
