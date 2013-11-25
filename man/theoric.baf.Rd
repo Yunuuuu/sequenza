@@ -11,7 +11,7 @@
 
 \usage{
 theoretical.baf(CNn, CNt, cellularity)
-theoretical.depth.ratio(cellularity = 0.5, ploidy = 1, copy.number.ratio = 1.5, avg.depth.ratio = 1)
+theoretical.depth.ratio(cellularity = 0.5, ploidy = 2, CNn = 2, CNt = 2, avg.depth.ratio = 1, normal.ploidy = 2)
 theoretical.mufreq(cellularity, CNn = 2, CNt = 2, Mt = 1)
 
 }
@@ -22,7 +22,7 @@ theoretical.mufreq(cellularity, CNn = 2, CNt = 2, Mt = 1)
   \item{Mt}{number of alleles carrying the mutation.}
   \item{cellularity}{fraction of tumor cells in the sample.}
   \item{ploidy}{ratio between total DNA content in a tumor cell and a normal cell.}
-  \item{copy.number.ratio}{ratio between copy number in the tumor sample and the reference copy number.}
+  \item{normal.ploidy}{Ploidy value in the normal sample. Default in human 2.}
   \item{avg.depth.ratio}{average normalized depth ratio.}
 }
 
