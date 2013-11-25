@@ -19,8 +19,6 @@ mutation.table(abf.tab, mufreq.treshold = 0.15, min.reads = 40,
   \item{max.mut.types}{maximum number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 different bases). Default is 3, to accept "noisy" mutation calls.}
   \item{min.type.freq}{minimal frequency of aberrant types.}
   \item{segments}{if specified, the values of depth ratio would be taken from the segments rather than from the raw data.}
-  \item{AB.sample}{base composition of the aberrant sample.}
-  \item{Af}{A-allele frequency.}
 }
 
 \details{

@@ -9,10 +9,10 @@
 
 \usage{
   mufreq.model.fit(cellularity = seq(0.3, 1, by = 0.01),
-                   ploidy = seq(0.7, 4, by = 0.01),
+                   ploidy = seq(1, 7, by = 0.1),
                    mc.cores = getOption("mc.cores", 2L), ...)
   baf.model.fit(cellularity = seq(0.3, 1, by = 0.01),
-                ploidy = seq(0.7, 4, by = 0.01),
+                ploidy = seq(1, 7, by = 0.1),
                 mc.cores = getOption("mc.cores", 2L), ...)                    
 }
 
