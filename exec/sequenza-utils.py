@@ -533,7 +533,7 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out, kmin, gamma):
       abf_b_win = sequenza.windowValues(x = abf_het.rx(True, 'Bf'), positions = abf_het.rx(True, 'n.base'), chromosomes = abf_het.rx(True, 'chromosome'), window = 1e6, overlap = 1, weight = robjects.r.round(abf_het.rx(True, 'good.s.reads'), 0))
       breaks = sequenza.find_breaks(abf_het, gamma = gamma, kmin = kmin, baf_thres = robjects.FloatVector((0, 0.5)))
       seg_s1 = sequenza.segment_breaks(abf_data, breaks = breaks)
-      mut_tab = sequenza.mutation_table(abf_data, mufreq_treshold = 0.10, min_reads = 40, max_mut_types = 1, min_type_freq = 0.9, segments = seg_s1)
+      mut_tab = sequenza.mutation_table(abf_data, mufreq_treshold = 0.04, min_reads = 40, max_mut_types = 1, min_type_freq = 0.9, segments = seg_s1)
       gc.collect()
       if loop:
          windows_baf.rx2[chr]   = abf_b_win.rx2(1)
@@ -566,7 +566,7 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out, kmin, gamma):
 
 def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", ncores = 4, ratio_priority = False, segment_filter = 10e6, priors = {'CN':[1,2,3,4], 'value' : [1,2,1,1]}):
    '''
-   Load the information stored from the functions above and infer cellularit/ploidy
+   Load the information stored from the functions above and infer cellularity/ploidy
    and save plots and table of mutations and CNV calls
    '''
    xy = {'X':X, 'Y' : Y}
@@ -703,6 +703,102 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
                                      'ploidy.mean'      : robjects.r('weighted.mean')(x=robjects.r('as.integer')(cn_sizes.names), w = cn_sizes)})
    robjects.r('write.table')(res_ci_tab, data_dir +'/'+ tag + "_confints_CP.txt", col_names = True, row_names = False, sep = "\t")
 
+def RPy2SequenzaOverride(data_dir, is_male = True, tag = None, X = "X", Y = "Y", ratio_priority = False, cellularity = None, ploidy = None):
+   '''
+   Fit the data with arbitrary values of cellularity and ploidy.
+   Useful when cellularity is so low that can't be estimate correctly.
+   '''
+   xy = {'X':X, 'Y' : Y}
+   if tag == None:
+      tag = os.path.split(data_dir)[-1]
+   obj_list = robjects.StrVector(('adj_GC.txt', 'raw_GC.txt', 'windows_Bf.Rdata', 'mutation_list.Rdata', 'windows_ratio.Rdata', 'segments_list.Rdata'))
+   obj_list = robjects.r.paste(tag, obj_list, sep = "_")
+   gc_tab   = robjects.r('read.table')(data_dir +'/' + obj_list[0], header = True, sep = '\t')
+   avg_depth_ratio = robjects.r.mean(gc_tab.rx(True, 2))
+   for i in range(2,6):
+      robjects.r.load(data_dir +'/' + obj_list[i])
+   windows_Bf    = robjects.r.eval(robjects.r('as.name')(tag + '_windows_Bf'))
+   windows_ratio = robjects.r.eval(robjects.r('as.name')(tag + '_windows_ratio'))
+   mutation_list = robjects.r.eval(robjects.r('as.name')(tag + '_mutation_list'))
+   segments_list = robjects.r.eval(robjects.r('as.name')(tag + '_segments_list'))
+   chr_vect      = windows_Bf.names
+   segs_all      = robjects.r('do.call')('rbind', segments_list)
+   mut_all       = robjects.r('do.call')('rbind', mutation_list)
+   mut_all       = robjects.r('na.exclude')(mut_all)
+   if is_male:
+      segs_is_xy = segs_all.rx(True, 'chromosome').ro == xy["X"] or segs_all.rx(True, 'chromosome').ro == xy["Y"]
+      mut_is_xy  = mut_all.rx(True, 'chromosome').ro == xy["X"] or mut_all.rx(True, 'chromosome').ro == xy["Y"]
+   else:
+      segs_is_xy = segs_all.rx(True, 'chromosome').ro == xy["Y"]
+   if is_male:
+      seg_res  = sequenza.baf_bayes(Bf = segs_all.rx(True, 'Bf').rx(segs_is_xy.ro == False),
+                         depth_ratio = segs_all.rx(True, 'depth.ratio').rx(segs_is_xy.ro == False),
+                         avg_depth_ratio = avg_depth_ratio,
+                         weight_ratio = 2*200, ratio_priority = ratio_priority,
+                         weight_Bf = 200, CNt_max = 20,
+                         cellularity = cellularity,
+                         ploidy = ploidy, CNr = 2)
+      mut_alleles = sequenza.mufreq_bayes(mufreq = mut_all.rx(True, 'F').rx(mut_is_xy.ro == False),
+                                          depth_ratio = mut_all.rx(True, 'adjusted.ratio').rx(mut_is_xy.ro == False),
+                                          cellularity = cellularity, ploidy = ploidy,
+                                          avg_depth_ratio = avg_depth_ratio, CNr = 2, CNt_max = 20)
+      seg_res_xy  = sequenza.baf_bayes(Bf = segs_all.rx(True, 'Bf').rx(segs_is_xy),
+                         depth_ratio = segs_all.rx(True, 'depth.ratio').rx(segs_is_xy),
+                         avg_depth_ratio = avg_depth_ratio,
+                         weight_ratio = 2*200, ratio_priority = ratio_priority,
+                         weight_Bf = 200, CNt_max = 20,
+                         cellularity = cellularity,
+                         ploidy = ploidy, CNr = 1)
+      mut_alleles_xy = sequenza.mufreq_bayes(mufreq = mut_all.rx(True, 'F').rx(mut_is_xy),
+                                             depth_ratio = mut_all.rx(True, 'adjusted.ratio').rx(mut_is_xy),
+                                             cellularity = cellularity, ploidy = ploidy,
+                                             avg_depth_ratio = avg_depth_ratio, CNr = 1, CNt_max = 20)
+      seg_res = robjects.r.cbind(robjects.r.rbind(segs_all.rx(segs_is_xy.ro == False,True),segs_all.rx(segs_is_xy, True)), robjects.r.rbind(seg_res, seg_res_xy))
+      mut_res = robjects.r.cbind(robjects.r.rbind(mut_all.rx(mut_is_xy.ro == False,True), mut_all.rx(mut_is_xy, True)), robjects.r.rbind(mut_alleles, mut_alleles_xy))
+   else:
+      seg_res  = sequenza.baf_bayes(Bf = segs_all.rx(True, 'Bf'),
+                         depth_ratio = segs_all.rx(True, 'depth.ratio'),
+                         avg_depth_ratio = avg_depth_ratio,
+                         weight_ratio = 2*200, ratio_priority = ratio_priority,
+                         weight_Bf = 200, CNt_max = 20,
+                         cellularity = cellularity,
+                         ploidy = ploidy, CNr = 2)
+      mut_alleles = sequenza.mufreq_bayes(mufreq = mut_all.rx(True, 'F'),
+                                          depth_ratio = mut_all.rx(True, 'adjusted.ratio'),
+                                          cellularity = cellularity, ploidy = ploidy,
+                                          avg_depth_ratio = avg_depth_ratio, CNr = 2, CNt_max = 20)
+      seg_res = robjects.r.cbind(segs_all, seg_res)
+      mut_res = robjects.r.cbind(mut_all, mut_alleles)
+   override_prefix = "_C"+ str(cellularity)+ "_P" + str(ploidy)
+   robjects.r('write.table')(seg_res, data_dir +'/'+ tag + override_prefix + "_segments.txt", col_names = True, row_names = False, sep = "\t")
+   robjects.r('write.table')(mut_res, data_dir +'/'+ tag + override_prefix + "_mutations.txt", col_names = True, row_names = False, sep = "\t")
+   robjects.r.pdf(data_dir +'/'+ tag + override_prefix + "_chromosome_view.pdf")
+   for chrom in chr_vect:
+      if is_male:
+         if chrom == xy["X"] or chrom == xy["Y"]:
+            CNr = 1
+         else:
+            CNr = 2
+      else:
+         CNr = 2
+      sequenza.chromosome_view(baf_windows = windows_Bf.rx2(chrom),
+                      ratio_windows = windows_ratio.rx2(chrom), min_N_ratio = 1,
+                      cellularity = cellularity, ploidy = ploidy,
+                      segments = seg_res.rx(seg_res.rx(True, 'chromosome').ro == chrom, True), mut_tab = mutation_list.rx2(chrom),
+                      main = chrom, avg_depth_ratio = avg_depth_ratio, CNr = CNr, BAF_style = "lines")
+   robjects.r('dev.off()')
+   res_seg_xy = seg_res.rx(True, 'chromosome').ro == xy["Y"]
+
+   barscn = robjects.DataFrame({'size' : (seg_res.rx(True, 'end.pos').rx(res_seg_xy.ro == False).ro - seg_res.rx(True, 'start.pos').rx(res_seg_xy.ro == False)),
+                                'CNt' : seg_res.rx(True, 'CNt').rx(res_seg_xy.ro == False)})
+   cn_sizes = robjects.r.split(barscn.rx(True,'size'),barscn.rx(True,'CNt'))
+   cn_sizes = robjects.r.sapply(cn_sizes, 'sum')
+   robjects.r.pdf(data_dir +'/'+ tag + override_prefix + "_CN_bars.pdf")
+   robjects.r.barplot(robjects.r.round((cn_sizes.ro/robjects.r.sum(cn_sizes)).ro * 100, 0), names = cn_sizes.names, las = 1,
+           ylab = "Percentage (%)", xlab = "copy number")
+   robjects.r('dev.off()')
+
+   
 def pileup2acgt(parser, subparser):
    subparser.add_argument('pileup', metavar='pileup',
                    help='pileup (SAMtools) file in input, if a gzipped file will be inputed it will be opened in gzip mode, if file name is - it would be loaded from STDIN.')
@@ -812,6 +908,28 @@ def sequenzaFit(parser, subparser):
                    help='Set the priors on the copy-number. Default 2 on CN = 2, 1 for all the other CN state.')                    
    return parser.parse_args()
 
+def sequenzaOverride(parser, subparser):
+   parser_io      = subparser.add_argument_group(title='Input',description='Input options.')
+   parser_param   = subparser.add_argument_group(title='Parameters',description='Model Parameters.')
+   parser_gender  = subparser.add_argument_group(title='Gender',description='Option to control the gender and X/Y chromosome.')
+   parser_io.add_argument('--dir', dest = 'dir', required = True,
+                   help='The directory where the data to load are stored')
+   parser_io.add_argument('-t', '--tag', dest = 'tag', default = None,
+                   help='Tag indicating the prefix of the data, if not specified it is assumed as the name of the contanitor directory')
+   parser_param .add_argument('-c', '--cellularity', required = True, type = float,
+                   help = 'Cellularity parameter to pass to the model.')
+   parser_param .add_argument('-p', '--ploidy', required = True, type = float,
+                   help = 'Ploidy parameter to pass to the model.')                
+   parser_gender.add_argument('--is-male', dest = 'isMale', action='store_true', default = False,
+                   help='Boolen flag indicating if the sequencing data are from a male or female, and consequently properly handle chromosome X and Y')
+   parser_gender.add_argument('-X', "--chrX", dest = 'X', type = str, default = "X",
+                   help='Character defining chromosome X. Default X.')
+   parser_gender.add_argument('-Y', "--chrY", dest = 'Y', type = str, default = "Y",
+                   help='Character defining chromosome Y. Default Y.')
+   parser_param.add_argument('-r', "--only-ratio", dest = 'onlyratio', action='store_true', default = False,
+                   help='Do not take into account the BAF in the Bayesian inference, but only the depth ratio.')                    
+   return parser.parse_args()
+
 def main():
    '''
    Execute the function with args
@@ -828,6 +946,7 @@ def main():
    if RPY2 == True:
       parser_squeezeAB  = subparsers.add_parser('sequenzaExtract', help = 'Uses the R sequenza package to extract and save meaningful information from an ABfreq file')
       parser_doAllSequenza = subparsers.add_parser('sequenzaFit', help = 'Uses the R sequenza package to infer purity, ploidy and annotate mutation and CNV.')
+      parser_overrideSequenza = subparsers.add_parser('sequenzaOverride', help = 'Uses the R sequenza package to calculate the CNV given the values for cellularity and ploidy.')      
    try:
       used_module =  sys.argv[1]
       if used_module == "pileup2acgt":
@@ -922,6 +1041,9 @@ def main():
          args = sequenzaFit(parser, parser_doAllSequenza)
          priors_dict = json.loads(args.priors)
          RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag, args.X, args.Y, args.ncpu, args.onlyratio, args.segfilt, priors_dict)
+      elif RPY2 == True and used_module == "sequenzaOverride":
+         args = sequenzaOverride(parser, parser_overrideSequenza)
+         RPy2SequenzaOverride(check_dir(args.dir), args.isMale, args.tag, args.X, args.Y, args.onlyratio, args.cellularity, args.ploidy)         
       else:
          return parser.parse_args()
 
