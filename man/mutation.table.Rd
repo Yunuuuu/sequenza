@@ -9,8 +9,7 @@
 
 \usage{
 mutation.table(abf.tab, mufreq.treshold = 0.15, min.reads = 40,
-               max.mut.types = 3, min.type.freq = 0.9, segments = NULL)
-mut.fractions(AB.sample, Af)                
+               max.mut.types = 3, min.type.freq = 0.9, segments = NULL)               
 }
 
 \arguments{
@@ -28,8 +27,6 @@ mut.fractions(AB.sample, Af)
   Calling mutations in impure tumor samples is a difficult task, because the degree of contamination by normal cells affects the measured mutation frequency. In highly impure samples, where the normal cells comprise the major component of the sample, mutations can be so diluted that it will even be difficult to distinguish them from sequencing errors.
   
   The function \code{mutation.table} tries to separate true mutations from sequencing errors, based on the given threshold. In samples with low contamination, it should even be possible to catch sub-clonal mutations using this function.
-  
-  The function \code{mut.fractions} is designed to split the different mutation types for each position (in the case of position with heterogeneous base contents), and return information on how many nucleotides were found (other then the germline nuceotide) in the column \code{base.count} and information on the major bases among the aberrant nucleotides, including \code{max.base.freq} column, indicating the frequency of the major aberrant base, considering only the aberrant reads; \code{base} indication the base of the major aberrant nucleotide; and \code{freq} which is the mutation frequency, considering the total reads in a given position.
 }
 
 \value{
