@@ -685,7 +685,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
                       ratio_windows = windows_ratio.rx2(chrom), min_N_ratio = 1,
                       cellularity = cint.rx('max.y')[0][0], ploidy = cint.rx('max.x')[0][0],
                       segments = seg_res.rx(seg_res.rx(True, 'chromosome').ro == chrom, True), mut_tab = mutation_list.rx2(chrom),
-                      main = chrom, avg_depth_ratio = avg_depth_ratio, CNr = CNr)
+                      main = chrom, avg_depth_ratio = avg_depth_ratio, CNr = CNr, BAF_style = "lines")
    robjects.r('dev.off()')
    res_seg_xy = seg_res.rx(True, 'chromosome').ro == xy["Y"]
 
@@ -700,7 +700,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
    robjects.r('dev.off()')
    res_ci_tab = robjects.DataFrame({'cellularity' : robjects.FloatVector((cint.rx2('confint.y')[0], cint.rx2('max.y')[0], cint.rx2('confint.y')[1])),
                                      'ploidy' : robjects.FloatVector((cint.rx2('confint.x')[0], cint.rx2('max.x')[0], cint.rx2('confint.x')[1])),
-                                     'ploidy'      : robjects.r('weighted.mean')(x=robjects.r('as.integer')(cn_sizes.names), w = cn_sizes)})
+                                     'ploidy.mean'      : robjects.r('weighted.mean')(x=robjects.r('as.integer')(cn_sizes.names), w = cn_sizes)})
    robjects.r('write.table')(res_ci_tab, data_dir +'/'+ tag + "_confints_CP.txt", col_names = True, row_names = False, sep = "\t")
 
 def pileup2acgt(parser, subparser):
@@ -808,7 +808,7 @@ def sequenzaFit(parser, subparser):
                    help='Do not take into account the BAF in the Bayesian inference, but only the depth ratio.')
    parser_model.add_argument('-f', "--segment-filter", dest = 'segfilt', type = float, default = 10e6,
                    help='Size in base-pair, to filter the segments to use in the Bayesian inference. Default 10e6.')
-   parser_model.add_argument('-l', "--priors", dest = 'priors', type = dict, default = {'CN' :[1, 2, 3, 4], 'value' : [1, 2, 1, 1]},
+   parser_model.add_argument('-l', "--priors", dest = 'priors', type = str, default = '{"CN" :[1, 2, 3, 4], "value" : [1, 2, 1, 1]}',
                    help='Set the priors on the copy-number. Default 2 on CN = 2, 1 for all the other CN state.')                    
    return parser.parse_args()
 
@@ -920,7 +920,8 @@ def main():
          RPy2sqeezeABfreq(args.abfreq, args.loop, args.tag, check_dir(args.dir), args.kmin, args.gamma)
       elif RPY2 == True and used_module == "sequenzaFit":
          args = sequenzaFit(parser, parser_doAllSequenza)
-         RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag, args.X, args.Y, args.ncpu, args.onlyratio, args.segfilt, args.priors)
+         priors_dict = json.loads(args.priors)
+         RPy2doAllSequenza(check_dir(args.dir), args.isMale, args.tag, args.X, args.Y, args.ncpu, args.onlyratio, args.segfilt, priors_dict)
       else:
          return parser.parse_args()
 
