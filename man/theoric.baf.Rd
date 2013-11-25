@@ -22,7 +22,7 @@ theoretical.mufreq(cellularity, CNn = 2, CNt = 2, Mt = 1)
   \item{Mt}{number of alleles carrying the mutation.}
   \item{cellularity}{fraction of tumor cells in the sample.}
   \item{ploidy}{ratio between total DNA content in a tumor cell and a normal cell.}
-  \item{normal.ploidy}{Ploidy value in the normal sample. Default in human 2.}
+  \item{normal.ploidy}{ploidy value in the normal sample. Default in human 2.}
   \item{avg.depth.ratio}{average normalized depth ratio.}
 }
 
