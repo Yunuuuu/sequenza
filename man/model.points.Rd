@@ -7,7 +7,7 @@
 }
 
 \usage{
-model.points(cellularity = 0.5, ploidy = 1, types = cbind(CNn = 2, CNt = 2, Mt = 1),
+model.points(cellularity = 0.5, ploidy = 2, types = cbind(CNn = 2, CNt = 2, Mt = 1),
              avg.depth.ratio = 1)}
 
 \arguments{
@@ -32,15 +32,13 @@ A matrix of two columns:
 
 \examples{
 
-# Simulate a cellularity of 0.5, ploidy of 1 and types from min CNt 0 and max = 4 on
-an originally diploid chromosome:
+# Simulate a cellularity of 0.5, ploidy of 2 and types from min CNt 0 and max = 4 on an originally diploid genome:
 types <- types.matrix(CNt.min = 0, CNt.max = 4, CNn = 2)
-cbind(types, model.points(cellularity = 0.5, ploidy = 1,
+cbind(types, model.points(cellularity = 0.5, ploidy = 2,
                           types = types, avg.depth.ratio = 1))
-# Simulate a cellularity of 0.5, ploidy of 1 and types from min CNt 0 and max = 4 on
-an originally monoallelic chromosome:
+# Simulate a cellularity of 0.5, ploidy of 2 and types from min CNt 0 and max = 4 on an originally monoallelic genome:
 types <- types.matrix(CNt.min = 0, CNt.max = 4, CNn = 1)
-cbind(types, model.points(cellularity = 0.5, ploidy = 1,
+cbind(types, model.points(cellularity = 0.5, ploidy = 2,
                           types = types, avg.depth.ratio = 1))
 
 }

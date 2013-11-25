@@ -12,7 +12,7 @@
                     mufreq.treshold = 0.10, min.reads = 40, max.mut.types = 1,
                     min.type.freq = 0.9)
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
-           cellularity = seq(0.1,1,0.01), ploidy = seq(0.5,3,0.05),
+           cellularity = seq(0.1,1,0.01), ploidy = seq(1, 7, 0.1),
            priors.table = data.frame(CN = 2, value = 2), mc.cores = getOption("mc.cores", 2L))                    
 }
 
