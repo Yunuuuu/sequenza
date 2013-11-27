@@ -495,7 +495,7 @@ class DefaultHelpParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
-def RPy2sqeezeABfreq(abfreq, loop, tag, out, kmin, gamma):
+def RPy2sqeezeABfreq(abfreq, loop, tag, out, kmin, gamma, mufreq_treshold):
    """
     Process an abfreq file and store the relvant (small and easy to re-acces) information
    """
@@ -533,7 +533,7 @@ def RPy2sqeezeABfreq(abfreq, loop, tag, out, kmin, gamma):
       abf_b_win = sequenza.windowValues(x = abf_het.rx(True, 'Bf'), positions = abf_het.rx(True, 'n.base'), chromosomes = abf_het.rx(True, 'chromosome'), window = 1e6, overlap = 1, weight = robjects.r.round(abf_het.rx(True, 'good.s.reads'), 0))
       breaks = sequenza.find_breaks(abf_het, gamma = gamma, kmin = kmin, baf_thres = robjects.FloatVector((0, 0.5)))
       seg_s1 = sequenza.segment_breaks(abf_data, breaks = breaks)
-      mut_tab = sequenza.mutation_table(abf_data, mufreq_treshold = 0.04, min_reads = 40, max_mut_types = 1, min_type_freq = 0.9, segments = seg_s1)
+      mut_tab = sequenza.mutation_table(abf_data, mufreq_treshold = mufreq_treshold, min_reads = 40, max_mut_types = 1, min_type_freq = 0.9, segments = seg_s1)
       gc.collect()
       if loop:
          windows_baf.rx2[chr]   = abf_b_win.rx2(1)
@@ -868,6 +868,7 @@ def merge_pileups(parser, subparser):
 def sequenzaExtract(parser, subparser):
    parser_io      = subparser.add_argument_group(title='Input and output',description='Input ABfreq files and output options.')
    parser_segment = subparser.add_argument_group(title='Segmentation',description='Option to control the segmentation.')
+   parser_mut     = subparser.add_argument_group(title='Mutations',description='Option to filter the mutations by variant allele frequency.')
    parser_misc    = subparser.add_argument_group(title='Misc',description='Miscellaneous options.')
    parser_io.add_argument('--abfreq', dest = 'abfreq', required = True,
                    help='An existing abfreq file')
@@ -878,7 +879,9 @@ def sequenzaExtract(parser, subparser):
    parser_segment.add_argument('-k', '--kmin', dest = 'kmin', type = int, default = 10,
                    help='minimum number of position per segment. default 10 (WGS is suggested to set to 500 or so)')
    parser_segment.add_argument('-g', '--gamma', dest = 'gamma', type = int, default = 80,
-                   help='gamma parapeter for the segmentation, higher is less sensible smaller is more. default 80')                   
+                   help='gamma parapeter for the segmentation, higher is less sensible smaller is more. default 80')
+   parser_mut.add_argument('-f', '--mut-threshold', dest = 'mufreq', type = float, default = 0.1,
+                   help='Threshold on the variant allele frequency to filter out the mutations. Default 0.1.')
    parser_misc.add_argument('--no-loop', dest = 'loop', action='store_false', default = True,
                    help='Boolen flag indicating if to loop over chromosomes one by one (default), or load all the file in memory')
    return parser.parse_args()
@@ -905,7 +908,7 @@ def sequenzaFit(parser, subparser):
    parser_model.add_argument('-f', "--segment-filter", dest = 'segfilt', type = float, default = 10e6,
                    help='Size in base-pair, to filter the segments to use in the Bayesian inference. Default 10e6.')
    parser_model.add_argument('-l', "--priors", dest = 'priors', type = str, default = '{"CN" :[1, 2, 3, 4], "value" : [1, 2, 1, 1]}',
-                   help='Set the priors on the copy-number. Default 2 on CN = 2, 1 for all the other CN state.')                    
+                   help='Set the priors on the copy-number. Default 2 on CN = 2, 1 for all the other CN state \'{"CN" :[1, 2, 3, 4], "value" : [1, 2, 1, 1]}\'.')                    
    return parser.parse_args()
 
 def sequenzaOverride(parser, subparser):
@@ -1036,7 +1039,7 @@ def main():
 
       elif RPY2 == True and used_module == "sequenzaExtract":
          args = sequenzaExtract(parser, parser_squeezeAB)
-         RPy2sqeezeABfreq(args.abfreq, args.loop, args.tag, check_dir(args.dir), args.kmin, args.gamma)
+         RPy2sqeezeABfreq(args.abfreq, args.loop, args.tag, check_dir(args.dir), args.kmin, args.gamma, args.mufreq)
       elif RPY2 == True and used_module == "sequenzaFit":
          args = sequenzaFit(parser, parser_doAllSequenza)
          priors_dict = json.loads(args.priors)
