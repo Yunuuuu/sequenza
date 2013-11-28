@@ -9,9 +9,9 @@
 
 \usage{
   baf.bayes(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
-            weight.Bf = 100, weight.ratio = 100, CNt.min = 0, CNt.max = 7, CNn = 2,
-            priors.table = data.frame(CN = CNt.min:CNt.max, value = 1), ratio.priority = FALSE,
-            skew.baf = 0.95)
+            weight.Bf = 100, weight.ratio = 100, CNt.min = 0, CNt.max = 7,
+            CNn = 2, priors.table = data.frame(CN = CNt.min:CNt.max, value = 1),
+            ratio.priority = FALSE, skew.baf = 0.95)
   mufreq.bayes(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
             weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, CNn = 2,
             priors.table = data.frame(CN = CNt.min:CNt.max, value = 1))

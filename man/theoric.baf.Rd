@@ -11,7 +11,8 @@
 
 \usage{
 theoretical.baf(CNn, CNt, cellularity)
-theoretical.depth.ratio(cellularity = 0.5, ploidy = 2, CNn = 2, CNt = 2, avg.depth.ratio = 1, normal.ploidy = 2)
+theoretical.depth.ratio(cellularity = 0.5, ploidy = 2, CNn = 2, CNt = 2,
+                        avg.depth.ratio = 1, normal.ploidy = 2)
 theoretical.mufreq(cellularity, CNn = 2, CNt = 2, Mt = 1)
 
 }
