@@ -9,5 +9,6 @@ bibentry(bibtype = 'Article',
                             as.person("Marcin Krzystanek"),
                             as.person("Zoltan Szallasi"),
                             as.person("Aron C Eklund")),
-        journal "submitted for publication"
+        journal = "submitted for publication",
+        year = 2013
 )
