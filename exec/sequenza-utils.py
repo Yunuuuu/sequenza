@@ -23,8 +23,8 @@ try:
 except ImportError:
    RPY2 = False
 
-VERSION = "0.5.0"
-DATE    = "10 October 2013"
+VERSION = "1.0.0"
+DATE    = "28 November 2013"
 AUTHOR  = "Favero Francesco"
 MAIL    = "favero@cbs.dtu.dk"
 
@@ -813,7 +813,7 @@ def RPy2SequenzaOverride(data_dir, is_male = True, tag = None, X = "X", Y = "Y",
    
 def pileup2acgt(parser, subparser):
    subparser.add_argument('pileup', metavar='pileup',
-                   help='pileup (SAMtools) file in input, if a gzipped file will be inputed it will be opened in gzip mode, if file name is - it would be loaded from STDIN.')
+                   help='pileup (SAMtools) file in input, if a gzipped file will be selected it will be opened in gzip mode, if file name is - it would be loaded from STDIN.')
    subparser.add_argument('-n', dest='n', type=int,
                    help='The minimum read depth on the base to consider the mutation on it.')
    parser_pup2muoutput      = subparser.add_argument_group(title='Output', description='Argument that involve the output destination.')
@@ -823,9 +823,9 @@ def pileup2acgt(parser, subparser):
                        help='Do not output additional debugging.')
    parser_pup2muperformance = subparser.add_argument_group(title='Performance', description='Argument that can effect the performance.')
    parser_pup2muperformance.add_argument('-p', '--processes', dest='nproc', default="0", type=int,
-                   help='Set the number of processes to split the parsing job. If it is set to 0 (default), the job will occour with no forking to other processes. If it is bigger then 0 it is more efficent with an adequate chunk size, otherwhise with smaller chuncks (eg.: < 1000) it will loose performance.')
+                   help='Set the number of processes to split the parsing job. If it is set to 0 (default), the job will occurs with no forking to other processes. If it is bigger then 0 it is more efficient with an adequate chunk size, otherwise with smaller chuncks (eg.: < 1000) it will loose performance.')
    parser_pup2muperformance.add_argument('-c', '--chunk', dest='chunk', default="0", type=int,
-                   help='Set the size (number of lines) of the portion of the file to assign to each process. If is set to 0 (default) wil set to default also the --processes parameter (-p 0). An adequate chunk size defends on the number of processes and on the file size (chunk size bigger then total number of line is not good). However a chunksize ~ 1000 leads to better performance.')
+                   help='Set the size (number of lines) of the portion of the file to assign to each process. If is set to 0 (default) wil set to default also the --processes parameter (-p 0). An adequate chunk size defends on the number of processes and on the file size (chunk size bigger then total number of line is not good). However a chunk size ~ 1000 leads to better performance.')
    parser_pup2muqualitysets = subparser.add_argument_group(title='Quality and Format', description='Argument that change the quality threshold or the quality format.')
    parser_pup2muqualitysets.add_argument('-q', '--qlimit', dest='qlimit', default=20,type=int,
                    help='Minimum nucleotide quality score for consider in the counts.')
@@ -858,9 +858,9 @@ def pileup2abfreq(parser, subparser):
    parser_ABgenotype.add_argument('--het', dest = 'het', type = float, default = 0.25,
                    help='Threshold to select heterozygous positions. Default 0.25.')
    parser_ABperformance.add_argument('-p', '--processes', dest='nproc', default="0", type=int,
-                   help='Set the number of processes to split the genotyping. If it is set to 0 (default), the job will occour with no forking to other processes. If it is bigger then 0 it is more efficent with an adequate chunk size, otherwhise with smaller chuncks (eg.: < 1000) it will loose performance. Default 0')
+                   help='Set the number of processes to split the genotyping. If it is set to 0 (default), the job will occurs with no forking to other processes. If it is bigger then 0 it is more efficient with an adequate chunk size, otherwise with smaller chunks (eg.: < 1000) it will loose performance. Default 0')
    parser_ABperformance.add_argument('-c', '--chunk', dest='chunk', default="1", type=int,
-                   help='Set the number of lines to assign to each process. If is set to 1 (default) will set to default also the --processes parameter (-p 0). An adequate chunk size defends on the number of processes and on the file size (chunk size bigger then total number of line is not good). However a chunksize ~ 1000 leads to better performance. Default 1.')   
+                   help='Set the number of lines to assign to each process. If is set to 1 (default) will set to default also the --processes parameter (-p 0). An adequate chunk size defends on the number of processes and on the file size (chunk size bigger then total number of line is not good). However a chunk size ~ 1000 leads to better performance. Default 1.')   
    return parser.parse_args()
 
 def GC_windows(parser, subparser):
@@ -891,11 +891,11 @@ def sequenzaExtract(parser, subparser):
    parser_segment.add_argument('-k', '--kmin', dest = 'kmin', type = int, default = 10,
                    help='minimum number of position per segment. default 10 (WGS is suggested to set to 500 or so)')
    parser_segment.add_argument('-g', '--gamma', dest = 'gamma', type = int, default = 80,
-                   help='gamma parapeter for the segmentation, higher is less sensible smaller is more. default 80')
+                   help='gamma parameter for the segmentation, higher is less sensible smaller is more. default 80')
    parser_mut.add_argument('-f', '--mut-threshold', dest = 'mufreq', type = float, default = 0.1,
                    help='Threshold on the variant allele frequency to filter out the mutations. Default 0.1.')
    parser_misc.add_argument('--no-loop', dest = 'loop', action='store_false', default = True,
-                   help='Boolen flag indicating if to loop over chromosomes one by one (default), or load all the file in memory')
+                   help='Boolean flag indicating if to loop over chromosomes one by one (default), or load all the file in memory')
    return parser.parse_args()
 
 def sequenzaFit(parser, subparser):
@@ -906,9 +906,9 @@ def sequenzaFit(parser, subparser):
    parser_io.add_argument('--dir', dest = 'dir', required = True,
                    help='The directory where the data to load are stored')
    parser_io.add_argument('-t', '--tag', dest = 'tag', default = None,
-                   help='Tag indicating the prefix of the data, if not specified it is assumed as the name of the contanitor directory')
+                   help='Tag indicating the prefix of the data, if not specified it is assumed as the name of the specified directory')
    parser_gender.add_argument('--is-male', dest = 'isMale', action='store_true', default = False,
-                   help='Boolen flag indicating if the sequencing data are from a male or female, and consequently properly handle chromosome X and Y')
+                   help='Boolean flag indicating if the sequencing data are from a male or female, and consequently properly handle chromosome X and Y')
    parser_perf.add_argument('-p', dest = 'ncpu', type = int, default = 4,
                    help='The number of core to use when performing the Bayesian inference. Default 4.')
    parser_gender.add_argument('-X', "--chrX", dest = 'X', type = str, default = "X",
