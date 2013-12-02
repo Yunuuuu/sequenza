@@ -723,17 +723,25 @@ def RPy2SequenzaOverride(data_dir, is_male = True, tag = None, X = "X", Y = "Y",
    xy = {'X':X, 'Y' : Y}
    if tag == None:
       tag = os.path.split(data_dir)[-1]
-   obj_list = robjects.StrVector(('adj_GC.txt', 'raw_GC.txt', 'windows_Bf.Rdata', 'mutation_list.Rdata', 'windows_ratio.Rdata', 'segments_list.Rdata'))
-   obj_list = robjects.r.paste(tag, obj_list, sep = "_")
-   gc_tab   = robjects.r('read.table')(data_dir +'/' + obj_list[0], header = True, sep = '\t')
-   avg_depth_ratio = robjects.r.mean(gc_tab.rx(True, 2))
-   for i in range(2,6):
-      robjects.r.load(data_dir +'/' + obj_list[i])
-   windows_Bf    = robjects.r.eval(robjects.r('as.name')(tag + '_windows_Bf'))
-   windows_ratio = robjects.r.eval(robjects.r('as.name')(tag + '_windows_ratio'))
-   mutation_list = robjects.r.eval(robjects.r('as.name')(tag + '_mutation_list'))
-   segments_list = robjects.r.eval(robjects.r('as.name')(tag + '_segments_list'))
-   chr_vect      = windows_Bf.names
+   robjects.r.load(data_dir +'/' + tag + '_sequenza_extract.Rdata')
+   extract = robjects.r.eval(robjects.r('as.name')(tag + '_sequenza_extract'))
+   windows_Bf    = extract.rx2('BAF')
+   windows_ratio = extract.rx2('ratio')
+   mutation_list = extract.rx2('mutations')
+   segments_list = extract.rx2('segments')
+   chr_vect      = extract.rx2('chromosomes')
+   #obj_list = robjects.StrVector(('adj_GC.txt', 'raw_GC.txt', 'windows_Bf.Rdata', 'mutation_list.Rdata', 'windows_ratio.Rdata', 'segments_list.Rdata'))
+   #obj_list = robjects.r.paste(tag, obj_list, sep = "_")
+   #gc_tab   = robjects.r('read.table')(data_dir +'/' + obj_list[0], header = True, sep = '\t')
+   #avg_depth_ratio = robjects.r.mean(gc_tab.rx(True, 2))
+   #for i in range(2,6):
+   #   robjects.r.load(data_dir +'/' + obj_list[i])
+   #windows_Bf    = robjects.r.eval(robjects.r('as.name')(tag + '_windows_Bf'))
+   #windows_ratio = robjects.r.eval(robjects.r('as.name')(tag + '_windows_ratio'))
+   #mutation_list = robjects.r.eval(robjects.r('as.name')(tag + '_mutation_list'))
+   #segments_list = robjects.r.eval(robjects.r('as.name')(tag + '_segments_list'))
+   #chr_vect      = windows_Bf.names
+   avg_depth_ratio = robjects.r.mean(extract.rx2('gc').rx2('adj').rx(True, 2))
    segs_all      = robjects.r('do.call')('rbind', segments_list)
    mut_all       = robjects.r('do.call')('rbind', mutation_list)
    mut_all       = robjects.r('na.exclude')(mut_all)
