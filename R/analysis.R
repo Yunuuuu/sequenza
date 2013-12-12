@@ -6,7 +6,7 @@ read.abfreq <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRU
    if(fast && nrows == -1) {
     if(gz) {
        if (!is.null(chr.name)) {
-          wc <- system(paste(paste('gzip -d -c | grep -c "^', chr.name, '\t"', sep = ''), file, sep = ' '), intern = TRUE)
+          wc <- system(paste('gzip -d -c ',file,' | grep -c "^', chr.name, '\t"', sep = ''), intern = TRUE)
        } else {
           wc <- system(paste('gzip -d -c', file, '| wc'), intern = TRUE)
        }
@@ -26,11 +26,11 @@ read.abfreq <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRU
   }
    if (!is.null(chr.name)) {
       if (gz) {
-         grep.part <- paste("gzip -d -c | grep '^", chr.name, "\t'", sep = "")
+         grep.part <- paste("gzip -d -c ", file," | grep '^", chr.name, "\t'", sep = "")
       } else {
          grep.part <- paste("grep '^", chr.name, "\t'", sep = "")
       }
-      abf.data   <- read.delim(pipe(paste(grep.part, file, sep = " ")), nrows = nrows, colClasses = colClasses, header = FALSE, ...)
+      abf.data   <- read.delim(pipe(grep.part), nrows = nrows, colClasses = colClasses, header = FALSE, ...)
       if (header == TRUE) {
          head       <- colnames(read.table(file, header = TRUE, nrows = 1 ))
          colnames(abf.data) <- head
