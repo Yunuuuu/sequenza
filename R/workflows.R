@@ -44,20 +44,24 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
 
 sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
                          cellularity = seq(0.1,1,0.01), ploidy = seq(1, 7, 0.1),
-                         priors.table = data.frame(CN = 2, value = 2),
+                         priors.table = data.frame(CN = 2, value = 2), chromosome.list = 1:23,
                          mc.cores = getOption("mc.cores", 2L)){
-   segs.all      = do.call(rbind, sequenza.extract$segments)
-   mut.all       = do.call(rbind, sequenza.extract$mutations)
-   mut.all       = na.exclude(mut.all)
+   if (is.null(chromosome.list)) {
+      segs.all      = do.call(rbind, sequenza.extract$segments)
+   } else {
+      segs.all      = do.call(rbind, sequenza.extract$segments[chromosome.list])      
+   }
+   #mut.all       = do.call(rbind, sequenza.extract$mutations)
+   #mut.all       = na.exclude(mut.all)
    segs.len      = segs.all$end.pos - segs.all$start.pos
    segs.filt     = segs.len >= segment.filter
    avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
    if (female == FALSE){
       segs.is.xy = segs.all$chromosome == XY["X"] | segs.all$chromosome == XY["Y"]
-      mut.is.xy  = mut.all$chromosome == XY["X"] | mut.all$chromosome == XY["Y"]
+      #mut.is.xy  = mut.all$chromosome == XY["X"] | mut.all$chromosome == XY["Y"]
    } else{
       segs.is.xy = segs.all$chromosome == XY["Y"]
-      mut.is.xy  = mut.all$chromosome == XY["Y"]
+      #mut.is.xy  = mut.all$chromosome == XY["Y"]
    }
    filt.test  = segs.filt & !segs.is.xy
    seg.test   = segs.all[filt.test, ]
