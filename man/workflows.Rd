@@ -15,7 +15,7 @@
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
                XY = c(X = "X", Y = "Y"), cellularity = seq(0.1,1,0.01),
                ploidy = seq(1, 7, 0.1), priors.table = data.frame(CN = 2, value = 2),
-               mc.cores = getOption("mc.cores", 2L))
+               chromosome.list = 1:23, mc.cores = getOption("mc.cores", 2L))
 }
 
 \arguments{
@@ -35,6 +35,7 @@
   \item{cellularity}{vector of values to test as cellularity parameter.}
   \item{ploidy}{vector of values to test as ploidy parameter.}
   \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
+  \item{chromosome.list}{Vector containing the index or the names of the chromosome to include in the model fitting.}
   \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
 }
 
