@@ -19,13 +19,36 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                 chromosomes = abf.data$chromosome,
                                 window = window, overlap = overlap,
                                 weight = abf.data$depth.normal)
-      abf.b.win <- windowValues(x = abf.het$Bf,
-                                positions = abf.het$n.base,
-                                chromosomes = abf.het$chromosome,
-                                window = window, overlap = overlap,
-                                weight = abf.het$good.s.reads)
-      breaks    <- find.breaks(abf.het, gamma = gamma, kmin = kmin, baf.thres = c(0, 0.5))
-      seg.s1    <- segment.breaks(abf.data, breaks = breaks)
+      if (nrow(abf.het) > 0) {
+         abf.b.win <- windowValues(x = abf.het$Bf,
+                                   positions = abf.het$n.base,
+                                   chromosomes = abf.het$chromosome,
+                                   window = window, overlap = overlap,
+                                   weight = abf.het$good.s.reads)
+         breaks    <- NULL
+         breaks    <- try(find.breaks(abf.het, gamma = gamma, 
+                                      kmin = kmin, baf.thres = c(0, 0.5)),
+                          silent = FALSE)
+         if (!is.null(breaks)){
+            seg.s1    <- segment.breaks(abf.data, breaks = breaks)            
+         } else {
+            seg.s1 <- segment.breaks(abf.data,
+                                     breaks = data.frame(chrom = chr,
+                                                         start.pos = min(abf.data$n.base, na.rm = TRUE),
+                                                         end.pos = max(abf.data$n.base, na.rm = TRUE)))
+         }
+         
+      } else {
+         abf.b.win <- list()
+         abf.b.win[[1]] <- data.frame(start = min(abf.data$n.base, na.rm = TRUE),
+                                      end = max(abf.data$n.base, na.rm = TRUE), mean = 0.5,
+                                      q0 = 0.5,  q1 = 0.5, N = 1)
+         seg.s1 <- segment.breaks(abf.data,
+                                  breaks = data.frame(chrom = chr,
+                                                      start.pos = min(abf.data$n.base, na.rm = TRUE),
+                                                      end.pos = max(abf.data$n.base, na.rm = TRUE)))
+                                  
+      }
       mut.tab   <- mutation.table(abf.data, mufreq.treshold = mufreq.treshold,
                                   min.reads = min.reads, max.mut.types = max.mut.types,
                                   min.type.freq = min.type.freq, segments = seg.s1)
