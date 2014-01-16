@@ -83,20 +83,21 @@ VarScan2abfreq <- function(varscan.snp, varscan.copynumber = NULL) {
    res <- res[res$depth.ratio > 0 & !is.infinite(res$depth.ratio) & !normal.pos, ]
    if (!is.null(varscan.copynumber)){
       smart.id <- order(c(1:nrow(varscan.copynumber),1:nrow(varscan.copynumber)+0.5))
-      varscan.copynumber$log2_ratio <- 2^(varscan.copynumber$log2_ratio)
+      varscan.copynumber$log2_ratio   <- 2^(varscan.copynumber$log2_ratio)
+      varscan.copynumber$normal_depth <- round(varscan.copynumber$normal_depth, 0)
+      varscan.copynumber$sample_depth <- round(varscan.copynumber$sample_depth, 0)
       mat.t <- data.frame(chromosome = c(varscan.copynumber$chrom, varscan.copynumber$chrom)[smart.id],
                           n.base = c(varscan.copynumber$chr_start, varscan.copynumber$chr_stop)[smart.id], base.ref = 'N',
-                          depth.normal = round(c(varscan.copynumber$normal_depth, varscan.copynumber$normal_depth)[smart.id], 0),
-                          depth.sample = round(c(varscan.copynumber$tumor_depth, varscan.copynumber$tumor_depth)[smart.id], 0),
-                          depth.ratio = c(varscan.copynumber$log2_ratio, varscan.copynumber$log2_ratio)[smart.id],
+                          depth.normal = c(varscan.copynumber$normal_depth, varscan.copynumber$normal_depth)[smart.id],
+                          depth.sample = c(varscan.copynumber$tumor_depth, varscan.copynumber$tumor_depth)[smart.id],
+                          depth.ratio  = c(varscan.copynumber$log2_ratio, varscan.copynumber$log2_ratio)[smart.id],
                           Af = 1, Bf = 0, ref.zygosity = 'hom',
                           GC.percent = c(varscan.copynumber$gc_content, varscan.copynumber$gc_content)[smart.id],
                           stringsAsFactors = FALSE)
       mat.t <- cbind(mat.t, good.s.reads = mat.t$depth.sample, AB.germline = 'N', AB.sample = '.')
       chrom.order <- unique(mat.t$chromosome)
       l.cnv <- split(mat.t, mat.t$chromosome)
-      l.snp <- split(res, res$chromosome)
-      
+      l.snp <- split(res, res$chromosome)     
       for (i in names(l.snp)){
          tab.i <- rbind(l.cnv[[i]], l.snp[[i]])
          tab.i <- tab.i[order(tab.i$n.base), ]
