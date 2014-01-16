@@ -1,7 +1,7 @@
 sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80, kmin = 10,
                              mufreq.treshold = 0.10, min.reads = 40, max.mut.types = 1,
                              min.type.freq = 0.9){
-   gc.stats <- gc.sample.stats(file)
+   gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
    gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
    windows.baf   <- list()
