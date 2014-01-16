@@ -42,3 +42,70 @@ sequenza2PyClone <- function(mut.tab, seg.cn, sample.id, norm.cn = 2) {
                             variant_case = sample.id,	variant_freq = mut.tab$F,	genotype = mut.tab$mutation)
   na.exclude(pyclone.tsv)
 }
+
+VarScan2abfreq <- function(varscan.snp, varscan.copynumber = NULL) {
+   
+   iupac.nucs     <- setNames(c('A', 'C', 'G', 'GT', 'AC', 'AG', 'CG', 'T', 'AT', 'CT'),
+                              c('A', 'C', 'G', 'K', 'M', 'R', 'S', 'T', 'W', 'Y'))
+   zygosity.vect  <- setNames(c('hom', 'hom', 'hom', 'het', 'het', 'het', 'het', 'hom', 'het', 'het'),
+                              c('A', 'C', 'G', 'K', 'M', 'R', 'S', 'T', 'W', 'Y'))
+   varscan.snp  <- varscan.snp[varscan.snp$somatic_status != 'Unknown', ]
+   varscan.snp$normal_var_freq <- as.numeric(sub('%', '', varscan.snp$normal_var_freq))/100
+   varscan.snp$tumor_var_freq  <- as.numeric(sub('%', '', varscan.snp$tumor_var_freq))/100
+   ref.zygosity <- zygosity.vect[varscan.snp$normal_gt]
+   AB.germline  <- iupac.nucs[varscan.snp$normal_gt]
+   AB.sample    <- rep('.', length(AB.germline))
+   
+   depth.normal <- varscan.snp$normal_reads1 + varscan.snp$normal_reads2
+   depth.sample <- varscan.snp$tumor_reads1 + varscan.snp$tumor_reads1
+   depth.ratio  <- depth.sample/depth.normal
+   Af <- 1 - varscan.snp$tumor_var_freq
+   Bf <- rep(0, length(Af))
+   idx <- ref.zygosity == 'het' & Af  < 0.5
+   Af[idx] <- 1 - Af[idx]
+   idx <- ref.zygosity == 'het'
+   Bf[idx] <- 1 - Af[idx]
+   idx <- ref.zygosity == 'hom' & varscan.snp$somatic_status == 'Somatic'
+   mut <- cbind(as.character(iupac.nucs[varscan.snp$tumor_gt[idx]]), varscan.snp$normal_gt[idx])
+   mut <- sapply(X = 1:sum(idx),
+                 FUN = function(x) gsub(x = mut[x, 1],
+                                        pattern = mut[x, 2],
+                                        replacement = ''))
+   mut <- paste0(mut, varscan.snp$tumor_var_freq[idx])
+   AB.sample[idx] <- mut
+   res <- data.frame(chromosome = varscan.snp$chrom, n.base = varscan.snp$position,
+                     base.ref = varscan.snp$ref, depth.normal = depth.normal,
+                     depth.sample = depth.sample, depth.ratio = depth.ratio,
+                     Af = round(Af, 3), Bf = round(Bf, 3), ref.zygosity = ref.zygosity, GC.percent = 50,
+                     good.s.reads = round(depth.sample, 2), AB.germline = AB.germline,
+                     AB.sample = AB.sample, stringsAsFactors = FALSE)
+   normal.pos <- res$ref.zygosity == 'hom' & res$AB.sample == '.'
+   res <- res[res$depth.ratio > 0 & !is.infinite(res$depth.ratio) & !normal.pos, ]
+   if (!is.null(varscan.copynumber)){
+      smart.id <- order(c(1:nrow(varscan.copynumber),1:nrow(varscan.copynumber)+0.5))
+      varscan.copynumber$log2_ratio <- 2^(varscan.copynumber$log2_ratio)
+      mat.t <- data.frame(chromosome = c(varscan.copynumber$chrom, varscan.copynumber$chrom)[smart.id],
+                          n.base = c(varscan.copynumber$chr_start, varscan.copynumber$chr_stop)[smart.id], base.ref = 'N',
+                          depth.normal = round(c(varscan.copynumber$normal_depth, varscan.copynumber$normal_depth)[smart.id], 0),
+                          depth.sample = round(c(varscan.copynumber$tumor_depth, varscan.copynumber$tumor_depth)[smart.id], 0),
+                          depth.ratio = c(varscan.copynumber$log2_ratio, varscan.copynumber$log2_ratio)[smart.id],
+                          Af = 1, Bf = 0, ref.zygosity = 'hom',
+                          GC.percent = c(varscan.copynumber$gc_content, varscan.copynumber$gc_content)[smart.id],
+                          stringsAsFactors = FALSE)
+      mat.t <- cbind(mat.t, good.s.reads = mat.t$depth.sample, AB.germline = 'N', AB.sample = '.')
+      chrom.order <- unique(mat.t$chromosome)
+      l.cnv <- split(mat.t, mat.t$chromosome)
+      l.snp <- split(res, res$chromosome)
+      
+      for (i in names(l.snp)){
+         tab.i <- rbind(l.cnv[[i]], l.snp[[i]])
+         tab.i <- tab.i[order(tab.i$n.base), ]
+         #idx.i <- diff(tab.i$n.base)
+         #dups.i  <- which(idx.i == 0)
+         #snp.i <- which(tab.i$GC.percent == -100)
+         l.cnv[[i]] <- tab.i
+      }
+      res <- do.call(rbind, l.cnv[chrom.order])
+   }
+   res
+}
