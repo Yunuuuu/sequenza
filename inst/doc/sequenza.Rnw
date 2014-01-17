@@ -88,9 +88,11 @@ Pileup files can be generated using \texttt{samtools}\cite{Li2009}. The genome s
    samtools mpileup -f hg19.fasta -Q 20 tumor.bam | gzip > tumor.pileup.gz
 \end{lstlisting}
 
-\subsection{Processing the data with \textit{sequenza-utils.py}.}
+Aletrnatively, it is possible to use the output of VarScan2\cite{Koboldt2012} (http://varscan.sourceforge.net), which would require a simlar approach and the generation of pileups as well.
 
-FFor convenience and efficiency we have implemented pre-processing algorithms in an standalone (not called from R) Python program. Although, the program is provided with the package; its exact location can be found like this:
+\subsection{Obtainig the required ABfreq file.}
+\subsubsection{Processing the data with \textit{sequenza-utils.py}.}
+For convenience and efficiency we have implemented pre-processing algorithms in a standalone (not called from R) Python program. Although, the program is provided with the package; its exact location can be found like this:
 
 <<label=findexec, echo=TRUE, eval=FALSE>>=
 system.file("exec", "sequenza-utils.py", package="sequenza")
@@ -120,6 +122,20 @@ If you don't have yet the pileup, or you are not interested on storing the pileu
                                    -s tumor.fifo | gzip > out.abfreq.gz
    rm normal.fifo tumor.fifo
 \end{lstlisting}
+
+\subsubsection{Convereting VarScan2 output to ABfreq.}
+Since many projects might already being processed trough VarScan2, it can be conveninet to be able to import such results.
+For this purpose a simple function is provided within the package, to convert the output of the \textit{somatic} and \textit{copynumber} programs of the VarScan2 suite into the \textit{ABfreq} format.
+
+<<label=varscan, echo=TRUE, eval=FALSE>>=
+cnv <- read.table("varscan.copynumber", header = TRUE, sep = "\t")
+snp <- read.table("varscan.snp", header = TRUE, sep = "\t")
+abf.data <- VarScan2abfreq(varscan.snp = snp, varscan.copynumber = cnv)
+
+write.table(abf.data, "my.sample.abfreq", col.names = TRUE, row.names = FALSE, sep = "\t")
+@
+
+For whole genome sequencing the information in the \textit{varscan.snp} could be enought to estimate the ploidy and cellularity, and define the copy number and mutations, hence the \texit{varscan.copynumber} argument is optional, but it is strongly suggested to use it in case of exome sequencing.
 
 \section{Exploring the \textit{ABfreq} file and GC-correction details}
 

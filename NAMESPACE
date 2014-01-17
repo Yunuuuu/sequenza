@@ -23,7 +23,8 @@ export(
 	model.points,
 	theoretical.baf,
   sequenza.fit,
-  sequenza.extract
+  sequenza.extract,
+   VarScan2abfreq
 )
 
 
