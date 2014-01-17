@@ -95,3 +95,112 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
                  ploidy = ploidy, priors.table = priors.table,
                  mc.cores = mc.cores)
 }
+
+sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = './',
+                             cellularity = NULL, ploidy = NULL, female = TRUE,
+                             XY = c(X = "X", Y = "Y"), chromosome.list = 1:24){
+   cp.file   <- paste(sample.id, "CP_contours.pdf", sep = '_')
+   cint.file <- paste(sample.id, "confints_CP.txt", sep = '_')
+   chrw.file <- paste(sample.id, "chromosome_view.pdf", sep = '_')
+   geno.file <- paste(sample.id, "genome_view.pdf", sep = '_')
+   cn.file   <- paste(sample.id, "CN_bars.pdf", sep = '_')
+   muts.file <- paste(sample.id, "mutations.txt", sep = '_')
+   segs.file <- paste(sample.id, "segments.txt", sep = '_')
+   robj.file <- paste(sample.id, "sequenza_extract", sep= '_')
+   avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
+   dir.create(path = out.dir, showWarnings = FALSE,
+              recursive = TRUE)
+   if (is.null(sequenza.fit) & (is.null(cellularity) | is.null(ploidy))){
+      stop("Either the sequenza.fit or both cellularity and ploidy argument are required.")
+   }
+   if (!is.null(sequenza.fit)){
+      cint <- get.ci(sequenza.fit)
+      pdf(paste(out.dir, cp.file, sep = "/"))
+         cp.plot(sequenza.fit)
+         cp.plot.contours(sequenza.fit, add=T, likThresh = c(0.95), col="red", pch = 20)
+         if (!is.null(cellularity) | !is.null(ploidy)) {
+            if (is.null(cellularity)) cellularity <- cint$max.y
+            if (is.null(ploidy)) ploidy <- cint$max.x
+            points(x = ploidy, y = cellularity , pch = 17)
+            text(x = ploidy, y = cellularity, 
+                 labels = "User selection",
+                 pos = 3, offset = 0.5)
+         } else {
+            cellularity <- cint$max.y
+            ploidy <- cint$max.x
+         }
+      dev.off()
+   }
+   seg.tab     <- na.exclude(do.call(rbind, sequenza.extract$segments[chromosome.list = 1:24]))
+   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list = 1:24]))
+   if (female == FALSE){
+      segs.is.xy = seg.tab$chromosome == XY["X"] | seg.tab$chromosome == XY["Y"]
+      mut.is.xy  = mut.tab$chromosome == XY["X"] | mut.tab$chromosome == XY["Y"]
+   } else{
+      segs.is.xy = seg.tab$chromosome == XY["Y"]
+      mut.is.xy  = mut.tab$chromosome == XY["Y"]
+   }
+
+   cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy],
+                            depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
+                            cellularity = cellularity, ploidy = ploidy,
+                            avg.depth.ratio = avg.depth.ratio, CNn = 2)
+   seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
+   if (female == FALSE){
+      cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[segs.is.xy],
+                               depth.ratio = seg.tab$depth.ratio[segs.is.xy],
+                               cellularity = cellularity, ploidy = ploidy,
+                               avg.depth.ratio = avg.depth.ratio, CNn = 1)
+      seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
+      seg.res    <- rbind(seg.res, seg.xy)     
+   }
+   write.table(seg.res, paste(out.dir, segs.file, sep = "/"),
+               col.names = TRUE, row.names = FALSE, sep="\t")   
+
+   mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy],
+                            depth.ratio = mut.tab$adjusted.ratio[!mut.is.xy],
+                            cellularity = cellularity, ploidy = ploidy,
+                            avg.depth.ratio = avg.depth.ratio, CNn = 2)
+   mut.res     <- cbind(mut.tab[!mut.is.xy, ], mut.alleles)
+   if (female == FALSE){
+      mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[mut.is.xy],
+                                  depth.ratio = mut.tab$adjusted.ratio[mut.is.xy],
+                                  cellularity = cellularity, ploidy = ploidy,
+                                  avg.depth.ratio = avg.depth.ratio, CNn = 1)
+      mut.xy     <- cbind(mut.tab[mut.is.xy, ], mut.alleles)
+      mut.res    <- rbind(mut.res, mut.xy)     
+   }
+   write.table(mut.res, paste(out.dir, muts.file, sep = "/"),
+               col.names = TRUE, row.names = FALSE, sep="\t")   
+   
+   pdf(paste(out.dir, chrw.file, sep = "/"))
+   for (i in unique(seg.res$chromosome)) {
+      
+      if (female == FALSE & (i == XY["Y"] | i == XY["Y"])){
+         CNn = 1
+      } else {
+         CNn <- 2
+      }
+      chromosome.view(mut.tab = sequenza.extract$mutations[[i]],
+                      baf.windows = sequenza.extract$BAF[[i]],
+                      ratio.windows = sequenza.extract$ratio[[i]], BAF.style="lines",
+                      cellularity = cellularity, ploidy = ploidy, main = i,
+                      segments = seg.res[seg.res$chromosome == i, ],
+                      avg.depth.ratio = avg.depth.ratio, CNn = CNn, min.N.ratio = 1)
+   }
+   dev.off()
+   pdf(paste(out.dir, geno.file, sep = "/"))
+      genome.view(seg.res)
+      genome.view(seg.res, "CN")
+   dev.off()
+   barscn <- data.frame(size = seg.res$end.pos - seg.res$start.pos,
+                     CNt = seg.res$CNt)
+   cn.sizes <- split(barscn$size,barscn$CNt)
+   cn.sizes <- sapply(cn.sizes, 'sum')
+   pdf(paste(out.dir, cn.file, sep = "/"))
+   barplot(round(cn.sizes/sum(cn.sizes)* 100, 0), names = names(cn.sizes), las = 1,
+                      ylab = "Percentage (%)", xlab = "copy number")
+   dev.off()
+   
+   ## Write down the results.... ploidy etc...
+}
