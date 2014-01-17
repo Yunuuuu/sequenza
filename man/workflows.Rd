@@ -15,7 +15,7 @@
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
                XY = c(X = "X", Y = "Y"), cellularity = seq(0.1,1,0.01),
                ploidy = seq(1, 7, 0.1), priors.table = data.frame(CN = 2, value = 2),
-               chromosome.list = 1:23, mc.cores = getOption("mc.cores", 2L))
+               chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L))
 }
 
 \arguments{
