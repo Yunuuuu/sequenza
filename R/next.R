@@ -85,7 +85,7 @@ VarScan2abfreq <- function(varscan.snp, varscan.copynumber = NULL) {
       smart.id <- order(c(1:nrow(varscan.copynumber),1:nrow(varscan.copynumber)+0.5))
       varscan.copynumber$log2_ratio   <- 2^(varscan.copynumber$log2_ratio)
       varscan.copynumber$normal_depth <- round(varscan.copynumber$normal_depth, 0)
-      varscan.copynumber$sample_depth <- round(varscan.copynumber$sample_depth, 0)
+      varscan.copynumber$tumor_depth <- round(varscan.copynumber$tumor_depth, 0)
       mat.t <- data.frame(chromosome = c(varscan.copynumber$chrom, varscan.copynumber$chrom)[smart.id],
                           n.base = c(varscan.copynumber$chr_start, varscan.copynumber$chr_stop)[smart.id], base.ref = 'N',
                           depth.normal = c(varscan.copynumber$normal_depth, varscan.copynumber$normal_depth)[smart.id],
