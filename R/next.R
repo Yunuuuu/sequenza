@@ -66,7 +66,8 @@ VarScan2abfreq <- function(varscan.snp, varscan.copynumber = NULL) {
    idx <- ref.zygosity == 'het'
    Bf[idx] <- 1 - Af[idx]
    idx <- ref.zygosity == 'hom' & varscan.snp$somatic_status == 'Somatic'
-   mut <- cbind(as.character(iupac.nucs[varscan.snp$tumor_gt[idx]]), varscan.snp$normal_gt[idx])
+   mut <- cbind(as.character(iupac.nucs[varscan.snp$tumor_gt[idx]]),
+                as.character(varscan.snp$normal_gt[idx]))
    mut <- sapply(X = 1:sum(idx),
                  FUN = function(x) gsub(x = mut[x, 1],
                                         pattern = mut[x, 2],
