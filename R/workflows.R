@@ -126,7 +126,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
          if (!is.null(cellularity) | !is.null(ploidy)) {
             if (is.null(cellularity)) cellularity <- cint$max.y
             if (is.null(ploidy)) ploidy <- cint$max.x
-            points(x = ploidy, y = cellularity , pch = 17)
+            points(x = ploidy, y = cellularity , pch = 5)
             text(x = ploidy, y = cellularity, 
                  labels = "User selection",
                  pos = 3, offset = 0.5)
