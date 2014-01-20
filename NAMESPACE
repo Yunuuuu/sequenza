@@ -28,4 +28,11 @@ export(
    VarScan2abfreq
 )
 
+# Import all packages listed as Imports or Depends
+import(
+ copynumber,
+ parallel,
+ squash
+)
+
 

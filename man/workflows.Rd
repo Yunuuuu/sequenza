@@ -18,8 +18,8 @@
                ploidy = seq(1, 7, 0.1), priors.table = data.frame(CN = 2, value = 2),
                chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L))
   sequenza.results(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = './',
-                   cellularity = NULL, ploidy = NULL, female = TRUE, XY = c(X = "X", Y = "Y"),
-                   chromosome.list = 1:24)
+                   cellularity = NULL, ploidy = NULL, female = TRUE,
+                   XY = c(X = "X", Y = "Y"), chromosome.list = 1:24)
 }
 
 \arguments{
