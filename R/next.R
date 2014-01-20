@@ -74,8 +74,8 @@ VarScan2abfreq <- function(varscan.snp, varscan.copynumber = NULL) {
                                         replacement = ''))
    mut <- paste0(mut, varscan.snp$tumor_var_freq[idx])
    AB.sample[idx] <- mut
-   res <- data.frame(chromosome = varscan.snp$chrom, n.base = varscan.snp$position,
-                     base.ref = varscan.snp$ref, depth.normal = depth.normal,
+   res <- data.frame(chromosome = as.character(varscan.snp$chrom), n.base = varscan.snp$position,
+                     base.ref = as.character(varscan.snp$ref), depth.normal = depth.normal,
                      depth.sample = depth.sample, depth.ratio = depth.ratio,
                      Af = round(Af, 3), Bf = round(Bf, 3), ref.zygosity = ref.zygosity, GC.percent = 50,
                      good.s.reads = round(depth.sample, 2), AB.germline = AB.germline,
@@ -87,6 +87,7 @@ VarScan2abfreq <- function(varscan.snp, varscan.copynumber = NULL) {
       varscan.copynumber$log2_ratio   <- 2^(varscan.copynumber$log2_ratio)
       varscan.copynumber$normal_depth <- round(varscan.copynumber$normal_depth, 0)
       varscan.copynumber$tumor_depth <- round(varscan.copynumber$tumor_depth, 0)
+      varscan.copynumber$chrom <- as.character(varscan.copynumber$chrom)
       mat.t <- data.frame(chromosome = c(varscan.copynumber$chrom, varscan.copynumber$chrom)[smart.id],
                           n.base = c(varscan.copynumber$chr_start, varscan.copynumber$chr_stop)[smart.id], base.ref = 'N',
                           depth.normal = c(varscan.copynumber$normal_depth, varscan.copynumber$normal_depth)[smart.id],
