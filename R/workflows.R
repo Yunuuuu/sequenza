@@ -106,14 +106,19 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    cn.file   <- paste(sample.id, "CN_bars.pdf", sep = '_')
    muts.file <- paste(sample.id, "mutations.txt", sep = '_')
    segs.file <- paste(sample.id, "segments.txt", sep = '_')
-   robj.file <- paste(sample.id, "sequenza_extract", sep= '_')
+   robj.extr <- paste(sample.id, "sequenza_extract.Rdata", sep= '_')
+   robj.fit  <- paste(sample.id, "sequenza_fit.Rdata", sep= '_')  
    avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
    dir.create(path = out.dir, showWarnings = FALSE,
               recursive = TRUE)
+   assign(x = paste0(sample.id,"_sequenza_extract"), value = sequenza.extract)
+   save(list = paste0(sample.id,"_sequenza_extract"), file = paste(out.dir, robj.extr, sep = "/")) 
    if (is.null(sequenza.fit) & (is.null(cellularity) | is.null(ploidy))){
       stop("Either the sequenza.fit or both cellularity and ploidy argument are required.")
    }
    if (!is.null(sequenza.fit)){
+      assign(x = paste0(sample.id,"_sequenza_fit"), value = sequenza.fit)
+      save(list = paste0(sample.id,"_sequenza_fit"), file = paste(out.dir, robj.fit, sep = "/"))       
       cint <- get.ci(sequenza.fit)
       pdf(paste(out.dir, cp.file, sep = "/"))
          cp.plot(sequenza.fit)
@@ -203,4 +208,11 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    dev.off()
    
    ## Write down the results.... ploidy etc...
+   if (!is.null(sequenza.fit)){
+      res.tab = data.frame(cellularity     = c(cint$confint.y[1], cint$max.y[1], cint$confint.y[2]),
+                           ploidy.estimate = c(cint$confint.x[1], cint$max.x[1], cint$confint.x[2]),
+                           ploidy.mean.cn  = weighted.mean(x = as.integer(names(cn.sizes)), w = cn.sizes))
+      write.table(res.tab, paste(out.dir, cint.file, sep = "/"), col.names = TRUE,
+                  row.names = FALSE, sep = "\t")
+   }
 }
