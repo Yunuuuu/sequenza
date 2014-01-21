@@ -97,7 +97,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
 }
 
 sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = './',
-                             cellularity = NULL, ploidy = NULL, female = TRUE,
+                             cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
                              XY = c(X = "X", Y = "Y"), chromosome.list = 1:24){
    cp.file   <- paste(sample.id, "CP_contours.pdf", sep = '_')
    cint.file <- paste(sample.id, "confints_CP.txt", sep = '_')
@@ -146,13 +146,13 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
       mut.is.xy  = mut.tab$chromosome == XY["Y"]
    }
 
-   cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy],
+   cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
                             depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (female == FALSE){
-      cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[segs.is.xy],
+      cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[segs.is.xy], CNt.max = CNt.max,
                                depth.ratio = seg.tab$depth.ratio[segs.is.xy],
                                cellularity = cellularity, ploidy = ploidy,
                                avg.depth.ratio = avg.depth.ratio, CNn = 1)
@@ -162,13 +162,13 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    write.table(seg.res, paste(out.dir, segs.file, sep = "/"),
                col.names = TRUE, row.names = FALSE, sep="\t")   
 
-   mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy],
+   mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy], CNt.max = CNt.max,
                             depth.ratio = mut.tab$adjusted.ratio[!mut.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio, CNn = 2)
    mut.res     <- cbind(mut.tab[!mut.is.xy, ], mut.alleles)
    if (female == FALSE){
-      mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[mut.is.xy],
+      mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[mut.is.xy], CNt.max = CNt.max,
                                   depth.ratio = mut.tab$adjusted.ratio[mut.is.xy],
                                   cellularity = cellularity, ploidy = ploidy,
                                   avg.depth.ratio = avg.depth.ratio, CNn = 1)
