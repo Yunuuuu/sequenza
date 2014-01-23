@@ -66,7 +66,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
 }
 
 sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
-                         cellularity = seq(0.1,1,0.01), ploidy = seq(1, 7, 0.1),
+                         cellularity = seq(0.1,1,0.01), ploidy = seq(1, 7, 0.1), ratio.priority = FALSE,
                          priors.table = data.frame(CN = 2, value = 2), chromosome.list = 1:24,
                          mc.cores = getOption("mc.cores", 2L)){
    if (is.null(chromosome.list)) {
@@ -93,12 +93,12 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
                  weight.ratio = 2 * weights.seg, weight.Bf = weights.seg,
                  avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                  ploidy = ploidy, priors.table = priors.table,
-                 mc.cores = mc.cores)
+                 mc.cores = mc.cores, ratio.priority = ratio.priority)
 }
 
 sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = './',
                              cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
-                             XY = c(X = "X", Y = "Y"), chromosome.list = 1:24){
+                             ratio.priority = FALSE, XY = c(X = "X", Y = "Y"), chromosome.list = 1:24){
    cp.file   <- paste(sample.id, "CP_contours.pdf", sep = '_')
    cint.file <- paste(sample.id, "confints_CP.txt", sep = '_')
    chrw.file <- paste(sample.id, "chromosome_view.pdf", sep = '_')
@@ -149,13 +149,15 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
                             depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
-                            avg.depth.ratio = avg.depth.ratio, CNn = 2)
+                            avg.depth.ratio = avg.depth.ratio,
+                            ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (female == FALSE){
       cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[segs.is.xy], CNt.max = CNt.max,
                                depth.ratio = seg.tab$depth.ratio[segs.is.xy],
                                cellularity = cellularity, ploidy = ploidy,
-                               avg.depth.ratio = avg.depth.ratio, CNn = 1)
+                               avg.depth.ratio = avg.depth.ratio,
+                               ratio.priority = ratio.priority, CNn = 1)
       seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
       seg.res    <- rbind(seg.res, seg.xy)     
    }
