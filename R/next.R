@@ -43,39 +43,39 @@ sequenza2PyClone <- function(mut.tab, seg.cn, sample.id, norm.cn = 2) {
   na.exclude(pyclone.tsv)
 }
 
-VarScan2abfreq <- function(varscan.snp, varscan.copynumber = NULL) {
+VarScan2abfreq <- function(varscan.somatic, varscan.copynumber = NULL) {
    
    iupac.nucs     <- setNames(c('A', 'C', 'G', 'GT', 'AC', 'AG', 'CG', 'T', 'AT', 'CT'),
                               c('A', 'C', 'G', 'K', 'M', 'R', 'S', 'T', 'W', 'Y'))
    zygosity.vect  <- setNames(c('hom', 'hom', 'hom', 'het', 'het', 'het', 'het', 'hom', 'het', 'het'),
                               c('A', 'C', 'G', 'K', 'M', 'R', 'S', 'T', 'W', 'Y'))
-   varscan.snp  <- varscan.snp[varscan.snp$somatic_status != 'Unknown', ]
-   varscan.snp$normal_var_freq <- as.numeric(sub('%', '', varscan.snp$normal_var_freq))/100
-   varscan.snp$tumor_var_freq  <- as.numeric(sub('%', '', varscan.snp$tumor_var_freq))/100
-   ref.zygosity <- zygosity.vect[varscan.snp$normal_gt]
-   AB.germline  <- iupac.nucs[varscan.snp$normal_gt]
+   varscan.somatic  <- varscan.somatic[varscan.somatic$somatic_status != 'Unknown', ]
+   varscan.somatic$normal_var_freq <- as.numeric(sub('%', '', varscan.somatic$normal_var_freq))/100
+   varscan.somatic$tumor_var_freq  <- as.numeric(sub('%', '', varscan.somatic$tumor_var_freq))/100
+   ref.zygosity <- zygosity.vect[varscan.somatic$normal_gt]
+   AB.germline  <- iupac.nucs[varscan.somatic$normal_gt]
    AB.sample    <- rep('.', length(AB.germline))
    
-   depth.normal <- varscan.snp$normal_reads1 + varscan.snp$normal_reads2
-   depth.sample <- varscan.snp$tumor_reads1 + varscan.snp$tumor_reads1
+   depth.normal <- varscan.somatic$normal_reads1 + varscan.somatic$normal_reads2
+   depth.sample <- varscan.somatic$tumor_reads1 + varscan.somatic$tumor_reads1
    depth.ratio  <- depth.sample/depth.normal
-   Af <- 1 - varscan.snp$tumor_var_freq
+   Af <- 1 - varscan.somatic$tumor_var_freq
    Bf <- rep(0, length(Af))
    idx <- ref.zygosity == 'het' & Af  < 0.5
    Af[idx] <- 1 - Af[idx]
    idx <- ref.zygosity == 'het'
    Bf[idx] <- 1 - Af[idx]
-   idx <- ref.zygosity == 'hom' & varscan.snp$somatic_status == 'Somatic'
-   mut <- cbind(as.character(iupac.nucs[varscan.snp$tumor_gt[idx]]),
-                as.character(varscan.snp$normal_gt[idx]))
+   idx <- ref.zygosity == 'hom' & varscan.somatic$somatic_status == 'Somatic'
+   mut <- cbind(as.character(iupac.nucs[varscan.somatic$tumor_gt[idx]]),
+                as.character(varscan.somatic$normal_gt[idx]))
    mut <- sapply(X = 1:sum(idx),
                  FUN = function(x) gsub(x = mut[x, 1],
                                         pattern = mut[x, 2],
                                         replacement = ''))
-   mut <- paste0(mut, varscan.snp$tumor_var_freq[idx])
+   mut <- paste0(mut, varscan.somatic$tumor_var_freq[idx])
    AB.sample[idx] <- mut
-   res <- data.frame(chromosome = as.character(varscan.snp$chrom), n.base = varscan.snp$position,
-                     base.ref = as.character(varscan.snp$ref), depth.normal = depth.normal,
+   res <- data.frame(chromosome = as.character(varscan.somatic$chrom), n.base = varscan.somatic$position,
+                     base.ref = as.character(varscan.somatic$ref), depth.normal = depth.normal,
                      depth.sample = depth.sample, depth.ratio = depth.ratio,
                      Af = round(Af, 3), Bf = round(Bf, 3), ref.zygosity = ref.zygosity, GC.percent = 50,
                      good.s.reads = round(depth.sample, 2), AB.germline = AB.germline,
