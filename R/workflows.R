@@ -106,8 +106,8 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    cn.file   <- paste(sample.id, "CN_bars.pdf", sep = '_')
    muts.file <- paste(sample.id, "mutations.txt", sep = '_')
    segs.file <- paste(sample.id, "segments.txt", sep = '_')
-   robj.extr <- paste(sample.id, "sequenza_extract.Rdata", sep= '_')
-   robj.fit  <- paste(sample.id, "sequenza_fit.Rdata", sep= '_')  
+   robj.extr <- paste(sample.id, "sequenza_extract.RData", sep= '_')
+   robj.fit  <- paste(sample.id, "sequenza_fit.RData", sep= '_')  
    avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
    dir.create(path = out.dir, showWarnings = FALSE,
               recursive = TRUE)
