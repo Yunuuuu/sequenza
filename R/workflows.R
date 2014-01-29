@@ -183,7 +183,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    pdf(paste(out.dir, chrw.file, sep = "/"))
    for (i in unique(seg.res$chromosome)) {
       
-      if (female == FALSE & (i == XY["Y"] | i == XY["Y"])){
+      if (female == FALSE & (i == XY["X"] | i == XY["Y"])){
          CNn = 1
       } else {
          CNn <- 2
