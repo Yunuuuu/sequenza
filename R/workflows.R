@@ -157,7 +157,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
                                depth.ratio = seg.tab$depth.ratio[segs.is.xy],
                                cellularity = cellularity, ploidy = ploidy,
                                avg.depth.ratio = avg.depth.ratio,
-                               ratio.priority = ratio.priority, CNn = 1)
+                               ratio.priority = TRUE, CNn = 1)
       seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
       seg.res    <- rbind(seg.res, seg.xy)     
    }

@@ -656,7 +656,7 @@ def RPy2doAllSequenza(data_dir, is_male = True, tag = None, X = "X", Y = "Y", nc
       seg_res_xy  = sequenza.baf_bayes(Bf = segs_all.rx(True, 'Bf').rx(segs_is_xy),
                          depth_ratio = segs_all.rx(True, 'depth.ratio').rx(segs_is_xy),
                          avg_depth_ratio = avg_depth_ratio,
-                         weight_ratio = 2*200, ratio_priority = ratio_priority,
+                         weight_ratio = 2*200, ratio_priority = True,
                          weight_Bf = 200, CNt_max = 20,
                          cellularity = cint.rx2('max.y'),
                          ploidy = cint.rx2('max.x'), CNn = 1)
