@@ -283,7 +283,7 @@ The result is a list in the format \textit{list(x, y, z)}, which is directly usa
 The last part of the workflow is to apply the estimated parameters. There is an all-in-one function that plots and saves the results, giving control on file names and output  directory:
 
 <<label=sequenzaRes, echo=TRUE, eval=FALSE, results=hide>>=
-sequenza.results(sequenza.extract = test, sequenza.fit = CP.examples,
+sequenza.results(sequenza.extract = test, sequenza.fit = CP.example,
                  sample.id = "Test", out.dir="TEST", )
 @
 
