@@ -20,7 +20,8 @@
                chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L))
   sequenza.results(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = './',
                    cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
-                   ratio.priority = FALSE, XY = c(X = "X", Y = "Y"), chromosome.list = 1:24)
+                   ratio.priority = FALSE, XY = c(X = "X", Y = "Y"),
+                   chromosome.list = 1:24)
 }
 
 \arguments{
