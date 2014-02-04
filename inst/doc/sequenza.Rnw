@@ -123,6 +123,17 @@ If you don't yet have the pileup, or you are not interested in storing the pileu
    rm normal.fifo tumor.fifo
 \end{lstlisting}
 
+To compress further the results, it is possible to use a binning function provided in \textit{sequenza-utils}.
+This would decrease the memory requirement to load the whole position in memory. as well will speedup the processing of the sample:
+
+\begin{lstlisting}[style=BashInputStyle]
+   sequenza-utils.py abfreq-binning -w  50 \
+                                   out.abfreq.gz | gzip > out_small.abfreq.gz
+\end{lstlisting}
+
+Where the parameter \textit{-w} indicate a window size in nucleotides, to be used for the binning.
+The heterozygous and the position carrying variant calls would remain untouched. 
+
 \subsubsection{Converting VarScan2 output to ABfreq.}
 Since many projects might already have been processed with VarScan2, it can be convenient to be able to import such results.
 For this purpose a simple function is provided within the package, to convert the output of the \textit{somatic} and \textit{copynumber} programs of the VarScan2 suite into the \textit{ABfreq} format.
@@ -130,7 +141,7 @@ For this purpose a simple function is provided within the package, to convert th
 <<label=varscan, echo=TRUE, eval=FALSE>>=
 cnv <- read.table("varscan.copynumber", header = TRUE, sep = "\t")
 snp <- read.table("varscan.snp", header = TRUE, sep = "\t")
-abf.data <- VarScan2abfreq(varscan.snp = snp, varscan.copynumber = cnv)
+abf.data <- VarScan2abfreq(varscan.somatic = snp, varscan.copynumber = cnv)
 
 write.table(abf.data, "my.sample.abfreq", col.names = TRUE, row.names = FALSE, sep = "\t")
 @
