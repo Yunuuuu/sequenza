@@ -124,7 +124,7 @@ If you don't yet have the pileup, or you are not interested in storing the pileu
 \end{lstlisting}
 
 To compress further the results, it is possible to use a binning function provided in \textit{sequenza-utils}.
-This would decrease the memory requirement to load the whole position in memory. as well will speedup the processing of the sample:
+This would decrease the memory requirement to load all the available positions in memory. as well it would speedup the processing of the sample:
 
 \begin{lstlisting}[style=BashInputStyle]
    sequenza-utils.py abfreq-binning -w  50 \
