@@ -1,4 +1,4 @@
-xx-xx-2014 - 1.0.5
+04-02-2014 - 1.0.5
  - Add a python utility to binning the data to a desired window size (reducing vastly memory footprint in the analysis)
  - Fix default workflows parameter to detect CN up to 20.
 
