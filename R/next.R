@@ -1,25 +1,28 @@
-subclonal.matrix <- function(mut.tab, cellularity = seq(0.1, 1, 0.05), ploidy, avg.depth.ratio, mc.cores = 2){
-
+subclonal.matrix <- function(mut.tab, segments = NULL, cellularity = seq(0.1, 1, 0.05), mc.cores = 2){
+  if (!is.null(segments)) {
+    mut.tab$CNt <-2
+    for (i in 1:nrow(segments)) {
+      pos.filt <- mut.tab$chromosome == segments$chrom[i] & mut.tab$n.base >= segments$start.pos[i] & mut.tab$n.base <= segments$end.pos[i]
+      mut.tab$CNt[pos.filt] <- segments$CNt[i]
+    }
+  }
   mut.types.list <- lapply(X = 1:nrow(mut.tab),
                            FUN = function(x) {
                              types.matrix(CNn = mut.tab[x, 'CNn'],
                                           CNt.min = mut.tab[x, 'CNt'],
                                           CNt.max = mut.tab[x, 'CNt'])})
-  mut.cloanlity <- function(F, depth.t, types, cellularity, ploidy, avg.depth.ratio) {
-    theorethic <- model.points(cellularity = cellularity,
-                               ploidy = ploidy,
-                               types = types,
-                               avg.depth.ratio = avg.depth.ratio)
-    max(mufreq.dpois(mufreq = F, mufreq.model = theorethic[, 1], depth.t = depth.t),na.rm = TRUE)
+  mut.cloanlity <- function(F, CNt, types, cellularity) {
+    theorethic.F <- theoretical.mufreq(cellularity = cellularity, 
+                                  CNn = types[, 1], CNt = types[, 2], Mt = types[, 3])
+    max(mufreq.dpois(mufreq = F, mufreq.model = theorethic.F, CNt = CNt),na.rm = TRUE)
   }
   res <- mclapplyPb (mc.cores = mc.cores, X = 1:nrow(mut.tab),
                      FUN = function (i) {
                              sapply(X = cellularity, FUN = function(x) {
                                 mut.cloanlity(F = mut.tab$F[i],
-                                           depth.t = mut.tab$good.s.reads[i],
+                                           CNt = mut.tab$CNt[i],
                                            types = mut.types.list[[i]],
-                                           cellularity = x, ploidy = ploidy,
-                                           avg.depth.ratio = avg.depth.ratio)
+                                           cellularity = x)
                            })
                          })
   res <- do.call(rbind, res)
