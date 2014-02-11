@@ -10,9 +10,9 @@ subclonal.matrix <- function(mut.tab, cellularity = seq(0.1, 1, 0.05), ploidy, a
                                ploidy = ploidy,
                                types = types,
                                avg.depth.ratio = avg.depth.ratio)
-    max(sequenza:::mufreq.dpois(mufreq = F, mufreq.model = theorethic[, 1], depth.t = depth.t),na.rm = TRUE)
+    max(mufreq.dpois(mufreq = F, mufreq.model = theorethic[, 1], depth.t = depth.t),na.rm = TRUE)
   }
-  res <- sequenza:::mclapplyPb (mc.cores = mc.cores, X = 1:nrow(mut.tab),
+  res <- mclapplyPb (mc.cores = mc.cores, X = 1:nrow(mut.tab),
                      FUN = function (i) {
                              sapply(X = cellularity, FUN = function(x) {
                                 mut.cloanlity(F = mut.tab$F[i],
