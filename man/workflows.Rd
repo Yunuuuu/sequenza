@@ -11,7 +11,8 @@
 \usage{
   sequenza.extract(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80,
                    kmin = 10, mufreq.treshold = 0.10, min.reads = 40,
-                   min.reads.normal = 10, max.mut.types = 1, min.type.freq = 0.9)
+                   min.reads.normal = 10, max.mut.types = 1,
+                   min.type.freq = 0.9, chromosome.list = NULL)
 
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
                XY = c(X = "X", Y = "Y"), cellularity = seq(0.1,1,0.01),

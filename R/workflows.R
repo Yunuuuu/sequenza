@@ -1,6 +1,6 @@
 sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80, kmin = 10,
                              mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
-                             max.mut.types = 1, min.type.freq = 0.9){
+                             max.mut.types = 1, min.type.freq = 0.9, chromosome.list = NULL){
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
    gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
@@ -8,7 +8,10 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    windows.ratio <- list()
    mutation.list <- list()
    segments.list <- list()
-   for (chr in chr.vect){
+   if (is.null(chromosome.list)) {
+     chromosome.list <- chr.vect
+   }
+   for (chr in chromosome.list){
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
       abf.data   <- read.abfreq(file, gz = gz, n.lines = c(file.lines$start, file.lines$end))
       abf.data$adjusted.ratio <- round(abf.data$depth.ratio / gc.vect[as.character(abf.data$GC.percent)], 3)
@@ -58,10 +61,10 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       mutation.list[[which(chr.vect == chr)]] = mut.tab
       segments.list[[which(chr.vect == chr)]] = seg.s1
    }
-   names(windows.baf)   <- chr.vect
-   names(windows.ratio) <- chr.vect
-   names(mutation.list) <- chr.vect
-   names(segments.list) <- chr.vect
+   names(windows.baf)   <- chromosome.list
+   names(windows.ratio) <- chromosome.list
+   names(mutation.list) <- chromosome.list
+   names(segments.list) <- chromosome.list
    return(list(BAF = windows.baf, ratio = windows.ratio, mutations = mutation.list,
                segments = segments.list, chromosomes = chr.vect, gc = gc.stats))
 }
