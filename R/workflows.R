@@ -10,6 +10,8 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    segments.list <- list()
    if (is.null(chromosome.list)) {
      chromosome.list <- chr.vect
+   } else {
+     chromosome.list <- chromosome.list[chromosome.list%in%chr.vect]
    }
    for (chr in chromosome.list){
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
