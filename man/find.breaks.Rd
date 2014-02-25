@@ -9,7 +9,7 @@
 
 \usage{
 find.breaks(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...)
-segment.breaks(abf.tab, breaks)
+segment.breaks(abf.tab, breaks, weighted.mean = FALSE)
 }
 
 \arguments{
@@ -17,6 +17,7 @@ segment.breaks(abf.tab, breaks)
   \item{abf.tab}{a complete ABfreq file.}
   \item{gamma, kmin, baf.thres, verbose}{arguments passed to \code{aspcf}.}
   \item{breaks}{breaks as output \code{find.breaks}.}
+  \item{weighted.mean}{boolean to select if the segments have to calculated using the read depth as a weights to calculate depth ratio and B-allele frequency means.}
   \item{...}{additional arguments passed to \code{aspcf}.}
 }
 
