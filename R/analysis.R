@@ -223,12 +223,12 @@ mut.fractions <- function(AB.sample, Af) {
               base = as.character(max.freqs[,2]), freq = as.numeric(max.freqs[,3]))
 }
 
-mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, max.mut.types = 3,
-                           min.type.freq = 0.9, segments = NULL) {
+mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal = 10,
+                           max.mut.types = 3, min.type.freq = 0.9, segments = NULL) {
    chroms      <- unique(abf.tab$chromosome)
    hom.filt    <- abf.tab$ref.zygosity == 'hom'
    abf.tab     <- abf.tab[hom.filt, ]
-   reads.filt  <- abf.tab$good.s.reads >= min.reads
+   reads.filt  <- abf.tab$good.s.reads >= min.reads & abf.tab$depth.normal >= min.reads.normal
    abf.tab     <- abf.tab[reads.filt, ]
    mufreq.filt <- abf.tab$Af <= (1 - mufreq.treshold)
    abf.tab     <- abf.tab[mufreq.filt, ]

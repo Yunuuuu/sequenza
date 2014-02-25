@@ -32,6 +32,7 @@
   \item{gamma, kmin}{arguments passed to \code{aspcf} from the \code{copynumber} package.}
   \item{mufreq.treshold}{mutation frequency threshold.}
   \item{min.reads}{minimal number of reads above the quality threshold to accept the mutation call.}
+  \item{min.reads.normal}{minimal number of reads used to determine the genotype in the normal sample.}
   \item{max.mut.types}{maximal number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 bases). Default is 3, to accept "noisy" mutation calls.}
   \item{min.type.freq}{minimal frequency of aberrant types.}
   \item{sequenza.extract}{a list of objects as output from the \code{sequenza.extract} function.}

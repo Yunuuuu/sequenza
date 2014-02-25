@@ -1,6 +1,6 @@
 sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80, kmin = 10,
-                             mufreq.treshold = 0.10, min.reads = 40, max.mut.types = 1,
-                             min.type.freq = 0.9){
+                             mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
+                             max.mut.types = 1, min.type.freq = 0.9){
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
    gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
@@ -50,8 +50,9 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                   
       }
       mut.tab   <- mutation.table(abf.data, mufreq.treshold = mufreq.treshold,
-                                  min.reads = min.reads, max.mut.types = max.mut.types,
-                                  min.type.freq = min.type.freq, segments = seg.s1)
+                                  min.reads = min.reads, min.reads.normal = min.reads.normal,
+                                  max.mut.types = max.mut.types, min.type.freq = min.type.freq,
+                                  segments = seg.s1)
       windows.baf[[which(chr.vect == chr)]]   = abf.b.win[[1]]
       windows.ratio[[which(chr.vect == chr)]] = abf.r.win[[1]]
       mutation.list[[which(chr.vect == chr)]] = mut.tab
