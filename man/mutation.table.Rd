@@ -8,7 +8,7 @@
 }
 
 \usage{
-mutation.table(abf.tab, mufreq.treshold = 0.15, min.reads = 40,
+mutation.table(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal = 10,
                max.mut.types = 3, min.type.freq = 0.9, segments = NULL)
 }
 

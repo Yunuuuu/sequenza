@@ -11,13 +11,14 @@
 \usage{
   sequenza.extract(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80,
                    kmin = 10, mufreq.treshold = 0.10, min.reads = 40,
-                   max.mut.types = 1, min.type.freq = 0.9)
+                   min.reads.normal = 10, max.mut.types = 1, min.type.freq = 0.9)
 
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
                XY = c(X = "X", Y = "Y"), cellularity = seq(0.1,1,0.01),
                ploidy = seq(1, 7, 0.1), ratio.priority = FALSE,
                priors.table = data.frame(CN = 2, value = 2),
                chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L))
+
   sequenza.results(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = './',
                    cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
                    ratio.priority = FALSE, XY = c(X = "X", Y = "Y"),
