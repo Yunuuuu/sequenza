@@ -137,8 +137,8 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
          }
       dev.off()
    }
-   seg.tab     <- na.exclude(do.call(rbind, sequenza.extract$segments[chromosome.list = 1:24]))
-   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list = 1:24]))
+   seg.tab     <- na.exclude(do.call(rbind, sequenza.extract$segments[chromosome.list = chromosome.list]))
+   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list = chromosome.list]))
    if (female == FALSE){
       segs.is.xy = seg.tab$chromosome == XY["X"] | seg.tab$chromosome == XY["Y"]
       mut.is.xy  = mut.tab$chromosome == XY["X"] | mut.tab$chromosome == XY["Y"]
