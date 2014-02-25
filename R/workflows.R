@@ -58,10 +58,10 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                   min.reads = min.reads, min.reads.normal = min.reads.normal,
                                   max.mut.types = max.mut.types, min.type.freq = min.type.freq,
                                   segments = seg.s1)
-      windows.baf[[which(chr.vect == chr)]]   = abf.b.win[[1]]
-      windows.ratio[[which(chr.vect == chr)]] = abf.r.win[[1]]
-      mutation.list[[which(chr.vect == chr)]] = mut.tab
-      segments.list[[which(chr.vect == chr)]] = seg.s1
+      windows.baf[[which(chromosome.list == chr)]]   = abf.b.win[[1]]
+      windows.ratio[[which(chromosome.list == chr)]] = abf.r.win[[1]]
+      mutation.list[[which(chromosome.list == chr)]] = mut.tab
+      segments.list[[which(chromosome.list == chr)]] = seg.s1
    }
    names(windows.baf)   <- chromosome.list
    names(windows.ratio) <- chromosome.list
