@@ -68,7 +68,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    names(mutation.list) <- chromosome.list
    names(segments.list) <- chromosome.list
    return(list(BAF = windows.baf, ratio = windows.ratio, mutations = mutation.list,
-               segments = segments.list, chromosomes = chr.vect, gc = gc.stats))
+               segments = segments.list, chromosomes = chromosome.list, gc = gc.stats))
 }
 
 sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
