@@ -273,9 +273,11 @@ find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), v
 }
 
 segment.breaks <- function(abf.tab, breaks) {
-   w.r     <- sqrt(abf.tab$depth.sample)
+   #w.r     <- sqrt(abf.tab$depth.sample)
+   w.r     <- sqrt(1)
    rw      <- abf.tab$adjusted.ratio * w.r
-   w.b     <- sqrt(abf.tab$good.s.reads)
+   #w.b     <- sqrt(abf.tab$good.s.reads)
+   w.b     <- sqrt(1)
    bw      <- abf.tab$Bf * w.b
    abf.tab <- cbind(abf.tab[, c("chromosome", "n.base", "ref.zygosity")],
                     rw = rw, w.r = w.r, bw = bw, w.b = w.b)
