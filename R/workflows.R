@@ -154,7 +154,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
                             ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (female == FALSE){
-      if (sum(mut.is.xy) >= 1) {
+      if (sum(segs.is.xy) >= 1) {
          cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[segs.is.xy], CNt.max = CNt.max,
                                depth.ratio = seg.tab$depth.ratio[segs.is.xy],
                                cellularity = cellularity, ploidy = ploidy,
