@@ -13,7 +13,7 @@ chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
                 min.N.baf = 1, min.N.ratio = 10000, main = "", vlines = FALSE,
                 legend.inset = c(-20 * strwidth("a", units = "figure"), 0),
                 BAF.style = "none", CNn = 2, cellularity = NULL, ploidy = NULL,
-                avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24",
+                avg.depth.ratio = NULL, avg.depth, model.lwd = 1, model.lty = "24",
                 model.col = 1, x.chr.space = 10)
 genome.view(seg.cn, info.type = "AB", ...)
 }
@@ -30,6 +30,7 @@ genome.view(seg.cn, info.type = "AB", ...)
   \item{cellularity}{fraction of tumor cells in the sample.}
   \item{ploidy}{value of the estimated \code{ploidy} parameter.}
   \item{avg.depth.ratio}{the average value of the normalized depth ratio.}
+  \item{avg.depth}{integer number indicating the sequencing depth of the tumor sample.}
   \item{main}{main title of the plot.}
   \item{legend.inset}{the inset argument to pass to the \code{legend} function. Defines the distance between the mutation legend and the plot border.}
   \item{BAF.style}{the style to visualize the theoretical thresholds for the B allele frequency panel. Possible values are "lines", "blocks", "none". Default is "none".}

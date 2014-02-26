@@ -11,7 +11,7 @@
   baf.bayes(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
             weight.Bf = 100, weight.ratio = 100, CNt.min = 0, CNt.max = 7,
             CNn = 2, priors.table = data.frame(CN = CNt.min:CNt.max, value = 1),
-            ratio.priority = FALSE, skew.baf = 0.95)
+            ratio.priority = FALSE, avg.depth)
   mufreq.bayes(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
             weight.mufreq = 100, weight.ratio = 100, CNt.min = 1, CNt.max = 7, CNn = 2,
             priors.table = data.frame(CN = CNt.min:CNt.max, value = 1))
@@ -32,7 +32,7 @@
   \item{CNn}{copy number of the normal genome.}
   \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
   \item{ratio.priority}{logical, if TRUE only the depth ratio will be used to determine the copy number state, while the Bf value will be used to determine the number of B-alleles.}
-  \item{skew.baf}{observed B-allele frequency often does not converge to the 0.5 frequency, for normal diploid positions. This argument indicate at which percentile of the observed B-allele frequency to skew the theoretic value below 0.5.}
+  \item{avg.depth}{integer number indicating the sequencing depth of the tumor sample.}
 }
 
 \value{

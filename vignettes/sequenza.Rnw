@@ -388,7 +388,8 @@ To detect copy number variations we use a B allele frequency model, implemented 
 seg.tab     <- na.exclude(do.call(rbind, test$segments))
 cn.alleles <- baf.bayes(Bf = seg.tab$Bf, depth.ratio = seg.tab$depth.ratio,
                         cellularity = cellularity, ploidy = ploidy,
-                        avg.depth.ratio = avg.depth.ratio)
+                        avg.depth.ratio = avg.depth.ratio,
+                        avg.depth = test$avg.depth)
 head(cn.alleles)
 seg.tab <- cbind(seg.tab, cn.alleles)
 head(seg.tab)
@@ -411,7 +412,7 @@ chromosome.view(mut.tab = test$mutations[[3]], baf.windows = test$BAF[[3]],
                 segments = seg.tab[seg.tab$chromosome == test$chromosomes[3],],
                 main = test$chromosomes[3],
                 cellularity = cellularity, ploidy = ploidy,
-                avg.depth.ratio = avg.depth.ratio)
+                avg.depth.ratio = avg.depth.ratio, avg.depth = test$avg.depth)
 @ 
       \caption{Plots of mutant allele frequency (top), B-allele frequency (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted lines indicate expectation values for various copy number/allele states.}
       \label{fig:crhomViewWithCP}

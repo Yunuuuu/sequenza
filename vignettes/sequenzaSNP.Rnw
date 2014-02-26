@@ -111,7 +111,7 @@ CPsnp.example <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         weight.Bf = weights.snp[filter.size],
                         avg.depth.ratio = avg.unlogR,
                         cellularity = seq(0.1,1,0.01), 
-                        ploidy = seq(1,7,0.1),
+                        ploidy = seq(1,7,0.1), avg.depth = 200,
                         priors.table = data.frame(CN = 2, value = 2))
 @
 
@@ -144,7 +144,7 @@ snp.seg.cn <- baf.bayes(Bf = seg.i$Bf,
                         depth.ratio = seg.i$depth.ratio, 
                         avg.depth.ratio = avg.unlogR,
                         cellularity = cellularity,
-                        weight.ratio = 2 * 300,
+                        weight.ratio = 2 * 300, avg.depth = 200,
                         weight.Bf = 300, ratio.priority = FALSE,
                         ploidy = ploidy, CNt.max = 10)
 
@@ -163,7 +163,7 @@ chromosome.view(baf.windows = snp.b.win[[1]],
                 ratio.windows = snp.r.win[[1]],  min.N.ratio = 1,
                 segments = segmented.snp[segmented.snp$chromosome == "1", ],
                 cellularity = cellularity, ploidy = ploidy,
-                avg.depth.ratio = avg.unlogR, main = "1")
+                avg.depth.ratio = avg.unlogR, main = "1", avg.depth = 200)
 @
       \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allele state. }
       \label{fig:crhomViewNoMutCP1}
@@ -176,7 +176,7 @@ chromosome.view(baf.windows = snp.b.win[[16]],
                 ratio.windows = snp.r.win[[16]],  min.N.ratio = 1,
                 segments = segmented.snp[segmented.snp$chromosome == "16", ],
                 cellularity = cellularity, ploidy = ploidy,
-                avg.depth.ratio = avg.unlogR, main = "16")
+                avg.depth.ratio = avg.unlogR, main = "16", avg.depth = 200)
 @
       \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allele state. }
       \label{fig:crhomViewNoMutCP16}
