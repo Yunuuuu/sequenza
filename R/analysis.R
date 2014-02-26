@@ -291,8 +291,8 @@ segment.breaks <- function(abf.tab, breaks, weighted.mean = FALSE) {
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))
       fact.r.i    <- cut(abf.tab[[i]]$n.base, breaks.vect)
       fact.b.i    <- cut(abf.b.i$n.base, breaks.vect)
-      seg.i.s.r   <- sapply(X = split(abf.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = length)
-      seg.i.s.b   <- sapply(X = split(abf.b.i$Bf, f = fact.b.i), FUN = length)
+      seg.i.s.r   <- sapply(X = split(abf.tab[[i]]$chromosome, f = fact.r.i), FUN = length)
+      seg.i.s.b   <- sapply(X = split(abf.b.i$chromosome, f = fact.b.i), FUN = length)
       if (weighted.mean == TRUE){
          seg.i.rw    <- sapply(X = split(abf.tab[[i]]$rw, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
          seg.i.w.r   <- sapply(X = split(abf.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
