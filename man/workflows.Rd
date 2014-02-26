@@ -12,7 +12,8 @@
   sequenza.extract(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80,
                    kmin = 10, mufreq.treshold = 0.10, min.reads = 40,
                    min.reads.normal = 10, max.mut.types = 1,
-                   min.type.freq = 0.9, chromosome.list = NULL)
+                   min.type.freq = 0.9, chromosome.list = NULL,
+                   weighted.mean = TRUE)
 
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
                XY = c(X = "X", Y = "Y"), cellularity = seq(0.1,1,0.01),
@@ -48,6 +49,7 @@
   \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
   \item{ratio.priority}{logical, if TRUE only the depth ratio will be used to determine the copy number state, while the Bf value will be used to determine the number of B-alleles.}
   \item{chromosome.list}{Vector containing the index or the names of the chromosome to include in the model fitting.}
+  \item{weighted.mean}{boolean to select if the segments have to calculated using the read depth as a weights to calculate depth ratio and B-allele frequency means.}
   \item{sample.id}{identifier of the sample. It will be used as prefix of saved object.}
   \item{out.dir}{output directory where all the files and object will be stored.}
   \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
