@@ -272,7 +272,7 @@ find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), v
                c("chrom", "start.pos", "end.pos")]
 }
 
-segment.breaks <- function(abf.tab, breaks, weighted.mean = FALSE) {
+segment.breaks <- function(abf.tab, breaks, weighted.mean = TRUE) {
    if (weighted.mean == TRUE){
       w.r     <- sqrt(abf.tab$depth.sample)
       rw      <- abf.tab$adjusted.ratio * w.r

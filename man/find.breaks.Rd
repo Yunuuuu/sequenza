@@ -9,7 +9,7 @@
 
 \usage{
 find.breaks(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...)
-segment.breaks(abf.tab, breaks, weighted.mean = FALSE)
+segment.breaks(abf.tab, breaks, weighted.mean = TRUE)
 }
 
 \arguments{
