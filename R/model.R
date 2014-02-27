@@ -67,7 +67,7 @@ expected.baf <- function(depth, ...) {
   baf      <- theoretical.baf(...)
   baf.binom <- function(BAF, depth, CNt, by = 0.001){
     bafs     <- seq(from = 0, to = 0.5, by = by)
-    curve    <- dbinom(round(depth*(CNt/2)*BAF,0), depth, bafs)
+    curve    <- dbinom(round(depth*(CNt/2)*BAF,0), round((CNt/2)*depth, 0), bafs)
     weighted.mean(bafs,curve)
   }
   baf$BAF <- sapply(1:nrow(baf), FUN = function (x) {
