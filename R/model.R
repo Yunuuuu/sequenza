@@ -64,17 +64,15 @@ theoretical.baf <- function(CNn, CNt, cellularity) {
    as.data.frame(do.call(rbind,res))
 }
 
-expected.baf <- function(depth, ploidy, ...) {
+expected.baf <- function(depth, ...) {
   baf      <- theoretical.baf(...)
-  baf.binom <- function(BAF, depth, CNt, by = 0.001, ploidy){
-    bafs     <- seq(from = 0, to = 0.5, by = by)
-    curve    <- dbinom(round(depth*(CNt/ploidy)*BAF,0), round((CNt/ploidy)*depth, 0), bafs)
-    weighted.mean(bafs,curve)
+  baf.binom <- function(BAF, depth, by = 0.001){
+     bafs     <- seq(from = 0, to = 0.5, by = by)
+      curve    <- dbinom(round(depth*BAF,0), depth, bafs)
+      weighted.mean(bafs,curve)
   }
-  baf$BAF <- sapply(1:nrow(baf), FUN = function (x) {
-       baf.binom(BAF = baf$BAF[x], depth = depth, CNt= baf$CNt[x],  ploidy = ploidy)
-     }
-  )
+  baf$BAF <- mapply(FUN = baf.binom, baf$BAF,
+                                   MoreArgs = list(depth))
   baf
 }
 

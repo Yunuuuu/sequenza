@@ -139,7 +139,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
             data.model     <- list()
             CNt.max        <- max(segments$CNt, na.rm = TRUE) + 1
             CNt.min        <- 0
-            data.model$baf <- expected.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity, depth = avg.depth, ploidy = ploidy)
+            data.model$baf <- expected.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity, depth = avg.depth)
             if (CNn == 2) {
                data.model$baf <- rbind(c(0,0,0.5,0), data.model$baf)
             } else {
