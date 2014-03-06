@@ -102,12 +102,12 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
    model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])
    #model.baf          <- theoretical.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity)
    model.baf           <- expected.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity, depth = avg.depth)
-   if(CNt.min == 0) {
-      model.baf          <- as.data.frame(rbind(c(0, 0, max(model.baf$BAF), 0), model.baf))
-   }
    # B-allele freq are never 0.5, always smaller. work around on this bias
    model.baf$BAF[model.baf$A==model.baf$B] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$weight.Bf),
                                                        na.rm = TRUE, probs = 0.95)
+   if(CNt.min == 0) {
+     model.baf          <- as.data.frame(rbind(c(0, 0, max(model.baf$BAF), 0), model.baf))
+   }
    #                                                na.rm = TRUE, probs = skew.baf)
    model.pts          <- merge(model.baf, model.d.ratio)
    # model.pts          <- cbind(baf.type = apply(model.pts[, 1:3], 1, FUN = function(x) paste(x, collapse = "_")),
