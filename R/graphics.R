@@ -144,9 +144,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                data.model$baf <- rbind(c(0,0,0.5,0), data.model$baf)
             } else {
                data.model$baf <- rbind(c(0,0,1,0), data.model$baf)
-            }
-            data.model$baf$BAF[data.model$baf$A==data.model$baf$B] <- quantile(segments$Bf,
-                                                                na.rm = TRUE, probs = 0.95)       
+            }       
             types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNn = CNn)
             data.model$muf <- cbind(types, model.points(cellularity = cellularity, ploidy = ploidy,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
