@@ -229,18 +229,22 @@ def parse_pileup(ref_base, line, qlimit=20, qformat='sanger'):
 
 def parse_pileup_str(line, min_depth, qlimit=20, qformat='sanger'):
    '''
+   '''
    Parse the pileup format
    '''
    if line.strip():
       line   = line.strip()
-      chromosome, n_base, ref_base, depth, mut_list, mut_qual = line.split()
-      rd     = int(depth)
-      rebase = ref_base.upper()
-      if rd >= min_depth and rebase != "N":
-         freq_dict = parse_pileup_seq(mut_list, mut_qual, rd, rebase, qlimit, qformat)
-         line = [chromosome, n_base, rebase, depth, freq_dict['A'], freq_dict['C'], freq_dict['G'], freq_dict['T']]
-         return '\t'.join(map(str,line))
-      else:
+      try:
+         chromosome, n_base, ref_base, depth, mut_list, mut_qual = line.split()
+         rd     = int(depth)
+         rebase = ref_base.upper()
+         if rd >= min_depth and rebase != "N":
+            freq_dict = parse_pileup_seq(mut_list, mut_qual, rd, rebase, qlimit, qformat)
+            line = [chromosome, n_base, rebase, depth, freq_dict['A'], freq_dict['C'], freq_dict['G'], freq_dict['T']]
+            return '\t'.join(map(str,line))
+         else:
+            pass
+      except ValueError:
          pass
    else:
       pass
