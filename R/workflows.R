@@ -218,7 +218,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
                       avg.depth = sequenza.extract$avg.depth)
    }
    dev.off()
-   pdf(paste(out.dir, geno.file, sep = "/"))
+   pdf(paste(out.dir, geno.file, sep = "/"), height = 5, width = 15)
       genome.view(seg.res)
       genome.view(seg.res, "CN")
    dev.off()
