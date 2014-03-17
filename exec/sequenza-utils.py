@@ -24,7 +24,7 @@ except ImportError:
    RPY2 = False
 
 VERSION = "1.0.0"
-DATE    = "28 November 2013"
+DATE    = "17 March 2014"
 AUTHOR  = "Favero Francesco"
 MAIL    = "favero@cbs.dtu.dk"
 
