@@ -118,8 +118,11 @@ class multiPileups:
       self._last_chromosome = None
    _sentinel        = object()
    def next(self):
-      chromosome1, position1, line1 = pileup_partial_split(self.p1.next())
-      chromosome2, position2, line2 = pileup_partial_split(self.p2.next())
+      try:
+         chromosome1, position1, line1 = pileup_partial_split(self.p1.next())
+         chromosome2, position2, line2 = pileup_partial_split(self.p2.next())
+      except ValueError:
+         raise StopIteration
       if chromosome1 == chromosome2:
          self._last_chromosome = chromosome1
       going_on = True
@@ -223,12 +226,11 @@ def parse_pileup(ref_base, line, qlimit=20, qformat='sanger'):
    depth    = int(depth)
    if ref_base != "N":
       freq_dict = parse_pileup_seq(mut_list, mut_qual, depth, ref_base, qlimit, qformat)
-      return [ref_base, depth, freq_dict['A'], freq_dict['C'], freq_dict['G'], freq_dict['T']]
+      return [ref_base, depth, freq_dict['A'], freq_dict['C'], freq_dict['G'], freq_dict['T'], freq_dict['Z']]
    else:
-      return [ref_base, depth, 0, 0, 0, 0]
+      return [ref_base, depth, 0, 0, 0, 0, [0, 0, 0, 0]]
 
 def parse_pileup_str(line, min_depth, qlimit=20, qformat='sanger'):
-   '''
    '''
    Parse the pileup format
    '''
@@ -240,7 +242,7 @@ def parse_pileup_str(line, min_depth, qlimit=20, qformat='sanger'):
          rebase = ref_base.upper()
          if rd >= min_depth and rebase != "N":
             freq_dict = parse_pileup_seq(mut_list, mut_qual, rd, rebase, qlimit, qformat)
-            line = [chromosome, n_base, rebase, depth, freq_dict['A'], freq_dict['C'], freq_dict['G'], freq_dict['T']]
+            line = [chromosome, n_base, rebase, depth, freq_dict['A'], freq_dict['C'], freq_dict['G'], freq_dict['T'], ':'.join(map(str, freq_dict['Z']))]
             return '\t'.join(map(str,line))
          else:
             pass
@@ -254,6 +256,7 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
    Parse the piled up sequence and return the frequence of mutation.
    '''
    nucleot_dict = {'A':0, 'C':0, 'G':0, 'T':0}
+   strand_dict  = {'A':0, 'C':0, 'G':0, 'T':0}
    reference    = reference.strip().upper()
    H            = 0
    n            = 0
@@ -284,11 +287,13 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
          elif base == '.' or base == ',':
             if ord(quality[n]) >= qlimit:
                nucleot_dict[reference] += 1
+               if base == '.': strand_dict[reference] += 1
             last_base        = reference
             n += 1
          elif base.strip().upper() in nucleot_dict:
             if ord(quality[n]) >= qlimit:
                nucleot_dict[base.strip().upper()] += 1
+               if base == base.strip().isupper(): strand_dict[reference] += 1
             last_base        = base.strip().upper()
             n +=1
          else:
@@ -302,9 +307,11 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
                   if base == '.' or base == ',':
                      if ord(quality[n]) >= qlimit:
                         nucleot_dict[reference] += 1
+                        if base == '.': strand_dict[reference] += 1
                   elif base.strip().upper() in nucleot_dict:
                      if ord(quality[n]) >= qlimit:
                         nucleot_dict[base.strip().upper()] += 1
+                        if base == base.strip().isupper(): strand_dict[reference] += 1
                block['length'] = 0
                block['seq']    = ''
                start           = False
@@ -327,6 +334,7 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
       # Debug line
       #print str(n) + " " + base + " " + seq
    if n == depth:
+      nucleot_dict["Z"] = [strand_dict['A'], strand_dict['C'], strand_dict['G'], strand_dict['T']]
       return nucleot_dict
    else:
       #print seq + " " + str(depth)+" " + str(n)
@@ -361,11 +369,14 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                   no_zero_bases = [str(bases_list[ll])+str(round(p2_freq[ll], 3)) for ll in no_zero_idx if ll != i]
                   if no_zero_bases == []:
                      no_zero_bases = '.'
+                     strands_bases = '0'
                   else:
-                     no_zero_bases = ":".join(map(str,no_zero_bases))
+                     no_zero_bases = ":".join(map(str, no_zero_bases))
+                     strands_bases = [str(bases_list[ll])+str(round(p2_mu[6][ll]/float(p2_mu[2+ll]), 3)) for ll in no_zero_idx if ll != i]
+                     strands_bases = ":".join(map(str, strands_bases))
                   #homoz_p2 = p2_mu[2 + i]/sum_p2
                   # chromosome, n_base, base_ref, depth_normal, depth_sample, depth.ratio, Af, Bf, ref.zygosity, GC-content, percentage reads above quality, AB.ref, AB.tum
-                  line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(homoz_p2, 3), 0, 'hom', gc, int(sum_p2), bases_list[i], no_zero_bases]
+                  line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(homoz_p2, 3), 0, 'hom', gc, int(sum_p2), bases_list[i], no_zero_bases, strands_bases]
                   return line_out
                else:
                   pass
@@ -385,10 +396,10 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                         het_a_p2 = p2_mu[2 + i]/sum_p2
                         het_b_p2 = p2_mu[2 + ii]/sum_p2
                         if  het_a_p2 >= het_b_p2:
-                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], "."]
+                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
                            return line_out
                         elif het_a_p2 < het_b_p2:
-                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], "."]
+                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
                            return line_out
                   else:
                      pass
@@ -1071,7 +1082,7 @@ def main():
             logging.warning("Using chunks of " + str(args.chunk) + " line(s), and splitting the job in " + str(args.nproc+1)  + " process(es).")
          with xopen(args.output, "wb") as fileout:
             with xopen(args.pileup, "rb") as f:
-               fileout.write('chr' + "\t" + 'n_base' + "\t" + 'ref_base' + "\t" +  'read.depth' + "\t" + 'A' + "\t" + 'C' + "\t" + 'G' + "\t" + 'T' + '\n')
+               fileout.write('chr' + "\t" + 'n_base' + "\t" + 'ref_base' + "\t" +  'read.depth' + "\t" + 'A' + "\t" + 'C' + "\t" + 'G' + "\t" + 'T' + "\t" + "strand" + '\n')
                parse_pileup_partial = partial(parse_pileup_str, min_depth=args.n, qlimit=args.qlimit, qformat=args.qformat)
                counter = 0
                for chunk in grouper(args.chunk, f):
@@ -1097,7 +1108,7 @@ def main():
       elif used_module == "pileup2abfreq":
          args = pileup2abfreq(parser, parser_pileup2abfreq)
          with xopen('-', "wb") as fileout:
-            out_header = ["chromosome", "n.base", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "ref.zygosity", "GC.percent", "good.s.reads", "AB.germline", "AB.sample"]
+            out_header = ["chromosome", "n.base", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "ref.zygosity", "GC.percent", "good.s.reads", "AB.germline", "AB.sample", "sample.strand"]
             p1 = args.reference
             p2 = args.sample
             gc = args.gc
