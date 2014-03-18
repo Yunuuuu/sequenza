@@ -465,7 +465,7 @@ class abfreReduce:
       gc = str(round(self._gc/self._n, 3))
       avg_line = [self._last_chromosome, self._last_position, 'N', self._n_depth/self._n,
                   self._t_depth/self._n, round(self._ratio/self._n, 3), 1.0, 0, 'hom',
-                  gc , self._n, 'N', '.']
+                  gc , self._n, 'N', '.', '0']
       self.line_dict['end'] = map(str, avg_line)
       if self.line_dict['top'] == '':
          avg_line[1] = self._last_edge
