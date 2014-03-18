@@ -203,28 +203,32 @@ get.ci <- function(cp.table, interval = 0.95) {
 # }
 
 
-mut.fractions <- function(AB.sample, Af) {
+mut.fractions <- function(AB.sample, Af, sample.strand) {
   F = 1 - Af
    base.mut <- lapply(X = AB.sample, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
+   base.fw  <- lapply(X = sample.strand, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
    frequencify <- function (x) {
       base.name <- substr(unlist(x), 1, 1)
       base.val  <- as.numeric(substr(unlist(x), 2, nchar(x)))
       setNames(base.val, base.name)
    }
    base.freqs <- lapply(X = base.mut, FUN = frequencify)
+   fw.freqs   <- lapply(X = base.fw, FUN = frequencify)
    n.base.mut <- do.call(c, lapply(X = base.mut, FUN = length))
    max.fq <- function (x) {
       freq.rel <- base.freqs[[x]] / F[x]
       f.max    <- which.max(freq.rel)
-      c(freq.rel[f.max], names(base.freqs[[x]])[f.max], base.freqs[[x]][f.max])
+      c(freq.rel[f.max], names(base.freqs[[x]])[f.max], base.freqs[[x]][f.max], fw.freqs[[x]][f.max])
    }
    max.freqs  <- do.call(rbind, lapply(1:length(F), max.fq))
    data.frame(base.count = as.integer(n.base.mut), maj.base.freq = as.numeric(max.freqs[, 1]),
-              base = as.character(max.freqs[,2]), freq = as.numeric(max.freqs[,3]))
+              base = as.character(max.freqs[,2]), freq = as.numeric(max.freqs[,3]),
+              fw.freq = as.numeric(max.freqs[,4]))
 }
 
 mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal = 10,
-                           max.mut.types = 3, min.type.freq = 0.9, segments = NULL) {
+                           max.mut.types = 3, min.type.freq = 0.9, min.fw.freq = 0,
+                           segments = NULL) {
    chroms      <- unique(abf.tab$chromosome)
    hom.filt    <- abf.tab$ref.zygosity == 'hom'
    abf.tab     <- abf.tab[hom.filt, ]
@@ -241,10 +245,19 @@ mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.
    abf.dummy   <- data.frame(chromosome = chroms, n.base = 1, GC.percent = NA, good.s.reads = NA,
                              adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)
    if (nrow(abf.tab) >= 1) {
-      mu.fracts   <- mut.fractions(AB.sample = abf.tab$AB.sample, Af = abf.tab$Af)
+      mu.fracts   <- mut.fractions(AB.sample = abf.tab$AB.sample, Af = abf.tab$Af,
+                                   sample.strand = abf.tab$sample.strand)
       mufreq.filt <- mu.fracts$freq >= mufreq.treshold
       type.filt   <- mu.fracts$base.count <= max.mut.types
-      prop.filt   <- mu.fracts$maj.base.freq <= min.type.freq
+      prop.filt   <- mu.fracts$maj.base.freq >= min.type.freq
+      if (!is.na(min.fw.freq)) {
+         fw.2 = 1 - min.fw.freq
+         fw.2 <- sort(c(fw.2, min.fw.freq))
+         fw.filt     <- mu.fracts$fw.freq > fw.2[1] & mu.fracts$fw.freq < fw.2[2]
+         mufreq.filt <- mufreq.filt & type.filt  & prop.filt & fw.filt
+      } else {
+         mufreq.filt <- mufreq.filt & type.filt  & prop.filt
+      }
       mut.type    <- paste(abf.tab$AB.germline, mu.fracts$base, sep = '>')
       abf.tab     <- abf.tab[,c('chromosome', 'n.base', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
       abf.tab     <- cbind(abf.tab, F = mu.fracts$freq, mutation = mut.type)
