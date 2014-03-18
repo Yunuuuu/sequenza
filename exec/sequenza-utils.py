@@ -293,7 +293,7 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
          elif base.strip().upper() in nucleot_dict:
             if ord(quality[n]) >= qlimit:
                nucleot_dict[base.strip().upper()] += 1
-               if base == base.strip().isupper(): strand_dict[reference] += 1
+               if base.strip().isupper(): strand_dict[base.strip().upper()] += 1
             last_base        = base.strip().upper()
             n +=1
          else:
@@ -311,7 +311,7 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
                   elif base.strip().upper() in nucleot_dict:
                      if ord(quality[n]) >= qlimit:
                         nucleot_dict[base.strip().upper()] += 1
-                        if base == base.strip().isupper(): strand_dict[reference] += 1
+                        if base.strip().isupper(): strand_dict[base.strip().upper()] += 1
                block['length'] = 0
                block['seq']    = ''
                start           = False
