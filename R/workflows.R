@@ -1,7 +1,7 @@
 sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80, kmin = 10,
                              mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
-                             max.mut.types = 1, min.type.freq = 0.9, chromosome.list = NULL,
-                             weighted.mean = TRUE){
+                             max.mut.types = 1, min.type.freq = 0.9, min.fw.freq = 0,
+                             verbose = TRUE, chromosome.list = NULL, weighted.mean = TRUE){
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
    gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
@@ -16,6 +16,9 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
      chromosome.list <- chromosome.list[chromosome.list%in%chr.vect]
    }
    for (chr in chromosome.list){
+      if (verbose == TRUE){
+         cat("processing ", chr, ": ") 
+      }
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
       abf.data   <- read.abfreq(file, gz = gz, n.lines = c(file.lines$start, file.lines$end))
       abf.data$adjusted.ratio <- round(abf.data$depth.ratio / gc.vect[as.character(abf.data$GC.percent)], 3)
@@ -61,13 +64,19 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       mut.tab   <- mutation.table(abf.data, mufreq.treshold = mufreq.treshold,
                                   min.reads = min.reads, min.reads.normal = min.reads.normal,
                                   max.mut.types = max.mut.types, min.type.freq = min.type.freq,
-                                  segments = seg.s1)
+                                  min.fw.freq = min.fw.freq, segments = seg.s1)
       windows.baf[[which(chromosome.list == chr)]]   = abf.b.win[[1]]
       windows.ratio[[which(chromosome.list == chr)]] = abf.r.win[[1]]
       mutation.list[[which(chromosome.list == chr)]] = mut.tab
       segments.list[[which(chromosome.list == chr)]] = seg.s1
       coverage.list[[which(chromosome.list == chr)]] = data.frame(sum(sum = abf.data$depth.sample, na.rm = TRUE),
                                                                  N  = length(abf.data$depth.sample) )
+      if (verbose == TRUE){
+        
+        cat(paste(nrow(mut.tab), 'variant calls;',
+                 nrow(abf.het), 'heterozygous positions;',
+                 sum(abf.hom), 'homozygous positions.', sep = " "), "\n") 
+      }
    }
    names(windows.baf)   <- chromosome.list
    names(windows.ratio) <- chromosome.list

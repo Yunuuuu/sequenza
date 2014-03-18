@@ -12,8 +12,8 @@
   sequenza.extract(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80,
                    kmin = 10, mufreq.treshold = 0.10, min.reads = 40,
                    min.reads.normal = 10, max.mut.types = 1,
-                   min.type.freq = 0.9, chromosome.list = NULL,
-                   weighted.mean = TRUE)
+                   min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE,
+                   chromosome.list = NULL, weighted.mean = TRUE)
 
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
                XY = c(X = "X", Y = "Y"), cellularity = seq(0.1,1,0.01),
@@ -38,6 +38,7 @@
   \item{min.reads.normal}{minimal number of reads used to determine the genotype in the normal sample.}
   \item{max.mut.types}{maximal number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 bases). Default is 3, to accept "noisy" mutation calls.}
   \item{min.type.freq}{minimal frequency of aberrant types.}
+    \item{min.fw.freq}{minimal frequency of variant reads detected in the forward strand. Setting it to 0, all the variant calls with strand frequency in the interval outside 0 and 1, margin not comprised, would be discarded.}
   \item{sequenza.extract}{a list of objects as output from the \code{sequenza.extract} function.}
   \item{sequenza.fit}{a list of objects as output from the \code{sequenza.fit} function.}
   \item{female}{logical, indicating whether the sample is male or female, to properly handle the X and Y chromosomes. Implementation only works for the human normal karyotype.}
@@ -50,6 +51,7 @@
   \item{ratio.priority}{logical, if TRUE only the depth ratio will be used to determine the copy number state, while the Bf value will be used to determine the number of B-alleles.}
   \item{chromosome.list}{Vector containing the index or the names of the chromosome to include in the model fitting.}
   \item{weighted.mean}{boolean to select if the segments have to calculated using the read depth as a weights to calculate depth ratio and B-allele frequency means.}
+  \item{verbose}{logical, indicating whether to print information about the chromosome being processed.}
   \item{sample.id}{identifier of the sample. It will be used as prefix of saved object.}
   \item{out.dir}{output directory where all the files and object will be stored.}
   \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
