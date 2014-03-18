@@ -94,67 +94,38 @@ gc.sample.stats <- function (file, gz = TRUE) {
    gc.stats
 }
 
-windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRUE,
-                          weight = rep.int( x = 1, times = length(x)), start.coord = 1) {
-   results  <- list()
-   weight   <- sqrt(weight)
-   xw       <- x * weight
-   overlap  <- as.integer(overlap)
-   window.o <- window - round(window * (overlap / (overlap + 1)), 0)
-   chr.order <- unique(chromosomes)
-   mat.w    <- data.frame(chr = chromosomes, pos = positions, x = x, xw = x * weight,
-                          w = weight, stringsAsFactors = FALSE)
-   mat.w    <- split(mat.w, mat.w$chr)
-   do.windows <- function(x.i, w.i, xw.i, breaks, overlap){
-      coords    <- data.frame(start = breaks[-length(breaks)], end = breaks[-1])
-      if (overlap > 0) {
-      start.w   <- 1:nrow(coords)
-      end.w     <- start.w + overlap
-      end.w[end.w > max(start.w)] <- max(start.w)
-      coords    <- data.frame(start = coords[start.w, 1], end = coords[end.w, 2])
-      idx.merge <- apply(cbind(start.w, end.w), 1, unique)
-      x.i       <- lapply(1:nrow(coords), function(a) do.call(c, x.i[idx.merge[[a]]]))
-      w.i       <- lapply(1:nrow(coords), function(a) do.call(c, w.i[idx.merge[[a]]]))
-      xw.i      <- lapply(1:nrow(coords), function(a) do.call(c, xw.i[idx.merge[[a]]]))
-      }
-      quartiles <- do.call(rbind,
-                           lapply(X = x.i, FUN = function(a) quantile(a, probs = c(0.25, 0.75),
-                                                                      na.rm = TRUE)))
-      sum.w     <- sapply(X = w.i, FUN = function(a) sum(a, na.rm = TRUE))
-      sum.xw    <- sapply(X = xw.i, FUN = function(a) sum(a, na.rm = TRUE))
-      size      <- sapply(X = x.i, FUN = length)
-      data.frame(coords, mean = sum.xw/sum.w, q0 = quartiles[,1],
-                 q1 = quartiles[,2], N = size, row.names = 1:length(size))
-   }
-   for (i in 1:length(mat.w)) {
-      range.pos            <- range(mat.w[[i]]$pos, na.rm = TRUE)
-      if (!is.null(start.coord)) {
-         range.pos[1] <- as.integer(start.coord)
-      }
-      beam.coords          <- seq(range.pos[1], range.pos[2], by = window.o)
-      if (max(beam.coords) != range.pos[2] ) {
-         beam.coords <- c(beam.coords, range.pos[2])
-      }
-      f.windows <- cut(x = mat.w[[i]]$pos, breaks = beam.coords)
-      xw      <- split(x = mat.w[[i]]$xw, f = f.windows)
-      w       <- split(x = mat.w[[i]]$w, f = f.windows)
-      x       <- split(x = mat.w[[i]]$x, f = f.windows)
-      if (overlap > 0 ) {
-         if (verbose) {
-            cat(paste("chromosome:", names(mat.w)[i], "from:", range.pos[1],"to:", range.pos[2], "window:", window, "overlapping windows:", overlap, "\n",sep=" "))
-         }
-      } else {
-         if (verbose) {
-            cat(paste("chromosome:", names(mat.w)[i], "from:", range.pos[1],"to:", range.pos[2], "window:", window,"\n",sep=" "))
-         }
-      }
-
-      results[[i]] <- do.windows(x.i = x, w.i = w, xw.i = xw,
-                                 breaks = beam.coords, overlap = overlap)
-   }
-   results <- results[as.factor(chr.order)]
-   names(results) <- names(chr.order)
-   results
+windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
+                         weight = rep.int( x = 1, times = length(x)), start.coord = 1) {
+  weight   <- sqrt(weight)
+  overlap  <- as.integer(overlap)
+  window.offset <- window - round(window * (overlap / (overlap + 1)))
+  chr.ordered <- unique(chromosomes)
+  data.splitByChr    <- split(data.frame(pos = positions, x = x, weight = weight), 
+                              f = factor(chromosomes, levels = chr.ordered))
+  lapply(data.splitByChr, function(data.oneChr) {
+    range.pos <- range(data.oneChr$pos, na.rm = TRUE)
+    if (!is.null(start.coord)) {
+      range.pos[1] <- as.integer(start.coord)
+    }
+    beam.coords <- seq(range.pos[1], range.pos[2], by = window.offset)
+    if (max(beam.coords) != range.pos[2] ) {
+      beam.coords <- c(beam.coords, range.pos[2])
+    }
+    nWindows <- length(beam.coords) - overlap - 1
+    pos.cut <- cut(data.oneChr$pos, breaks = beam.coords)
+    x.split <- split(data.oneChr$x, f = pos.cut)
+    weight.split <- split(data.oneChr$weight, f = pos.cut)
+    window.starts <- beam.coords[1:nWindows]
+    window.ends <- beam.coords[(1:nWindows) + 1 + overlap]
+    idx.list <- lapply(1:nWindows, function(ii) ii + (0:overlap))
+    x.window <- lapply(idx.list, function(idx) unlist(x.split[idx], use.names = FALSE))
+    weight.window <- lapply(idx.list, function(idx) unlist(weight.split[idx], use.names = FALSE))
+    window.means <- mapply(weighted.mean, x = x.window, w = weight.window)
+    window.quantiles <- sapply(x.window, quantile, probs = c(0.25, 0.75), na.rm = TRUE, names = FALSE)
+    window.counts <- sapply(x.window, length)
+    data.frame(start = window.starts, end = window.ends, mean = window.means, 
+               q0 = window.quantiles[1,], q1 = window.quantiles[2,], N = window.counts)
+  })
 }
 
 get.ci <- function(cp.table, interval = 0.95) {

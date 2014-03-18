@@ -7,7 +7,7 @@
 }
 
 \usage{
-windowValues(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRUE,
+windowValues(x, positions, chromosomes, window = 1e6, overlap = 0,
              weight = rep.int( x = 1, times = length(x)), start.coord = 1)
 }
 \arguments{
@@ -16,7 +16,6 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0, verbose = TRU
   \item{chromosomes}{names or numbers of the chromosomes.}
   \item{window}{size of windows used for binning data. Smaller windows will take more time to compute.}
   \item{overlap}{integer defining the number of overlapping windows. Default is 0, no overlap.}
-  \item{verbose}{logical, indicating whether to print information about the chromosome being processed.}
   \item{weight}{weights to be assigned to each value of \code{x}, usually related to the read depth.}
   \item{start.coord}{coordinate at which to start computing the windows. If NULL, will start at the first position available.}
 }
