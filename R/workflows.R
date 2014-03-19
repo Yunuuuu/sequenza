@@ -13,10 +13,10 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    if (is.null(chromosome.list)) {
      chromosome.list <- chr.vect
    } else {
-     chromosome.list <- chromosome.list[chromosome.list%in%chr.vect]
+     chromosome.list <- chromosome.list[chromosome.list %in% chr.vect]
    }
    for (chr in chromosome.list){
-      if (verbose == TRUE){
+      if (verbose){
          cat("processing ", chr, ": ") 
       }
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
@@ -65,13 +65,13 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                   min.reads = min.reads, min.reads.normal = min.reads.normal,
                                   max.mut.types = max.mut.types, min.type.freq = min.type.freq,
                                   min.fw.freq = min.fw.freq, segments = seg.s1)
-      windows.baf[[which(chromosome.list == chr)]]   = abf.b.win[[1]]
-      windows.ratio[[which(chromosome.list == chr)]] = abf.r.win[[1]]
-      mutation.list[[which(chromosome.list == chr)]] = mut.tab
-      segments.list[[which(chromosome.list == chr)]] = seg.s1
-      coverage.list[[which(chromosome.list == chr)]] = data.frame(sum(sum = abf.data$depth.sample, na.rm = TRUE),
+      windows.baf[[which(chromosome.list == chr)]]   <- abf.b.win[[1]]
+      windows.ratio[[which(chromosome.list == chr)]] <- abf.r.win[[1]]
+      mutation.list[[which(chromosome.list == chr)]] <- mut.tab
+      segments.list[[which(chromosome.list == chr)]] <- seg.s1
+      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum(sum = abf.data$depth.sample, na.rm = TRUE),
                                                                  N  = length(abf.data$depth.sample) )
-      if (verbose == TRUE){
+      if (verbose){
         
         cat(paste(nrow(mut.tab), 'variant calls;',
                  nrow(abf.het), 'heterozygous positions;',
@@ -83,36 +83,36 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    names(mutation.list) <- chromosome.list
    names(segments.list) <- chromosome.list
    coverage.list <- do.call(rbind, coverage.list)
-   coverage <- sum(coverage.list$sum)/sum(coverage.list$N)
+   coverage <- sum(coverage.list$sum) / sum(coverage.list$N)
    return(list(BAF = windows.baf, ratio = windows.ratio, mutations = mutation.list,
                segments = segments.list, chromosomes = chromosome.list, gc = gc.stats,
                avg.depth = round(coverage,0)))
 }
 
 sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
-                         cellularity = seq(0.1,1,0.01), ploidy = seq(1, 7, 0.1), ratio.priority = FALSE,
+                         cellularity = seq(0.1, 1, 0.01), ploidy = seq(1, 7, 0.1), ratio.priority = FALSE,
                          priors.table = data.frame(CN = 2, value = 2), chromosome.list = 1:24,
                          mc.cores = getOption("mc.cores", 2L)){
    if (is.null(chromosome.list)) {
-      segs.all      = do.call(rbind, sequenza.extract$segments)
+      segs.all      <- do.call(rbind, sequenza.extract$segments)
    } else {
-      segs.all      = do.call(rbind, sequenza.extract$segments[chromosome.list])      
+      segs.all      <- do.call(rbind, sequenza.extract$segments[chromosome.list])      
    }
-   #mut.all       = do.call(rbind, sequenza.extract$mutations)
-   #mut.all       = na.exclude(mut.all)
-   segs.len      = segs.all$end.pos - segs.all$start.pos
-   segs.filt     = segs.len >= segment.filter
+   #mut.all       <- do.call(rbind, sequenza.extract$mutations)
+   #mut.all       <- na.exclude(mut.all)
+   segs.len      <- segs.all$end.pos - segs.all$start.pos
+   segs.filt     <- segs.len >= segment.filter
    avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
-   if (female == FALSE){
-      segs.is.xy = segs.all$chromosome == XY["X"] | segs.all$chromosome == XY["Y"]
-      #mut.is.xy  = mut.all$chromosome == XY["X"] | mut.all$chromosome == XY["Y"]
+   if (female){
+      segs.is.xy <- segs.all$chromosome == XY["Y"]
+      #mut.is.xy  <- mut.all$chromosome == XY["Y"]
    } else{
-      segs.is.xy = segs.all$chromosome == XY["Y"]
-      #mut.is.xy  = mut.all$chromosome == XY["Y"]
+      segs.is.xy <- segs.all$chromosome %in% XY
+      #mut.is.xy  <- mut.all$chromosome %in% XY
    }
-   filt.test  = segs.filt & !segs.is.xy
-   seg.test   = segs.all[filt.test, ]
-   weights.seg = round(segs.len[filt.test] / 1e6, 0) + 150
+   filt.test  <- segs.filt & !segs.is.xy
+   seg.test   <- segs.all[filt.test, ]
+   weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 150
    baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
                  weight.ratio = 2 * weights.seg, weight.Bf = weights.seg,
                  avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
@@ -137,7 +137,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
               recursive = TRUE)
    assign(x = paste0(sample.id,"_sequenza_extract"), value = sequenza.extract)
    save(list = paste0(sample.id,"_sequenza_extract"), file = paste(out.dir, robj.extr, sep = "/")) 
-   if (is.null(sequenza.fit) & (is.null(cellularity) | is.null(ploidy))){
+   if (is.null(sequenza.fit) && (is.null(cellularity) || is.null(ploidy))){
       stop("Either the sequenza.fit or both cellularity and ploidy argument are required.")
    }
    if (!is.null(sequenza.fit)){
@@ -146,11 +146,11 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
       cint <- get.ci(sequenza.fit)
       pdf(paste(out.dir, cp.file, sep = "/"))
          cp.plot(sequenza.fit)
-         cp.plot.contours(sequenza.fit, add=T, likThresh = c(0.95), col="red", pch = 20)
-         if (!is.null(cellularity) | !is.null(ploidy)) {
+         cp.plot.contours(sequenza.fit, add = TRUE, likThresh = c(0.95), col = "red", pch = 20)
+         if (!is.null(cellularity) || !is.null(ploidy)) {
             if (is.null(cellularity)) cellularity <- cint$max.y
             if (is.null(ploidy)) ploidy <- cint$max.x
-            points(x = ploidy, y = cellularity , pch = 5)
+            points(x = ploidy, y = cellularity, pch = 5)
             text(x = ploidy, y = cellularity, 
                  labels = "User selection",
                  pos = 3, offset = 0.5)
@@ -162,12 +162,12 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    }
    seg.tab     <- na.exclude(do.call(rbind, sequenza.extract$segments[chromosome.list = chromosome.list]))
    mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list = chromosome.list]))
-   if (female == FALSE){
-      segs.is.xy = seg.tab$chromosome == XY["X"] | seg.tab$chromosome == XY["Y"]
-      mut.is.xy  = mut.tab$chromosome == XY["X"] | mut.tab$chromosome == XY["Y"]
+   if (female){
+      segs.is.xy <- segs.all$chromosome == XY["Y"]
+      mut.is.xy  <- mut.all$chromosome == XY["Y"]
    } else{
-      segs.is.xy = seg.tab$chromosome == XY["Y"]
-      mut.is.xy  = mut.tab$chromosome == XY["Y"]
+      segs.is.xy <- segs.all$chromosome %in% XY
+      mut.is.xy  <- mut.all$chromosome %in% XY
    }
 
    cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
@@ -177,7 +177,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
                             avg.depth = sequenza.extract$avg.depth,
                             ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
-   if (female == FALSE){
+   if (!female){
       if (sum(segs.is.xy) >= 1) {
          cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[segs.is.xy], CNt.max = CNt.max,
                                depth.ratio = seg.tab$depth.ratio[segs.is.xy],
@@ -197,7 +197,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
                             cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio, CNn = 2)
    mut.res     <- cbind(mut.tab[!mut.is.xy, ], mut.alleles)
-   if (female == FALSE){
+   if (!female){
       if (sum(mut.is.xy) >= 1) {
          mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[mut.is.xy], CNt.max = CNt.max,
                                   depth.ratio = mut.tab$adjusted.ratio[mut.is.xy],
@@ -213,8 +213,8 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    pdf(paste(out.dir, chrw.file, sep = "/"))
    for (i in unique(seg.res$chromosome)) {
       
-      if (female == FALSE & (i == XY["X"] | i == XY["Y"])){
-         CNn = 1
+      if (!female && i %in% XY){
+         CNn <- 1
       } else {
          CNn <- 2
       }
@@ -242,7 +242,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    
    ## Write down the results.... ploidy etc...
    if (!is.null(sequenza.fit)){
-      res.tab = data.frame(cellularity     = c(cint$confint.y[1], cint$max.y[1], cint$confint.y[2]),
+      res.tab <- data.frame(cellularity     = c(cint$confint.y[1], cint$max.y[1], cint$confint.y[2]),
                            ploidy.estimate = c(cint$confint.x[1], cint$max.x[1], cint$confint.x[2]),
                            ploidy.mean.cn  = weighted.mean(x = as.integer(names(cn.sizes)), w = cn.sizes))
       write.table(res.tab, paste(out.dir, cint.file, sep = "/"), col.names = TRUE,
