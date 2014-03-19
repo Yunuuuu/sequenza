@@ -129,27 +129,26 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
 }
 
 get.ci <- function(cp.table, interval = 0.95) {
-   results  <- list()
-   maxs.x   <- apply(cp.table$z, 1, FUN = max)
-   maxs.y   <- apply(cp.table$z, 2, FUN = max)
-   max.xy   <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
-   val.95.x <- quantile(maxs.x, prob = interval, na.rm = TRUE)
-   val.95.y <- quantile(maxs.y, prob = interval, na.rm = TRUE)
-   values.x <- cp.table$x[maxs.x >= val.95.x]
-   values.y <- cp.table$y[maxs.y >= val.95.y]
-   up.x     <- max(values.x)
-   low.x    <- min(values.x)
-   max.x    <- cp.table$x[which.max(maxs.x)]
-   up.y     <- max(values.y)
-   low.y    <- min(values.y)
-   max.y    <- cp.table$y[which.max(maxs.y)]
-   results$values.x  <- cbind(x = cp.table$x, y = maxs.x)
-   results$confint.x <- c(low.x, up.x)
-   results$max.x     <- max.x
-   results$values.y  <- cbind(x = maxs.y, y = cp.table$y)
-   results$confint.y <- c(low.y, up.y)
-   results$max.y     <- max.y
-   results
+  znormsort <- sort(cp.table$z, decreasing = TRUE)
+  znormcumLik <- cumsum(znormsort)
+  n <- sapply(interval, function(x) sum(znormcumLik < x) + 1)
+  LikThresh <- znormsort[n]
+  values.x <- data.frame(x = cp.table$x, y = apply(cp.table$z, 1, max))
+  values.y <- data.frame(x = apply(cp.table$z, 2, max), y = cp.table$y)
+  up.x  <- max(values.x$x[values.x$y >= LikThresh])
+  low.x <- min(values.x$x[values.x$y >= LikThresh])
+  max.x <- values.x$x[which.max(values.x$y)]
+  up.y  <- max(values.y$y[values.y$x >= LikThresh])
+  low.y <- min(values.y$y[values.y$x >= LikThresh])
+  max.y <- values.y$y[which.max(values.y$x)]
+  results <- list()
+  results$values.x <- values.x
+  results$confint.x <- c(low.x, up.x)
+  results$max.x <- max.x
+  results$values.y <- values.y
+  results$confint.y <- c(low.y, up.y)
+  results$max.y <- max.y
+  results
 }
 
 # merge.baf.ratio <- function(baf.segments, ratio.segments) {
