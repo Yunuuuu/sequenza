@@ -29,7 +29,7 @@ segment.breaks(abf.tab, breaks, weighted.mean = TRUE)
 
   \dontrun{
 
-data.file <-  system.file("data", "data.seqz.gz", package = "sequenza")
+data.file <-  system.file("data", "data.seqz.txt.gz", package = "sequenza")
 # read all the chromosomes:
 abf.data  <- read.seqz(data.file)
 # Gather genome wide GC-stats from raw file:

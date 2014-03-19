@@ -67,7 +67,7 @@ The \code{acgt} file format is similar to the \code{seqz} format, but contains o
 \examples{
    \dontrun{
 
-data.file <-  system.file("data", "data.seqz.gz", package = "sequenza")
+data.file <-  system.file("data", "data.seqz.txt.gz", package = "sequenza")
 ## read chromosome 1 from an seqz file.
 abf.data <- read.seqz(data.file, chr.name = 1)
 
