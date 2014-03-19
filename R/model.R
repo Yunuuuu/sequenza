@@ -64,18 +64,6 @@ theoretical.baf <- function(CNn, CNt, cellularity) {
    as.data.frame(do.call(rbind,res))
 }
 
-expected.baf <- function(depth, ...) {
-   baf      <- theoretical.baf(...)
-   #   baf.binom <- function(BAF, depth, by = 0.001){
-   #      bafs     <- seq(from = 0, to = 0.5, by = by)
-   #       curve    <- dbinom(round(depth*BAF,0), depth, bafs)
-   #       weighted.mean(bafs,curve)
-   #   }
-   #   baf$BAF <- mapply(FUN = baf.binom, baf$BAF,
-   #                                    MoreArgs = list(depth))
-   baf
-}
-
 baf.model.points <- function (cellularity, ploidy, avg.depth.ratio,
                                CNn = 2, CNt.min = 1, CNt.max = 4) {
    mufreq.depth.ratio <- model.points(cellularity = cellularity, ploidy = ploidy,

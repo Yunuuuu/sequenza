@@ -116,7 +116,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
    baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
                  weight.ratio = 2 * weights.seg, weight.Bf = weights.seg,
                  avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
-                 ploidy = ploidy, priors.table = priors.table, avg.depth = sequenza.extract$avg.depth,
+                 ploidy = ploidy, priors.table = priors.table,
                  mc.cores = mc.cores, ratio.priority = ratio.priority)
 }
 
@@ -163,18 +163,17 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    seg.tab     <- na.exclude(do.call(rbind, sequenza.extract$segments[chromosome.list = chromosome.list]))
    mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list = chromosome.list]))
    if (female){
-      segs.is.xy <- segs.all$chromosome == XY["Y"]
-      mut.is.xy  <- mut.all$chromosome == XY["Y"]
+      segs.is.xy <- seg.tab$chromosome == XY["Y"]
+      mut.is.xy  <- mut.tab$chromosome == XY["Y"]
    } else{
-      segs.is.xy <- segs.all$chromosome %in% XY
-      mut.is.xy  <- mut.all$chromosome %in% XY
+      segs.is.xy <- seg.tab$chromosome %in% XY
+      mut.is.xy  <- mut.tab$chromosome %in% XY
    }
 
    cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
                             depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio,
-                            avg.depth = sequenza.extract$avg.depth,
                             ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (!female){
@@ -183,7 +182,6 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
                                depth.ratio = seg.tab$depth.ratio[segs.is.xy],
                                cellularity = cellularity, ploidy = ploidy,
                                avg.depth.ratio = avg.depth.ratio,
-                               avg.depth = sequenza.extract$avg.depth,
                                ratio.priority = TRUE, CNn = 1)
          seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
          seg.res    <- rbind(seg.res, seg.xy)
@@ -223,8 +221,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
                       ratio.windows = sequenza.extract$ratio[[i]], BAF.style="lines",
                       cellularity = cellularity, ploidy = ploidy, main = i,
                       segments = seg.res[seg.res$chromosome == i, ],
-                      avg.depth.ratio = avg.depth.ratio, CNn = CNn, min.N.ratio = 1,
-                      avg.depth = sequenza.extract$avg.depth)
+                      avg.depth.ratio = avg.depth.ratio, CNn = CNn, min.N.ratio = 1)
    }
    dev.off()
    pdf(paste(out.dir, geno.file, sep = "/"), height = 5, width = 15)
