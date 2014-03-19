@@ -1,6 +1,6 @@
-subclonal.matrix <- function(mut.tab, segments = NULL, cellularity = seq(0.1, 1, 0.05), mc.cores = 2){
+subclonal.matrix <- function(mut.tab, segments = NULL, cellularity = seq(0.1, 1, 0.05), mc.cores = getOption("mc.cores", 2L)){
   if (!is.null(segments)) {
-    mut.tab$CNt <-2
+    mut.tab$CNt <- 2
     for (i in 1:nrow(segments)) {
       pos.filt <- mut.tab$chromosome == segments$chrom[i] & mut.tab$n.base >= segments$start.pos[i] & mut.tab$n.base <= segments$end.pos[i]
       mut.tab$CNt[pos.filt] <- segments$CNt[i]
@@ -11,22 +11,22 @@ subclonal.matrix <- function(mut.tab, segments = NULL, cellularity = seq(0.1, 1,
                              types.matrix(CNn = mut.tab[x, 'CNn'],
                                           CNt.min = mut.tab[x, 'CNt'],
                                           CNt.max = mut.tab[x, 'CNt'])})
-  mut.cloanlity <- function(F, depth, types, cellularity) {
-    theorethic.F <- theoretical.mufreq(cellularity = cellularity, 
+  mut.clonality <- function(F, depth, types, cellularity) {
+    theoretical.F <- theoretical.mufreq(cellularity = cellularity, 
                                   CNn = types[, 1], CNt = types[, 2], Mt = types[, 3])
-    max(mufreq.dpois(mufreq = F, mufreq.model = theorethic.F, depth.t = depth),na.rm = TRUE)
+    max(mufreq.dpois(mufreq = F, mufreq.model = theoretical.F, depth.t = depth), na.rm = TRUE)
   }
   res <- mclapplyPb (mc.cores = mc.cores, X = 1:nrow(mut.tab),
                      FUN = function (i) {
                              sapply(X = cellularity, FUN = function(x) {
-                                mut.cloanlity(F = mut.tab$F[i],
+                                mut.clonality(F = mut.tab$F[i],
                                            depth = mut.tab$good.s.reads[i],
                                            types = mut.types.list[[i]],
                                            cellularity = x)
                            })
                          })
   res <- do.call(rbind, res)
-  res <- res/rowSums(res)
+  res <- res / rowSums(res)
   colnames(res) <- cellularity
   res
 }
@@ -53,8 +53,8 @@ VarScan2abfreq <- function(varscan.somatic, varscan.copynumber = NULL) {
    zygosity.vect  <- setNames(c('hom', 'hom', 'hom', 'het', 'het', 'het', 'het', 'hom', 'het', 'het'),
                               c('A', 'C', 'G', 'K', 'M', 'R', 'S', 'T', 'W', 'Y'))
    varscan.somatic  <- varscan.somatic[varscan.somatic$somatic_status != 'Unknown', ]
-   varscan.somatic$normal_var_freq <- as.numeric(sub('%', '', varscan.somatic$normal_var_freq))/100
-   varscan.somatic$tumor_var_freq  <- as.numeric(sub('%', '', varscan.somatic$tumor_var_freq))/100
+   varscan.somatic$normal_var_freq <- as.numeric(sub('%', '', varscan.somatic$normal_var_freq)) / 100
+   varscan.somatic$tumor_var_freq  <- as.numeric(sub('%', '', varscan.somatic$tumor_var_freq)) / 100
    ref.zygosity <- zygosity.vect[varscan.somatic$normal_gt]
    AB.germline  <- iupac.nucs[varscan.somatic$normal_gt]
    AB.sample    <- rep('.', length(AB.germline))
@@ -86,8 +86,8 @@ VarScan2abfreq <- function(varscan.somatic, varscan.copynumber = NULL) {
    normal.pos <- res$ref.zygosity == 'hom' & res$AB.sample == '.'
    res <- res[res$depth.ratio > 0 & !is.infinite(res$depth.ratio) & !normal.pos, ]
    if (!is.null(varscan.copynumber)){
-      smart.id <- order(c(1:nrow(varscan.copynumber),1:nrow(varscan.copynumber)+0.5))
-      varscan.copynumber$log2_ratio   <- 2^(varscan.copynumber$log2_ratio)
+      smart.id <- order(c(1:nrow(varscan.copynumber), 1:nrow(varscan.copynumber) + 0.5))
+      varscan.copynumber$log2_ratio   <- 2 ^ (varscan.copynumber$log2_ratio)
       varscan.copynumber$normal_depth <- round(varscan.copynumber$normal_depth, 0)
       varscan.copynumber$tumor_depth <- round(varscan.copynumber$tumor_depth, 0)
       varscan.copynumber$chrom <- as.character(varscan.copynumber$chrom)
