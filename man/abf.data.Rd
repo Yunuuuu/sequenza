@@ -22,6 +22,7 @@ ABfreq is a tab separated text file with column headers. The file has currently 
 \item{good.s.reads}{number of reads that passed the quality threshold (threshold specified in the pre-processing software)}
 \item{AB.germline}{base found in the germline sample}
 \item{AB.sample}{base found in the tumor sample}
+\item{sample.strand}{frequency of the variant nucleotides detected on the forward orientation.}
 }
 
 \usage{
