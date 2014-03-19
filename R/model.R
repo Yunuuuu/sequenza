@@ -1,13 +1,13 @@
 theoretical.depth.ratio <- function(cellularity = 0.5, ploidy = 2, CNn = 2, CNt = 2, avg.depth.ratio = 1, normal.ploidy = 2) {
-   cellu.copy.term   <- (1 - cellularity) + (CNt/CNn * cellularity)
+   cellu.copy.term   <- (1 - cellularity) + (CNt / CNn * cellularity)
    ploidy.cellu.term <- (ploidy / normal.ploidy * cellularity) + 1 - cellularity
    avg.depth.ratio * cellu.copy.term / ploidy.cellu.term
 }
 
 theoretical.mufreq <- function(cellularity, CNn = 2, CNt = 2, Mt = 1) {
-   normal.alleles <- (CNt-Mt)*cellularity + CNn*(1-cellularity)
-   all.alleles    <- (CNt*cellularity) + CNn*(1-cellularity)
-   1 - (normal.alleles/all.alleles)
+   normal.alleles <- (CNt - Mt) * cellularity + CNn * (1 - cellularity)
+   all.alleles    <- (CNt * cellularity) + CNn * (1 - cellularity)
+   1 - (normal.alleles / all.alleles)
 }
 
 types.matrix <- function(CNt.min = 1, CNt.max = 7, CNn = 2) {
@@ -26,7 +26,7 @@ model.points <- function(cellularity = 0.5, ploidy = 2,
    depth.ratio <-  theoretical.depth.ratio(cellularity = cellularity, ploidy = ploidy,
                                        CNt = types[, 2], CNn = types[, 1],
                                        avg.depth.ratio = avg.depth.ratio)
-   cbind(mufreqs,depth.ratio)
+   cbind(mufreqs, depth.ratio)
 }
 
 # theoretical.baf <- function(cellularity = 0.5, CNt = 2, B = 1, CNn = 2){
@@ -84,7 +84,7 @@ baf.model.points <- function (cellularity, ploidy, avg.depth.ratio,
    model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])
    model.baf          <- theoretical.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity)
    if (CNt.min == 0) {
-      model.baf <- as.data.frame(rbind(c(0,0,0.5,0), model.baf))
+      model.baf <- as.data.frame(rbind(c(0, 0, 0.5, 0), model.baf))
    }
    model.pts          <- merge(model.baf, model.d.ratio)
    model.pts
