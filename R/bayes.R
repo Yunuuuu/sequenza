@@ -70,7 +70,7 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.rat
 
       res.cn     <- model.pts$CNt[which.max(score.r)]
       idx.pts    <- model.pts$CNt == res.cn
-      model.lik  <- cbind(model.pts[idx.pts, 1:3], log2(post.model[idx.pts]))
+      model.lik  <- cbind(model.pts[idx.pts, 1:3], log(post.model[idx.pts]))
       if (is.null(dim(model.lik))) {
          max.post <- model.lik
       } else {
@@ -134,11 +134,11 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
       post.model[post.model == 0] <- min.offset
       if (ratio.priority == FALSE) {
          max.lik <-  which.max(post.model)
-         max.post <- c(as.numeric(model.pts[max.lik,1:3]), log2(post.model[max.lik]))
+         max.post <- c(as.numeric(model.pts[max.lik,1:3]), log(post.model[max.lik]))
       } else {
          res.cn     <- model.pts$CNt[which.max(score.r)]
          idx.pts    <- model.pts$CNt == res.cn
-         model.lik  <- cbind(model.pts[idx.pts, 1:3], log2(post.model[idx.pts]))
+         model.lik  <- cbind(model.pts[idx.pts, 1:3], log(post.model[idx.pts]))
          if (is.null(dim(model.lik))) {
             max.post <- model.lik
          } else {
@@ -176,8 +176,8 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
    x <- as.numeric(rownames(z))
    y <- as.numeric(colnames(z))
    max.lik <- max(result$L)
-   LogSumLik <- log2(sum(2^(result$L - max.lik))) + max.lik
-   znorm <- 2^(z - LogSumLik)
+   LogSumLik <- log(sum(exp(result$L - max.lik))) + max.lik
+   znorm <- exp(z - LogSumLik)
    list(x = x, y = y, z = znorm)
 }
 
@@ -199,7 +199,7 @@ baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
    x <- as.numeric(rownames(z))
    y <- as.numeric(colnames(z))
    max.lik <- max(result$L)
-   LogSumLik <- log2(sum(2^(result$L - max.lik))) + max.lik
-   znorm <- 2^(z - LogSumLik)
+   LogSumLik <- log(sum(exp(result$L - max.lik))) + max.lik
+   znorm <- exp(z - LogSumLik)
    list(x = x, y = y, z = znorm)
 }
