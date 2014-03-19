@@ -10,8 +10,8 @@
    get.ci(cp.table, interval = 0.95)
 }
 \arguments{
-  \item{cp.table}{list obtained with \code{baf.model.fit} or \code{mufreq.model.fit}.}
-  \item{interval}{size of confidence interval (in decimal). Defaults to 0.95}
+  \item{cp.table}{list obtained with \code{\link{baf.model.fit}} or \code{\link{mufreq.model.fit}}.}
+  \item{interval}{Confidence level.}
 }
 
 \value{
@@ -25,4 +25,10 @@
 
 \seealso{
   \code{baf.model.fit}, \code{mufreq.model.fit}.
+}
+
+\examples{
+  data(CP.example)
+  CP.example.ci <- get.ci(CP.example)
+  str(CP.example.ci)
 }
