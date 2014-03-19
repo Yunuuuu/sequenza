@@ -66,7 +66,7 @@ install.packages("sequenza")
 \subsection{Workflow overview}
 A typical workflow developed with Sequenza on pre-aligned sequencing files (BAM format) is structured as follows:
 \begin{enumerate}
-\item Convert pileup to \textit{ABfreq} format 
+\item Convert pileup to \textit{seqz} format 
 \item GC normalization
 \item Allele-specific segmentation using the depth ratio and the B allele frequencies (BAFs)
 \item Infer cellularity and ploidy by model fitting
@@ -90,7 +90,7 @@ Pileup files can be generated using \texttt{samtools}\cite{Li2009}. The genome s
 
 Alternatively, it is possible to use the output of VarScan2\cite{Koboldt2012} (http://varscan.sourceforge.net), which would require a similar approach and the generation of pileups as well.
 
-\subsection{Obtaining the required ABfreq file.}
+\subsection{Obtaining the required seqz file.}
 \subsubsection{Processing the data with \textit{sequenza-utils.py}.}
 For convenience and efficiency we have implemented pre-processing algorithms in a standalone (not called from R) Python program. This program is provided with the R package; its exact location can be found like this:
 
@@ -99,17 +99,17 @@ system.file("exec", "sequenza-utils.py", package="sequenza")
 @
 You may wish to copy this program to a location on your path.
 
-To obtain the GC content information (required to obtain an \textit{ABfreq} file), it is possible to use a function from \textit{sequenza-utils}, and extract the average GC content using a fixed genomic windows, or download the gc5Base from golden path (\url{http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/gc5Base/}).
+To obtain the GC content information (required to obtain an \textit{seqz} file), it is possible to use a function from \textit{sequenza-utils}, and extract the average GC content using a fixed genomic windows, or download the gc5Base from golden path (\url{http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/gc5Base/}).
 The following example calculates GC content for 50 nucleotides windows:
 \begin{lstlisting}[style=BashInputStyle]
    sequenza-utils.py GC-windows -w 50 hg19.fa | gzip > hg19.gc50Base.txt.gz
 \end{lstlisting}
 
-When the GC content file is available, it is possible to process the two pileup files to obtain an \textit{ABfreq} file containing genotype information, alleles and mutation frequency, and more other features.
+When the GC content file is available, it is possible to process the two pileup files to obtain an \textit{seqz} file containing genotype information, alleles and mutation frequency, and more other features.
 \begin{lstlisting}[style=BashInputStyle]
-   sequenza-utils.py pileup2abfreq -gc hg19.gc50Base.txt.gz \
+   sequenza-utils.py pileup2seqz -gc hg19.gc50Base.txt.gz \
                                    -r normal.pileup.gz \
-                                   -s tumor.pileup.gz | gzip > out.abfreq.gz
+                                   -s tumor.pileup.gz | gzip > out.seqz.gz
 \end{lstlisting}
 
 If you don't yet have the pileup, or you are not interested in storing the pileup for further use, you can use two \textit{FIFO} files, to pipe the samtools output directly to \textit{sequenza-utils}:
@@ -117,9 +117,9 @@ If you don't yet have the pileup, or you are not interested in storing the pileu
    mkfifo normal.fifo tumor.fifo
    samtools mpileup -f hg19.fasta -Q 20 normal.bam > normal.fifo &
    samtools mpileup -f hg19.fasta -Q 20 tumor.bam > tumor.fifo &
-   sequenza-utils.py pileup2abfreq -gc hg19.gc50Base.txt.gz \
+   sequenza-utils.py pileup2seqz -gc hg19.gc50Base.txt.gz \
                                    -r normal.fifo \
-                                   -s tumor.fifo | gzip > out.abfreq.gz
+                                   -s tumor.fifo | gzip > out.seqz.gz
    rm normal.fifo tumor.fifo
 \end{lstlisting}
 
@@ -127,28 +127,28 @@ To compress further the results, it is possible to use a binning function provid
 This would decrease the memory requirement to load all the available positions in memory. as well it would speedup the processing of the sample:
 
 \begin{lstlisting}[style=BashInputStyle]
-   sequenza-utils.py abfreq-binning -w  50 \
-                                   out.abfreq.gz | gzip > out_small.abfreq.gz
+   sequenza-utils.py seqz-binning -w  50 \
+                                   out.seqz.gz | gzip > out_small.seqz.gz
 \end{lstlisting}
 
 Where the parameter \textit{-w} indicate a window size in nucleotides, to be used for the binning.
 The heterozygous and the position carrying variant calls would remain untouched. 
 
-\subsubsection{Converting VarScan2 output to ABfreq.}
+\subsubsection{Converting VarScan2 output to seqz.}
 Since many projects might already have been processed with VarScan2, it can be convenient to be able to import such results.
-For this purpose a simple function is provided within the package, to convert the output of the \textit{somatic} and \textit{copynumber} programs of the VarScan2 suite into the \textit{ABfreq} format.
+For this purpose a simple function is provided within the package, to convert the output of the \textit{somatic} and \textit{copynumber} programs of the VarScan2 suite into the \textit{seqz} format.
 
 <<label=varscan, echo=TRUE, eval=FALSE>>=
 cnv <- read.table("varscan.copynumber", header = TRUE, sep = "\t")
 snp <- read.table("varscan.snp", header = TRUE, sep = "\t")
-abf.data <- VarScan2abfreq(varscan.somatic = snp, varscan.copynumber = cnv)
+abf.data <- VarScan2seqz(varscan.somatic = snp, varscan.copynumber = cnv)
 
-write.table(abf.data, "my.sample.abfreq", col.names = TRUE, row.names = FALSE, sep = "\t")
+write.table(abf.data, "my.sample.seqz", col.names = TRUE, row.names = FALSE, sep = "\t")
 @
 
 For whole genome sequencing the information in the \textit{varscan.snp} could be enough to estimate the ploidy and cellularity, and define the copy number and mutations, hence the \textit{varscan.copynumber} argument is optional, but it is strongly suggested to use it in case of exome sequencing.
 
-\section{Exploring the \textit{ABfreq} file and GC-correction details}
+\section{Exploring the \textit{seqz} file and GC-correction details}
 
 After the aligned sequence data have been pre-processed, the \textit{sequenza} R package handles all the normalization and analysis steps. So the following part of this vignette will take place in R.
 
@@ -165,23 +165,23 @@ data.file
 <<label=setFile2, echo=FALSE, eval=TRUE>>=
 data.file <-  system.file("data", "data.seqz.gz", package = "sequenza")
 @
-The ABfreq file can be read all at once, but processing one chromosome at a time is less demanding on computational resources, especially while processing NGS data and might be preferable in case of limited computational resources.
+The seqz file can be read all at once, but processing one chromosome at a time is less demanding on computational resources, especially while processing NGS data and might be preferable in case of limited computational resources.
 
 Read only the data corresponding to chromosome 1:
 <<label=readAfreqChr, echo=TRUE, eval=FALSE>>=
-abf.data <- read.abfreq(data.file, chr.name = "1")
+abf.data <- read.seqz(data.file, chr.name = "1")
 @
 
 Alternatively, read all data at once:
 <<label=readAfreq, echo=TRUE>>=
-abf.data <- read.abfreq(data.file)
+abf.data <- read.seqz(data.file)
 @
 
 <<>>==
 str(abf.data, vec.len = 2)
 @
 
-The files can be read even faster; after mapping the chromosomes location in the file, it is possible to select the coordinate (in terms of from line x to line y) of the file to read. See the man page of \textit{read.abfreq} for an example.
+The files can be read even faster; after mapping the chromosomes location in the file, it is possible to select the coordinate (in terms of from line x to line y) of the file to read. See the man page of \textit{read.seqz} for an example.
 
 \subsection{Quality control and normalization}
 
@@ -191,7 +191,7 @@ Each aligned base, in the next generation sequencing, is associated with a quali
 
 The GC content bias affects most of the samples; however, some samples are more biased than others. We attempt to remove this bias by normalizing with the mean depth ratio value of a corresponding GC content value.
 
-It is possible to gather GC-content information from the entire file and in the meantime map the chromosome position in the file (to fast access chromosome by chromosome later, see ?read.abfreq):
+It is possible to gather GC-content information from the entire file and in the meantime map the chromosome position in the file (to fast access chromosome by chromosome later, see ?read.seqz):
 
 <<label=depthRGCnormall, echo=TRUE, results=hide>>=
 gc.stats <- gc.sample.stats(data.file)
@@ -236,13 +236,13 @@ hist2(abf.data$depth.ratio, abf.data$adjusted.ratio,
 The R package \textit{sequenza} offers an ensemble of functions and models that can be used to design customized workflows and analyses. Here we provide generic and most commonly used analysis steps. 
 
 \begin{itemize}
-\item Extract the relevant information from the raw \textit{ABfreq} file.
+\item Extract the relevant information from the raw \textit{seqz} file.
 \item Fit the \textit{sequenza} model to infer cellularity and ploidy (ploidy).
 \item Apply the estimated parameter to detect CNV variant alleles
 \end{itemize}
 
-\subsection{Extract the information from the \textit{ABfreq} file.}
-The function \textit{sequenza.extract} is designed to efficiently access the raw ABfreq data and take care of normalization steps. The arguments enable customization of a set of actions listed below:
+\subsection{Extract the information from the \textit{seqz} file.}
+The function \textit{sequenza.extract} is designed to efficiently access the raw seqz data and take care of normalization steps. The arguments enable customization of a set of actions listed below:
 \begin{itemize}
 \item binning depth ratio and B allele frequency in a desired window size (allowing a desired number of overlapping windows);
 \item performing a fast, allele specific segmentation using the \textit{copynumber} package\cite{BMCcopynumber};

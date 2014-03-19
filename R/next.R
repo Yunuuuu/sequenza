@@ -46,7 +46,7 @@ sequenza2PyClone <- function(mut.tab, seg.cn, sample.id, norm.cn = 2) {
   na.exclude(pyclone.tsv)
 }
 
-VarScan2abfreq <- function(varscan.somatic, varscan.copynumber = NULL) {
+VarScan2seqz <- function(varscan.somatic, varscan.copynumber = NULL) {
    
    iupac.nucs     <- setNames(c('A', 'C', 'G', 'GT', 'AC', 'AG', 'CG', 'T', 'AT', 'CT'),
                               c('A', 'C', 'G', 'K', 'M', 'R', 'S', 'T', 'W', 'Y'))

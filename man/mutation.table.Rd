@@ -1,10 +1,10 @@
 \name{mutation.table}
 \alias{mutation.table}
 \alias{mut.fractions}
-\title{Extract mutations on homozygous position from an ABfreq file.}
+\title{Extract mutations on homozygous position from an seqz file.}
 
 \description{
- \code{mutation.table} extracts positions from an ABfreq file that differ from the reference genome, applying various filters.
+ \code{mutation.table} extracts positions from an seqz file that differ from the reference genome, applying various filters.
 }
 
 \usage{
@@ -13,7 +13,7 @@ mutation.table(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal
 }
 
 \arguments{
-  \item{abf.tab}{an ABfreq table, as output from \code{read.abfreq}.}
+  \item{abf.tab}{an seqz table, as output from \code{read.seqz}.}
   \item{mufreq.treshold}{mutation frequency threshold.}
   \item{min.reads}{minimal number of reads above the quality threshold to accept the mutation call.}
   \item{min.reads.normal}{minimal number of reads used to determine the genotype in the normal sample.}
@@ -30,7 +30,7 @@ mutation.table(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal
 }
 
 \value{
-A data frame, which in addition to some of the columns of the ABfreq table, contains the following two columns:
+A data frame, which in addition to some of the columns of the seqz table, contains the following two columns:
 \item{F}{the mutation frequency}
 \item{mutation}{a character representation of the mutation. For example, a mutation from A in the germline to G in the tumor is annotated as "A>G".}
 
@@ -40,7 +40,7 @@ A data frame, which in addition to some of the columns of the ABfreq table, cont
    \dontrun{
 
 data.file <-  system.file("data", "data.seqz.gz", package = "sequenza")
-abf.data  <- read.abfreq(data.file)
+abf.data  <- read.seqz(data.file)
 # Detect how many reads passed the quality treshold
 
 # Normalize coverage by GC-content

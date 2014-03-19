@@ -28,7 +28,7 @@
 }
 
 \arguments{
-  \item{file}{an ABfreq file.}
+  \item{file}{an seqz file.}
   \item{gz}{logical. If TRUE (the default) the function expects a gzipped file.}
   \item{window}{size of windows used when plotting mean and quartile ranges of depth ratios and B-allele frequencies. Smaller windows will take more time to compute.}
   \item{overlap}{integer specifying the number of overlapping windows.}

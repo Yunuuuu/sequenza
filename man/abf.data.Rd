@@ -1,14 +1,14 @@
-\name{abf.data.abfreq}
-\alias{abf.data.abfreq}
+\name{abf.data.seqz}
+\alias{abf.data.seqz}
 
-\title{ABfreq file example.}
+\title{seqz file example.}
 
 \description{
-  Example of ABfreq file: This data is representative of an exome-sequenced tumor sample, e.g. as could be obtained from TCGA.
+  Example of seqz file: This data is representative of an exome-sequenced tumor sample, e.g. as could be obtained from TCGA.
 }
 
 \value{
-ABfreq is a tab separated text file with column headers. The file has currently 13 columns:
+seqz is a tab separated text file with column headers. The file has currently 13 columns:
 \item{chromosome}{with the chromosome names}
 \item{n.base}{with the base positions}
 \item{base.ref}{with the base in the reference genome used (usually hg19). Note the \code{base.ref} is NOT the base of the germline.}
@@ -26,5 +26,5 @@ ABfreq is a tab separated text file with column headers. The file has currently 
 }
 
 \usage{
-  data(abf.data.abfreq)
+  data(abf.data.seqz)
 }

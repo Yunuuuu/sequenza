@@ -1,13 +1,13 @@
-\name{VarScan2abfreq}
-\alias{VarScan2abfreq}
+\name{VarScan2seqz}
+\alias{VarScan2seqz}
 \title{Import varscan output files, to be able to use it with sequenza algorithm.}
 
 \description{
-   Create an abfreq file from VarScan2 output files.
+   Create an seqz file from VarScan2 output files.
 }
 
 \usage{
-  VarScan2abfreq(varscan.somatic, varscan.copynumber = NULL)
+  VarScan2seqz(varscan.somatic, varscan.copynumber = NULL)
 }
 
 \arguments{
@@ -17,5 +17,5 @@
 
 \details{
   It is possible to run sequenza with the output of VarScan2, as version 2.3.6, but also previous release might be working as well.
-  The function will create a data.frame with the abfreq format, as explained in \code{\link{read.abfreq}} page.
+  The function will create a data.frame with the seqz format, as explained in \code{\link{read.seqz}} page.
 }

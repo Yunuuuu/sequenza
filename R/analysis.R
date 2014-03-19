@@ -1,4 +1,4 @@
-read.abfreq <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
+read.seqz <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
     colClasses = c('character', 'integer', 'character', 'integer',
       'integer', 'numeric', 'numeric', 'numeric', 'character',
       'numeric', 'numeric', "character", "character"), chr.name = NULL, n.lines = NULL, ...) {
@@ -63,7 +63,7 @@ read.abfreq <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRU
 
 read.acgt <- function (file, colClasses = c('character', 'integer', 'character', 'integer',
                                             'integer', 'integer', 'integer', 'integer'), ...) {
-   read.abfreq(file = file , colClasses = colClasses, ...)
+   read.seqz(file = file , colClasses = colClasses, ...)
 }
 
 gc.norm <- function (x, gc) {

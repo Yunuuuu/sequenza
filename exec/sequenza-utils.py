@@ -579,7 +579,7 @@ def pileup2acgt(parser, subparser):
                    help='Just display the version information and exit.')
    return parser.parse_args()
 
-def pileup2abfreq(parser, subparser):
+def pileup2seqz(parser, subparser):
    parser_ABinput    = subparser.add_argument_group(title='Input Files',description='Required input files.')
    parser_ABgenotype    = subparser.add_argument_group(title='Genotyper',description='Options regarding the genotyping.')
    parser_ABperformance = subparser.add_argument_group(title='Performance', description='Options affecting the performance.')
@@ -620,11 +620,11 @@ def merge_pileups(parser, subparser):
                    help='The second pileup, will show as the last columns set')
    return parser.parse_args()
 
-def reduce_abfreq(parser, subparser):
-   subparser.add_argument('-a', '--abfreq', dest = 'abfreq', required = True,
-                   help='An ABfreq file from the pileup2abfreq function.')
+def reduce_seqz(parser, subparser):
+   subparser.add_argument('-a', '--seqz', dest = 'seqz', required = True,
+                   help='An seqz file from the pileup2seqz function.')
    subparser.add_argument('-w', '--window', dest = 'w', type = int, default = 50,
-                   help='Window size used to binning the original ABfreq file. Default is 50.')
+                   help='Window size used to binning the original seqz file. Default is 50.')
    return parser.parse_args()
 
 def main():
@@ -636,8 +636,8 @@ def main():
                               usage= '%(prog)s module [options]', epilog = 'This is version {0} - Francesco Favero - {1}'.format(VERSION, DATE))
    subparsers = parser.add_subparsers(dest='module')
    subparsers.metavar = None
-   parser_pileup2abfreq  = subparsers.add_parser('pileup2abfreq', help = ' given a paired set of pileup (normal and matching tumor), and GC-content genome-wide information returns the common positions with A and B alleles frequencies',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=39, width=90))
-   parser_reduce_abfreq = subparsers.add_parser('abfreq-binning', help = 'Binning the abfreq file to reduce file size and memory requirement for the analysis.')
+   parser_pileup2seqz  = subparsers.add_parser('pileup2seqz', help = ' given a paired set of pileup (normal and matching tumor), and GC-content genome-wide information returns the common positions with A and B alleles frequencies',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=39, width=90))
+   parser_reduce_seqz = subparsers.add_parser('seqz-binning', help = 'Binning the seqz file to reduce file size and memory requirement for the analysis.')
    parser_pup2mu = subparsers.add_parser('pileup2acgt', help = 'convert pileup format to ACGT format',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=30, width=90))
    parser_gc_window  = subparsers.add_parser('GC-windows', help = 'Given a fasta file and a window size it computes the GC percentage across the sequences, and returns a file in the same format as gc5Base from UCSC')
    parser_merge_pileups = subparsers.add_parser('merge-pileups', help = 'Merging two pileups, it finds the common positions and return an mpileup file adding the second pilep as last 3 columns.')
@@ -684,8 +684,8 @@ def main():
                seconds =  end-start
                logging.warning("Pileup to ACGT: processed " + str(counter) + " lines in " + str(seconds) + " seconds")
 
-      elif used_module == "pileup2abfreq":
-         args = pileup2abfreq(parser, parser_pileup2abfreq)
+      elif used_module == "pileup2seqz":
+         args = pileup2seqz(parser, parser_pileup2seqz)
          with xopen('-', "wb") as fileout:
             out_header = ["chromosome", "n.base", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "ref.zygosity", "GC.percent", "good.s.reads", "AB.germline", "AB.sample", "sample.strand"]
             p1 = args.reference
@@ -727,10 +727,10 @@ def main():
             pup = multiPileups(pileup1,pileup2)
             for line in pup:
                print('\t'.join(map(str, line)) + '\n')
-      elif used_module == "abfreq-binning":
-         args = reduce_abfreq(parser, parser_reduce_abfreq)
-         with xopen(args.abfreq, 'rb') as abfreq:
-            abfred = abfreReduce(abfreq, args.w)
+      elif used_module == "seqz-binning":
+         args = reduce_seqz(parser, parser_reduce_seqz)
+         with xopen(args.seqz, 'rb') as seqz:
+            abfred = abfreReduce(seqz, args.w)
             print abfred._header
             for a in abfred:
                if a:

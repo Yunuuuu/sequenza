@@ -13,8 +13,8 @@ segment.breaks(abf.tab, breaks, weighted.mean = TRUE)
 }
 
 \arguments{
-  \item{abf.baf}{an ABfreq file containing only the heterozygous positions.}
-  \item{abf.tab}{a complete ABfreq file.}
+  \item{abf.baf}{an seqz file containing only the heterozygous positions.}
+  \item{abf.tab}{a complete seqz file.}
   \item{gamma, kmin, baf.thres, verbose}{arguments passed to \code{aspcf}.}
   \item{breaks}{breaks as output \code{find.breaks}.}
   \item{weighted.mean}{boolean to select if the segments have to calculated using the read depth as a weights to calculate depth ratio and B-allele frequency means.}
@@ -31,12 +31,12 @@ segment.breaks(abf.tab, breaks, weighted.mean = TRUE)
 
 data.file <-  system.file("data", "data.seqz.gz", package = "sequenza")
 # read all the chromosomes:
-abf.data  <- read.abfreq(data.file)
+abf.data  <- read.seqz(data.file)
 # Gather genome wide GC-stats from raw file:
 gc.stats <- gc.sample.stats(data.file)
 gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
 # Read only one chromosome:
-abf.data  <- read.abfreq(data.file, chr.name = 12)
+abf.data  <- read.seqz(data.file, chr.name = 12)
 
 # Correct the coverage of the loaded chromosome:
 abf.data$adjusted.ratio <- abf.data$depth.ratio /
