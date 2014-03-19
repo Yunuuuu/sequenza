@@ -159,13 +159,6 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
    bafs.L
 }
 
-shannon.types <- function(types.mat) {
-   data.types <- apply(types.mat, 1, FUN = function(x) paste(x, collapse = "_"))
-   tab.types <- table(data.types)/length(data.types)
-   tab.types <- tab.types * log2(tab.types)
-   -sum(tab.types)
-}
-
 mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
                           ploidy = seq(1, 7, by = 0.1),
                           mc.cores = getOption("mc.cores", 2L), ...) {
