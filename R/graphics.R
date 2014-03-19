@@ -1,12 +1,11 @@
-cp.plot <- function (cp.table, ...) {
-   #colorgram(x = cp.table$x, y = cp.table$y, z = log(cp.table$z),
-   #    colFn = heat, map = map, outlier = outlier, las = 1,
-   #    xlab = "ploidy", ylab = "Cellularity", zlab = "log-likelihood",
-   #    ...)
-   colorgram(x = cp.table$x, y = cp.table$y, z = matrix(rank(cp.table$z),
-                                                        nrow = nrow(cp.table$z)), colFn = colorRampPalette(c('white', 'lightblue')),
-             las = 1, xlab = "Ploidy", ylab = "Cellularity", zlab = "Rank likelihood",
-             ...)
+cp.plot <- function (cp.table,  
+                     xlab = "Ploidy", ylab = "Cellularity", zlab = "Scaled rank likelihood", 
+                     colFn = colorRampPalette(c('white', 'lightblue')), ...) {
+  z <- matrix(rank(cp.table$z), nrow = nrow(cp.table$z)) / length(cp.table$z)
+  map <- makecmap(c(0, 1), colFn = colFn, include.lowest = TRUE)
+  colorgram(x = cp.table$x, y = cp.table$y, z = z, 
+            map = map, las = 1, 
+            xlab = xlab, ylab = ylab, zlab = zlab, ...)
 }
 
 cp.plot.contours <- function(cp.table, likThresh = c(0.95),
