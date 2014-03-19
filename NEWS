@@ -1,5 +1,7 @@
 1.0.6 - xx-xx-2014
- - Add filter mutation by nomal sample depth (exclude mutations with poor genotype detection)
+ - Add column with strand orientation
+ - Correction on the depth.ratio model formula
+ - Add filter mutation by normal sample depth (exclude mutations with poor genotype detection)
  - Change default to not-weighted mean to calculate segment value.
 1.0.5 - 04-02-2014
  - Add a python utility to binning the data to a desired window size (reducing vastly memory footprint in the analysis)
