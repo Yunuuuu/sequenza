@@ -50,7 +50,7 @@ This document details a typical analysis of matched tumor-normal exome sequence 
 \item Memory: Minimum 4GB of RAM.  Recommended >8GB.
 \item Disk space: 1.5 GB for sample 
 \item R version: 2.15.1 
-\item Python version: 2.7; rpy2 is required to run sequenza R functions from the python command line programs. 
+\item Python version: 2.7 (or Pypy 2.*) 
 \end{itemize}
 
 \subsection{Installation}
