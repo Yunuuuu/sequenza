@@ -50,7 +50,7 @@ This document details a typical analysis of matched tumor-normal exome sequence 
 \item Memory: Minimum 4GB of RAM.  Recommended >8GB.
 \item Disk space: 1.5 GB for sample 
 \item R version: 2.15.1 
-\item Python version: 2.7; rpy2 is required to run sequenza R functions from the python command line programs. 
+\item Python version: 2.7 (or Pypy 2.*) 
 \end{itemize}
 
 \subsection{Installation}
@@ -295,7 +295,7 @@ The last part of the workflow is to apply the estimated parameters. There is an 
 
 <<label=sequenzaRes, echo=TRUE, eval=FALSE, results=hide>>=
 sequenza.results(sequenza.extract = test, sequenza.fit = CP.example,
-                 sample.id = "Test", out.dir="TEST", )
+                 sample.id = "Test", out.dir="TEST")
 @
 
 Although this standard way of presenting the result would be appropriate for most situations, it is possible to create an alternative wrapper by using functions in the following sub-sections.
@@ -314,7 +314,7 @@ It is also possible to plot the likelihood over the combinations of the two para
       \centering
 <<label=CPplot,fig=TRUE,width=6,height=6>>=
 cp.plot(CP.example)
-cp.plot.contours(CP.example, add = TRUE, likThresh = c(0.999))
+cp.plot.contours(CP.example, add = TRUE, likThresh = c(0.95))
 @ 
  \caption{Result from the Bayesian inference over the defined range of cellularity and ploidy. Color intensity indicates the log-likelihood of corresponding cellularity/ploidy values.}
       \label{fig:cpPlot}
@@ -388,8 +388,7 @@ To detect copy number variations we use a B allele frequency model, implemented 
 seg.tab     <- na.exclude(do.call(rbind, test$segments))
 cn.alleles <- baf.bayes(Bf = seg.tab$Bf, depth.ratio = seg.tab$depth.ratio,
                         cellularity = cellularity, ploidy = ploidy,
-                        avg.depth.ratio = avg.depth.ratio,
-                        avg.depth = test$avg.depth)
+                        avg.depth.ratio = avg.depth.ratio)
 head(cn.alleles)
 seg.tab <- cbind(seg.tab, cn.alleles)
 head(seg.tab)
@@ -412,7 +411,7 @@ chromosome.view(mut.tab = test$mutations[[3]], baf.windows = test$BAF[[3]],
                 segments = seg.tab[seg.tab$chromosome == test$chromosomes[3],],
                 main = test$chromosomes[3],
                 cellularity = cellularity, ploidy = ploidy,
-                avg.depth.ratio = avg.depth.ratio, avg.depth = test$avg.depth)
+                avg.depth.ratio = avg.depth.ratio)
 @ 
       \caption{Plots of mutant allele frequency (top), B-allele frequency (middle) and depth ratio (bottom) for chromosome position. Horizontal dotted lines indicate expectation values for various copy number/allele states.}
       \label{fig:crhomViewWithCP}
