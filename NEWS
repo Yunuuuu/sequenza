@@ -1,5 +1,6 @@
 1.0.6 - xx-xx-2014
  - Change the extension file from abfreq to seqz
+ - Normalize/scaling the cp.plot log-likelood
  - Add a column within newer seqz file, with strand orientation information
  - Correction on the depth.ratio model formula
  - Add filter mutation by normal sample depth (exclude mutations with poor genotype detection)
