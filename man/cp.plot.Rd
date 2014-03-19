@@ -8,13 +8,19 @@
 }
 
 \usage{
-   cp.plot(cp.table, ...)
+   cp.plot(cp.table, xlab = "Ploidy", ylab = "Cellularity",
+           zlab = "Scaled rank likelihood", 
+           colFn = colorRampPalette(c('white', 'lightblue')), ...)
    cp.plot.contours(cp.table, likThresh = c(0.95),
                     col = palette(), legend.pos = "bottomright", pch = 18, ...)
 }
 
 \arguments{
   \item{cp.table}{matrix, as output from \code{\link{baf.model.fit}} or \code{\link{mufreq.model.fit}}.}
+  \item{xlab}{xlab parameter as in the function \code{\link{colorgram}}.}
+  \item{ylab}{ylab parameter as in the function \code{\link{colorgram}}.}
+  \item{zlab}{zlab parameter as in the function \code{\link{colorgram}}.}
+  \item{colFn}{colFn parameter as in the function \code{\link{colorgram}}.}  
   \item{likThresh}{vector of selected likelihood tresholds.}
   \item{col}{vector of colours.}
   \item{legend.pos}{position for placing the legend.}
