@@ -42,7 +42,7 @@ A list with the following elements:
 
   \dontrun{
 
-data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+data.file <-  system.file("data", "data.seqz.gz", package = "sequenza")
 # read all the chromosomes:
 abf.data  <- read.abfreq(data.file)
 # Normalize coverage by GC-content

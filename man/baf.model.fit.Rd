@@ -42,7 +42,7 @@
 \examples{
   \dontrun{
 
-data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+data.file <-  system.file("data", "data.seqz.gz", package = "sequenza")
 # read all the chromosomes:
 abf.data  <- read.abfreq(data.file)
 # Gather genome wide GC-stats from raw file:

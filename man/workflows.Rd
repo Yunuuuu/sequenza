@@ -71,7 +71,7 @@
 \examples{
   \dontrun{
 
-data.file <-  system.file("data", "abf.data.abfreq.txt.gz",
+data.file <-  system.file("data", "data.seqz.gz",
               package = "sequenza")
 test <- sequenza.extract(data.file)
 CP   <- sequenza.fit(test, mc.cores = 4)

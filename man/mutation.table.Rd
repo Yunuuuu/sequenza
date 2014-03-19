@@ -39,7 +39,7 @@ A data frame, which in addition to some of the columns of the ABfreq table, cont
 
    \dontrun{
 
-data.file <-  system.file("data", "abf.data.abfreq.txt.gz", package = "sequenza")
+data.file <-  system.file("data", "data.seqz.gz", package = "sequenza")
 abf.data  <- read.abfreq(data.file)
 # Detect how many reads passed the quality treshold
 
