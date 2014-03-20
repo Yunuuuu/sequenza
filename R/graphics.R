@@ -18,7 +18,7 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95),
 
    contour(cp.table, levels = znormsort[n], col = col,
            drawlabels = FALSE,
-           xlab= "Ploidy", ylab = "Cellularity", ...)
+           xlab = "Ploidy", ylab = "Cellularity", ...)
    max.xy <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
    points(x = cp.table$x[max.xy[, "row"]],
           y = cp.table$y[max.xy[, "col"]], pch = pch)
@@ -72,21 +72,22 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95),
 plotWindows <- function(abf.window, m.lty = 1, m.lwd = 3,
                          m.col = "black", q.bg = "lightblue", log2.plot = FALSE,
                          n.min = 1, xlim, ylim, add = FALSE, ...) {
-   if (log2.plot == TRUE) {
+   if (log2.plot) {
       abf.window[, c(3, 4, 5)] <- log2(abf.window[, c(3, 4, 5)])
    }
    if(!add) {
       if(missing(xlim))
-         xlim <- c(abf.window[1, 1], abf.window[nrow(abf.window), 2])
+         xlim <- c(abf.window$start[1], abf.window$end[nrow(abf.window)])
       if(missing(ylim))
-         ylim <- c(min(abf.window[, 4], na.rm = TRUE), max(abf.window[, 5], na.rm = TRUE))
+         ylim <- c(min(abf.window$q0, na.rm = TRUE), max(abf.window$q1, na.rm = TRUE))
       plot(xlim, ylim, type = "n", ...)
    }
-   abf.window <- abf.window[abf.window[, 6] >= n.min, ]
-   rect(xleft = abf.window[, 1], ybottom = abf.window[, 4],
-        xright = abf.window[, 2], ytop = abf.window[, 5],
+   abf.window <- abf.window[abf.window$N >= n.min, ]
+   rect(xleft = abf.window$start, ybottom = abf.window$q0,
+        xright = abf.window$end, ytop = abf.window$q1,
         col = q.bg, border = NA)
-   segments(y0 = abf.window[, 3], x0 = abf.window[, 1] , x1 = abf.window[, 2], lty = m.lty, lwd = m.lwd, col = m.col)
+   segments(y0 = abf.window$mean, x0 = abf.window$start, x1 = abf.window$end, 
+            lty = m.lty, lwd = m.lwd, col = m.col)
 
 }
 

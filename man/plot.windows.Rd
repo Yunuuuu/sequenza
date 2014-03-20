@@ -3,7 +3,7 @@
 \title{Plot the specified windowed chromosome.}
 
 \description{
-  \code{plotWindows} is a convenient plot function that visualizes a specified chromosome attribute using the matrix produced by the function \code{windowValues}.
+  \code{plotWindows} is a convenient plot function that visualizes a specified chromosome attribute using the data frame produced by the function \code{windowValues}.
 }
 
 \usage{
@@ -13,7 +13,7 @@ plotWindows(abf.window, m.lty = 1, m.lwd = 3,
 }
 
 \arguments{
-  \item{abf.window}{matrix of base-pair windows and corresponding statistics to be plotted. A list of such matrices can be output from \code{windowValues}}
+  \item{abf.window}{data frame of base-pair windows and corresponding statistics to be plotted. A list of such data frames can be output from \code{\link{windowValues}}}
   \item{m.lty}{line type used for plotting mean values.}
   \item{m.lwd}{line width used for plotting mean values.}
   \item{m.col}{line color used for plotting mean values.}
@@ -23,11 +23,11 @@ plotWindows(abf.window, m.lty = 1, m.lwd = 3,
   \item{xlim}{limits of the x axis.}
   \item{ylim}{limits of the y axis.}
   \item{add}{logical, if TRUE the plot will be added to an existing opened device.}
-  \item{...}{any other arguments accepted by \code{plot}.}
+  \item{...}{any other arguments accepted by \code{\link{plot}}.}
 }
 
 \seealso{
-  \code{chromosome.view},
+  \code{\link{chromosome.view}},
 }
 
 \examples{
@@ -42,14 +42,14 @@ abf.ratio <- windowValues(x = abf.data$depth.ratio,
                            chromosomes = abf.data$chromosome, window = 1e6,
                            weight = abf.data$depth.normal, start.coord = 1, overlap = 1)
 
-plotWindows(abf.r.win[[1]], log2.plot = FALSE,
+plotWindows(abf.ratio[[1]], log2.plot = FALSE,
             ylab = "Depth ratio", xlab = "Position (bases)",
-            main = names(abf.r.win)[1], las = 1, n.min = 1,
+            main = names(abf.ratio)[1], las = 1, n.min = 1,
             ylim = c(0, 2.5))
 
-plotWindows(abf.r.win[[17]], log2.plot = FALSE,
+plotWindows(abf.ratio[[17]], log2.plot = FALSE,
             ylab = "Depth ratio", xlab = "Position (bases)",
-            main = names(abf.r.win)[1], las = 1, n.min = 1,
+            main = names(abf.ratio)[1], las = 1, n.min = 1,
             ylim = c(0, 2.5))
    }
 }
