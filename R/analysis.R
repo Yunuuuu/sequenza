@@ -142,6 +142,8 @@ get.ci <- function(cp.table, interval = 0.95) {
   low.y <- min(values.y$y[values.y$x >= LikThresh])
   max.y <- values.y$y[which.max(values.y$x)]
   results <- list()
+  values.x$y <- values.x$y/sum(values.x$y)
+  values.y$x <- values.y$x/sum(values.y$x)
   results$values.x <- values.x
   results$confint.x <- c(low.x, up.x)
   results$max.x <- max.x
