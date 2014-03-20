@@ -46,7 +46,7 @@ This document details a typical analysis of matched tumor-normal exome sequence 
 \subsection{Minimum requirements}
 \begin{itemize}
 \item Software: R, Python
-\item Operating system: Linux, OSX
+\item Operating system: Linux, OSX, Windows
 \item Memory: Minimum 4GB of RAM.  Recommended >8GB.
 \item Disk space: 1.5 GB for sample 
 \item R version: 2.15.1 
