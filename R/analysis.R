@@ -155,28 +155,6 @@ get.ci <- function(cp.table, interval = 0.95) {
   results
 }
 
-# merge.baf.ratio <- function(baf.segments, ratio.segments) {
-#    baf.table    <- lapply(1:length(baf.segments), FUN = function(x) cbind(chromosome = names(baf.segments)[x],
-#                                                                         as.data.frame(do.call(rbind, baf.segments[[x]]))))
-#    ratio.table  <- lapply(1:length(ratio.segments), FUN = function(x) cbind(chromosome = names(ratio.segments)[x],
-#                                                                           as.data.frame(do.call(rbind, ratio.segments[[x]]))))
-#    baf.table    <- do.call(rbind, baf.table)
-#    ratio.table  <- do.call(rbind, ratio.table)
-#    baf.table$chromosome <- as.character(baf.table$chromosome)
-#    ratio.table$chromosome <- as.character(ratio.table$chromosome)
-#    baf.index    <- sapply(1:nrow(baf.table), FUN = function(x) paste(baf.table[x, 1:2], collapse ="_"))
-#    ratio.index  <- sapply(1:nrow(ratio.table), FUN = function(x) paste(ratio.table[x, 1:2], collapse = "_"))
-#    baf.table    <- cbind(index = baf.index, baf.table[, c(5,7)])
-#    ratio.table  <- cbind(index = ratio.index, ratio.table[, c(1,2,3,5,7)])
-#    colnames(ratio.table) <- c("index", "chromosome", "start", "end", "ratio", "N.depth")
-#    colnames(baf.table) <- c("index", "Bf", "N.BAF")
-#    merged.table <- merge(ratio.table, baf.table, all = TRUE, sort = FALSE)
-#    merged.table <- merged.table[, -1]
-
-#    merged.table
-# }
-
-
 mut.fractions <- function(AB.sample, Af, sample.strand) {
   F = 1 - Af
    base.mut <- lapply(X = AB.sample, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
