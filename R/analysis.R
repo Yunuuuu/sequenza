@@ -1,7 +1,8 @@
 read.seqz <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
     colClasses = c('character', 'integer', 'character', 'integer',
       'integer', 'numeric', 'numeric', 'numeric', 'character',
-      'numeric', 'numeric', "character", "character"), chr.name = NULL, n.lines = NULL, ...) {
+      'numeric', 'numeric', "character", "character", "character"),
+    chr.name = NULL, n.lines = NULL, ...) {
    if (!is.null(n.lines) & is.null(chr.name)) fast <-  FALSE
    if(fast && nrows == -1) {
     if(gz) {
@@ -62,7 +63,8 @@ read.seqz <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
 }
 
 read.acgt <- function (file, colClasses = c('character', 'integer', 'character', 'integer',
-                                            'integer', 'integer', 'integer', 'integer'), ...) {
+                                            'integer', 'integer', 'integer', 'integer', "character"),
+                       ...) {
    read.seqz(file = file , colClasses = colClasses, ...)
 }
 
