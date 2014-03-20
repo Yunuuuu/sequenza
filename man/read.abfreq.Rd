@@ -11,11 +11,11 @@
 read.seqz(file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
             colClasses = c("character", "integer", "character", "integer",
             "integer", "numeric", "numeric", "numeric", "character",
-            "numeric", "numeric", "character", "character"),
+            "numeric", "numeric", "character", "character", "character"),
             chr.name = NULL, n.lines = NULL, ...)
 
 read.acgt(file, colClasses = c("character", "integer", "character", "integer",
-          "integer", "integer", "integer", "integer"), ...)
+          "integer", "integer", "integer", "integer", "character"), ...)
 }
 
 \arguments{
