@@ -34,7 +34,7 @@ plotWindows(abf.window, m.lty = 1, m.lwd = 3,
 
    \dontrun{
 
-data.file <-  system.file("data", "data.seqz.txt.gz", package = "sequenza")
+data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 abf.data <- read.seqz(data.file)
 # 1Mb windows, each window is overlapping with 1 other adjacent window: depth ratio
 abf.ratio <- windowValues(x = abf.data$depth.ratio,

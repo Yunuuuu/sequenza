@@ -39,7 +39,7 @@ A data frame, which in addition to some of the columns of the seqz table, contai
 
    \dontrun{
 
-data.file <-  system.file("data", "data.seqz.txt.gz", package = "sequenza")
+data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 abf.data  <- read.seqz(data.file)
 # Detect how many reads passed the quality treshold
 

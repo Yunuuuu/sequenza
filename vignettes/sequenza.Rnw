@@ -158,12 +158,12 @@ library("sequenza")
 \subsection{Read the file}
 In the package we provide an example file, to find the complete path of the example data file:
 <<label=setFile, echo=TRUE, eval=FALSE>>=
-data.file <-  system.file("data", "data.seqz.txt.gz", package = "sequenza")
+data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 data.file
 @
 
 <<label=setFile2, echo=FALSE, eval=TRUE>>=
-data.file <-  system.file("data", "data.seqz.txt.gz", package = "sequenza")
+data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 @
 The seqz file can be read all at once, but processing one chromosome at a time is less demanding on computational resources, especially while processing NGS data and might be preferable in case of limited computational resources.
 

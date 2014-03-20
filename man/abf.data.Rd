@@ -1,5 +1,5 @@
-\name{data.seqz}
-\alias{data.seqz}
+\name{example.seqz}
+\alias{example.seqz}
 
 \title{seqz file example.}
 
@@ -26,5 +26,5 @@ seqz is a tab separated text file with column headers. The file has currently 13
 }
 
 \usage{
-  data(data.seqz)
+  data(example.seqz)
 }

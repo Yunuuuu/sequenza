@@ -53,7 +53,7 @@ genome.view(seg.cn, info.type = "AB", ...)
 \examples{
   \dontrun{
 
-data.file <-  system.file("data", "data.seqz.txt.gz", package = "sequenza")
+data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 # read all the chromosomes:
 abf.data  <- read.seqz(data.file)
 # Gather genome wide GC-stats from raw file:
