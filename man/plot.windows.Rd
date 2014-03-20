@@ -7,13 +7,13 @@
 }
 
 \usage{
-plotWindows(abf.window, m.lty = 1, m.lwd = 3,
+plotWindows(seqz.window, m.lty = 1, m.lwd = 3,
              m.col = "black", q.bg = "lightblue", log2.plot = FALSE,
              n.min = 1, xlim, ylim, add = FALSE, ...)
 }
 
 \arguments{
-  \item{abf.window}{data frame of base-pair windows and corresponding statistics to be plotted. A list of such data frames can be output from \code{\link{windowValues}}}
+  \item{seqz.window}{data frame of base-pair windows and corresponding statistics to be plotted. A list of such data frames can be output from \code{\link{windowValues}}}
   \item{m.lty}{line type used for plotting mean values.}
   \item{m.lwd}{line width used for plotting mean values.}
   \item{m.col}{line color used for plotting mean values.}
@@ -35,21 +35,21 @@ plotWindows(abf.window, m.lty = 1, m.lwd = 3,
    \dontrun{
 
 data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
-abf.data <- read.seqz(data.file)
+seqz.data <- read.seqz(data.file)
 # 1Mb windows, each window is overlapping with 1 other adjacent window: depth ratio
-abf.ratio <- windowValues(x = abf.data$depth.ratio,
-                           positions = abf.data$n.base,
-                           chromosomes = abf.data$chromosome, window = 1e6,
-                           weight = abf.data$depth.normal, start.coord = 1, overlap = 1)
+seqz.ratio <- windowValues(x = seqz.data$depth.ratio,
+                           positions = seqz.data$n.base,
+                           chromosomes = seqz.data$chromosome, window = 1e6,
+                           weight = seqz.data$depth.normal, start.coord = 1, overlap = 1)
 
-plotWindows(abf.ratio[[1]], log2.plot = FALSE,
+plotWindows(seqz.ratio[[1]], log2.plot = FALSE,
             ylab = "Depth ratio", xlab = "Position (bases)",
-            main = names(abf.ratio)[1], las = 1, n.min = 1,
+            main = names(seqz.ratio)[1], las = 1, n.min = 1,
             ylim = c(0, 2.5))
 
-plotWindows(abf.ratio[[17]], log2.plot = FALSE,
+plotWindows(seqz.ratio[[17]], log2.plot = FALSE,
             ylab = "Depth ratio", xlab = "Position (bases)",
-            main = names(abf.ratio)[1], las = 1, n.min = 1,
+            main = names(seqz.ratio)[1], las = 1, n.min = 1,
             ylim = c(0, 2.5))
    }
 }

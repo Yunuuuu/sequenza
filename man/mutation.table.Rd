@@ -8,12 +8,12 @@
 }
 
 \usage{
-mutation.table(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal = 10,
+mutation.table(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal = 10,
                max.mut.types = 3, min.type.freq = 0.9, min.fw.freq = 0, segments = NULL)
 }
 
 \arguments{
-  \item{abf.tab}{an seqz table, as output from \code{read.seqz}.}
+  \item{seqz.tab}{an seqz table, as output from \code{read.seqz}.}
   \item{mufreq.treshold}{mutation frequency threshold.}
   \item{min.reads}{minimal number of reads above the quality threshold to accept the mutation call.}
   \item{min.reads.normal}{minimal number of reads used to determine the genotype in the normal sample.}
@@ -40,17 +40,17 @@ A data frame, which in addition to some of the columns of the seqz table, contai
    \dontrun{
 
 data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
-abf.data  <- read.seqz(data.file)
+seqz.data  <- read.seqz(data.file)
 # Detect how many reads passed the quality treshold
 
 # Normalize coverage by GC-content
-gc.stats <- gc.norm(x = abf.data$depth.ratio,
-                    gc = abf.data$GC.percent)
+gc.stats <- gc.norm(x = seqz.data$depth.ratio,
+                    gc = seqz.data$GC.percent)
 gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
-abf.data$adjusted.ratio <- abf.data$depth.ratio /
-                           gc.vect[as.character(abf.data$GC.percent)]
+seqz.data$adjusted.ratio <- seqz.data$depth.ratio /
+                           gc.vect[as.character(seqz.data$GC.percent)]
 # Subset mutations, apply mutation frequency treshold.
-mut.tab   <- mutation.table(abf.data, mufreq.treshold = 0.15,
+mut.tab   <- mutation.table(seqz.data, mufreq.treshold = 0.15,
                             min.reads = 40, max.mut.types = 1,
                             min.type.freq = 0.9)
 mut.tab <- na.exclude(mut.tab)

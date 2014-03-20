@@ -38,19 +38,19 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0,
    \dontrun{
 
 data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
-abf.data <- read.seqz(data.file)
+seqz.data <- read.seqz(data.file)
 # 1Mb windows, each window is overlapping with 1 other adjacent window: depth ratio
-abf.ratio <- windowValues(x = abf.data$depth.ratio,
-                           positions = abf.data$n.base,
-                           chromosomes = abf.data$chromosome, window = 1e6,
-                           weight = abf.data$depth.normal, start.coord = 1, overlap = 1)
-abf.hom  <- abf.data$ref.zygosity == 'hom'
-abf.het  <- abf.data[!abf.hom, ]
+seqz.ratio <- windowValues(x = seqz.data$depth.ratio,
+                           positions = seqz.data$n.base,
+                           chromosomes = seqz.data$chromosome, window = 1e6,
+                           weight = seqz.data$depth.normal, start.coord = 1, overlap = 1)
+seqz.hom  <- seqz.data$ref.zygosity == 'hom'
+seqz.het  <- seqz.data[!seqz.hom, ]
 # 1Mb windows, each window is overlapping with 1 other adjacent window: B-allele frequency
-abf.bafs  <- windowValues(x = abf.het$Bf,
-                           positions = abf.het$n.base,
-                           chromosomes = abf.het$chromosome, window = 1e6,
-                           weight = abf.het$depth.sample,
+seqz.bafs  <- windowValues(x = seqz.het$Bf,
+                           positions = seqz.het$n.base,
+                           chromosomes = seqz.het$chromosome, window = 1e6,
+                           weight = seqz.het$depth.sample,
                            start.coord = 1, overlap = 1)
    }
 }

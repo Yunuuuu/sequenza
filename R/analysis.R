@@ -31,12 +31,12 @@ read.seqz <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
       } else {
          grep.part <- paste("grep '^", chr.name, "\t'", sep = "")
       }
-      abf.data   <- read.delim(pipe(grep.part), nrows = nrows, colClasses = colClasses, header = FALSE, ...)
+      seqz.data   <- read.delim(pipe(grep.part), nrows = nrows, colClasses = colClasses, header = FALSE, ...)
       if (header == TRUE) {
          head       <- colnames(read.table(file, header = TRUE, nrows = 1 ))
-         colnames(abf.data) <- head
+         colnames(seqz.data) <- head
       }
-      abf.data
+      seqz.data
    } else {
       if (!is.null(n.lines)){
          if (!is.numeric(n.lines) | length(n.lines) != 2) stop("n.lines must be a vector of 2 integers")
@@ -45,17 +45,17 @@ read.seqz <- function (file, nrows = -1, fast = FALSE, gz = TRUE, header = TRUE,
             n.lines <- n.lines + 1
          }
          if(gz) {
-            abf.data <- read.delim(pipe(paste("gzip -d -c", file,"| sed -n '", paste(n.lines[1], n.lines[2], sep = ","),"p'")),
+            seqz.data <- read.delim(pipe(paste("gzip -d -c", file,"| sed -n '", paste(n.lines[1], n.lines[2], sep = ","),"p'")),
                        colClasses = colClasses, nrows = 1 + n.lines[2] - n.lines[1], header = FALSE,...)
          }  else{
-            abf.data <- read.delim(pipe(paste("sed -n '", paste(n.lines[1], n.lines[2], sep = ","),"p'", file)),
+            seqz.data <- read.delim(pipe(paste("sed -n '", paste(n.lines[1], n.lines[2], sep = ","),"p'", file)),
                        colClasses = colClasses, nrows = 1 + n.lines[2] - n.lines[1], header = FALSE, ...)
          }
          if (header == TRUE) {
             head  <- colnames(read.table(file, header = TRUE, nrows = 1 ))
-            colnames(abf.data) <- head
+            colnames(seqz.data) <- head
          }
-         abf.data
+         seqz.data
       } else {
          read.delim(file, nrows = nrows, colClasses = colClasses, header = header, ...)
       }
@@ -81,14 +81,14 @@ gc.norm <- function (x, gc) {
 gc.sample.stats <- function (file, gz = TRUE) {
    colClasses = c('character', 'numeric', 'numeric')
    if (gz) {
-      abf.data <- read.delim(pipe(paste('gzip -d -c', file, '| cut -f 1,6,10')), colClasses = colClasses)
+      seqz.data <- read.delim(pipe(paste('gzip -d -c', file, '| cut -f 1,6,10')), colClasses = colClasses)
    } else {
-      abf.data <- read.delim(pipe(paste('cut -f 1,6,10', file)), colClasses = colClasses)
+      seqz.data <- read.delim(pipe(paste('cut -f 1,6,10', file)), colClasses = colClasses)
    }
-   gc.stats <- gc.norm(x = abf.data$depth.ratio,
-                       gc = abf.data$GC.percent)
-   chr.ord  <- unique(abf.data$chromosome)
-   chr.dim  <- lapply(X = split(abf.data$chromosome, abf.data$chromosome), FUN = length)
+   gc.stats <- gc.norm(x = seqz.data$depth.ratio,
+                       gc = seqz.data$GC.percent)
+   chr.ord  <- unique(seqz.data$chromosome)
+   chr.dim  <- lapply(X = split(seqz.data$chromosome, seqz.data$chromosome), FUN = length)
    chr.dim  <- data.frame(chr = chr.ord, n.lines = do.call(rbind,chr.dim[chr.ord]))
    chr.dim$start <- cumsum(c(1, chr.dim$n.lines[-length(chr.dim$n.lines)]))
    chr.dim$end   <- chr.dim$start + chr.dim$n.lines - 1
@@ -178,27 +178,27 @@ mut.fractions <- function(AB.sample, Af, sample.strand) {
               fw.freq = as.numeric(max.freqs[,4]))
 }
 
-mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal = 10,
+mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min.reads.normal = 10,
                            max.mut.types = 3, min.type.freq = 0.9, min.fw.freq = 0,
                            segments = NULL) {
-   chroms      <- unique(abf.tab$chromosome)
-   hom.filt    <- abf.tab$ref.zygosity == 'hom'
-   abf.tab     <- abf.tab[hom.filt, ]
-   reads.filt  <- abf.tab$good.s.reads >= min.reads & abf.tab$depth.normal >= min.reads.normal
-   abf.tab     <- abf.tab[reads.filt, ]
-   mufreq.filt <- abf.tab$Af <= (1 - mufreq.treshold)
-   abf.tab     <- abf.tab[mufreq.filt, ]
+   chroms      <- unique(seqz.tab$chromosome)
+   hom.filt    <- seqz.tab$ref.zygosity == 'hom'
+   seqz.tab     <- seqz.tab[hom.filt, ]
+   reads.filt  <- seqz.tab$good.s.reads >= min.reads & seqz.tab$depth.normal >= min.reads.normal
+   seqz.tab     <- seqz.tab[reads.filt, ]
+   mufreq.filt <- seqz.tab$Af <= (1 - mufreq.treshold)
+   seqz.tab     <- seqz.tab[mufreq.filt, ]
    if (!is.null(segments)) {
       for (i in 1:nrow(segments)) {
-         pos.filt <- abf.tab$chromosome == segments$chrom[i] & abf.tab$n.base >= segments$start.pos[i] & abf.tab$n.base <= segments$end.pos[i]
-         abf.tab$adjusted.ratio[pos.filt] <- segments$depth.ratio[i]
+         pos.filt <- seqz.tab$chromosome == segments$chrom[i] & seqz.tab$n.base >= segments$start.pos[i] & seqz.tab$n.base <= segments$end.pos[i]
+         seqz.tab$adjusted.ratio[pos.filt] <- segments$depth.ratio[i]
       }
    }
-   abf.dummy   <- data.frame(chromosome = chroms, n.base = 1, GC.percent = NA, good.s.reads = NA,
+   seqz.dummy   <- data.frame(chromosome = chroms, n.base = 1, GC.percent = NA, good.s.reads = NA,
                              adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)
-   if (nrow(abf.tab) >= 1) {
-      mu.fracts   <- mut.fractions(AB.sample = abf.tab$AB.sample, Af = abf.tab$Af,
-                                   sample.strand = abf.tab$sample.strand)
+   if (nrow(seqz.tab) >= 1) {
+      mu.fracts   <- mut.fractions(AB.sample = seqz.tab$AB.sample, Af = seqz.tab$Af,
+                                   sample.strand = seqz.tab$sample.strand)
       mufreq.filt <- mu.fracts$freq >= mufreq.treshold
       type.filt   <- mu.fracts$base.count <= max.mut.types
       prop.filt   <- mu.fracts$maj.base.freq >= min.type.freq
@@ -210,66 +210,66 @@ mutation.table <- function(abf.tab, mufreq.treshold = 0.15, min.reads = 40, min.
       } else {
          mufreq.filt <- mufreq.filt & type.filt  & prop.filt
       }
-      mut.type    <- paste(abf.tab$AB.germline, mu.fracts$base, sep = '>')
-      abf.tab     <- abf.tab[,c('chromosome', 'n.base', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
-      abf.tab     <- cbind(abf.tab, F = mu.fracts$freq, mutation = mut.type)
-      rbind(abf.tab[mufreq.filt, ], abf.dummy)
+      mut.type    <- paste(seqz.tab$AB.germline, mu.fracts$base, sep = '>')
+      seqz.tab     <- seqz.tab[,c('chromosome', 'n.base', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
+      seqz.tab     <- cbind(seqz.tab, F = mu.fracts$freq, mutation = mut.type)
+      rbind(seqz.tab[mufreq.filt, ], seqz.dummy)
    } else {
-      abf.dummy
+      seqz.dummy
    }
 }
 
-find.breaks <- function(abf.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...) {
-   chromosome <- gsub(x = abf.baf$chromosome, pattern = "chr", replacement = "")
+find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...) {
+   chromosome <- gsub(x = seqz.baf$chromosome, pattern = "chr", replacement = "")
    logR = data.frame(chrom = chromosome,
-                     pos = abf.baf$n.base,
-                     s1 = log2(abf.baf$adjusted.ratio))
+                     pos = seqz.baf$n.base,
+                     s1 = log2(seqz.baf$adjusted.ratio))
    BAF = data.frame(chrom = chromosome,
-                    pos = abf.baf$n.base,
-                    s1 = abf.baf$Bf)
+                    pos = seqz.baf$n.base,
+                    s1 = seqz.baf$Bf)
    logR.wins <- copynumber::winsorize(logR, verbose = verbose)
    allele.seg <- copynumber::aspcf(logR = logR.wins, BAF = BAF, baf.thres = baf.thres,
                        verbose = verbose, gamma = gamma, kmin = kmin, ...)
-    if (length(grep("chr", abf.baf$chromosome)) > 0) {
+    if (length(grep("chr", seqz.baf$chromosome)) > 0) {
         allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")
     }
     allele.seg[allele.seg$end.pos - allele.seg$start.pos != 0,
                c("chrom", "start.pos", "end.pos")]
 }
 
-segment.breaks <- function(abf.tab, breaks, weighted.mean = TRUE) {
+segment.breaks <- function(seqz.tab, breaks, weighted.mean = TRUE) {
    if (weighted.mean == TRUE){
-      w.r     <- sqrt(abf.tab$depth.sample)
-      rw      <- abf.tab$adjusted.ratio * w.r
-      w.b     <- sqrt(abf.tab$good.s.reads)
-      bw      <- abf.tab$Bf * w.b
-      abf.tab <- cbind(abf.tab[, c("chromosome", "n.base", "ref.zygosity")],
+      w.r     <- sqrt(seqz.tab$depth.sample)
+      rw      <- seqz.tab$adjusted.ratio * w.r
+      w.b     <- sqrt(seqz.tab$good.s.reads)
+      bw      <- seqz.tab$Bf * w.b
+      seqz.tab <- cbind(seqz.tab[, c("chromosome", "n.base", "ref.zygosity")],
                     rw = rw, w.r = w.r, bw = bw, w.b = w.b)
    }
-   chr.order <- unique(abf.tab$chromosome)
-   abf.tab <- split(abf.tab, f = abf.tab$chromosome)
+   chr.order <- unique(seqz.tab$chromosome)
+   seqz.tab <- split(seqz.tab, f = seqz.tab$chromosome)
    segments <- list()
-   for (i in 1:length(abf.tab)) {
-      abf.b.i     <- abf.tab[[i]][abf.tab[[i]]$ref.zygosity == 'het', ]
-      breaks.i    <- breaks[breaks$chrom == names(abf.tab)[i], ]
+   for (i in 1:length(seqz.tab)) {
+      seqz.b.i     <- seqz.tab[[i]][seqz.tab[[i]]$ref.zygosity == 'het', ]
+      breaks.i    <- breaks[breaks$chrom == names(seqz.tab)[i], ]
       nb          <- nrow(breaks.i)
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))
-      fact.r.i    <- cut(abf.tab[[i]]$n.base, breaks.vect)
-      fact.b.i    <- cut(abf.b.i$n.base, breaks.vect)
-      seg.i.s.r   <- sapply(X = split(abf.tab[[i]]$chromosome, f = fact.r.i), FUN = length)
-      seg.i.s.b   <- sapply(X = split(abf.b.i$chromosome, f = fact.b.i), FUN = length)
+      fact.r.i    <- cut(seqz.tab[[i]]$n.base, breaks.vect)
+      fact.b.i    <- cut(seqz.b.i$n.base, breaks.vect)
+      seg.i.s.r   <- sapply(X = split(seqz.tab[[i]]$chromosome, f = fact.r.i), FUN = length)
+      seg.i.s.b   <- sapply(X = split(seqz.b.i$chromosome, f = fact.b.i), FUN = length)
       if (weighted.mean == TRUE){
-         seg.i.rw    <- sapply(X = split(abf.tab[[i]]$rw, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
-         seg.i.w.r   <- sapply(X = split(abf.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
-         seg.i.bw    <- sapply(X = split(abf.b.i$bw, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
-         seg.i.w.b   <- sapply(X = split(abf.b.i$w.b, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
-         segments.i <- data.frame(chromosome  = names(abf.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
+         seg.i.rw    <- sapply(X = split(seqz.tab[[i]]$rw, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
+         seg.i.w.r   <- sapply(X = split(seqz.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
+         seg.i.bw    <- sapply(X = split(seqz.b.i$bw, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
+         seg.i.w.b   <- sapply(X = split(seqz.b.i$w.b, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
+         segments.i <- data.frame(chromosome  = names(seqz.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
                                end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.bw/seg.i.w.b, N.BAF = seg.i.s.b,
                                depth.ratio = seg.i.rw/seg.i.w.r, N.ratio = seg.i.s.r, stringsAsFactors = FALSE)
       } else {
-        seg.i.r   <- sapply(X = split(abf.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = mean)
-        seg.i.b   <- sapply(X = split(abf.b.i$Bf, f = fact.b.i), FUN = mean)
-        segments.i <- data.frame(chromosome  = names(abf.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
+        seg.i.r   <- sapply(X = split(seqz.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = mean)
+        seg.i.b   <- sapply(X = split(seqz.b.i$Bf, f = fact.b.i), FUN = mean)
+        segments.i <- data.frame(chromosome  = names(seqz.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
                                  end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.b, N.BAF = seg.i.s.b,
                                  depth.ratio = seg.i.r, N.ratio = seg.i.s.r, stringsAsFactors = FALSE)
       }

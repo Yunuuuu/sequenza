@@ -69,15 +69,15 @@ The \code{acgt} file format is similar to the \code{seqz} format, but contains o
 
 data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 ## read chromosome 1 from an seqz file.
-abf.data <- read.seqz(data.file, chr.name = 1)
+seqz.data <- read.seqz(data.file, chr.name = 1)
 
 ## fast accessing cromosome 17 using the file metrics
 gc.stats <- gc.sample.stats(data.file)
 chrX <- gc.stats$file.metrics[gc.stats$file.metrics$chr == "X", ]
-abf.data <- read.seqz(data.file, n.lines = c(chrX$start, chrX$end))
+seqz.data <- read.seqz(data.file, n.lines = c(chrX$start, chrX$end))
 
 ## Comparison the running time of the two different methods.
 system.time(read.seqz(data.file, n.lines = c(chrX$start, chrX$end)))
-system.time(abf.data <- read.seqz(data.file,chr.name="X"))
+system.time(seqz.data <- read.seqz(data.file,chr.name="X"))
    }
 }

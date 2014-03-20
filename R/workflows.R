@@ -20,62 +20,62 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
          cat("processing ", chr, ": ") 
       }
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
-      abf.data   <- read.seqz(file, gz = gz, n.lines = c(file.lines$start, file.lines$end))
-      abf.data$adjusted.ratio <- round(abf.data$depth.ratio / gc.vect[as.character(abf.data$GC.percent)], 3)
-      abf.hom <- abf.data$ref.zygosity == 'hom'
-      abf.het <- abf.data[!abf.hom, ]
-      abf.r.win <- windowValues(x = abf.data$adjusted.ratio,
-                                positions = abf.data$n.base,
-                                chromosomes = abf.data$chromosome,
+      seqz.data   <- read.seqz(file, gz = gz, n.lines = c(file.lines$start, file.lines$end))
+      seqz.data$adjusted.ratio <- round(seqz.data$depth.ratio / gc.vect[as.character(seqz.data$GC.percent)], 3)
+      seqz.hom <- seqz.data$ref.zygosity == 'hom'
+      seqz.het <- seqz.data[!seqz.hom, ]
+      seqz.r.win <- windowValues(x = seqz.data$adjusted.ratio,
+                                positions = seqz.data$n.base,
+                                chromosomes = seqz.data$chromosome,
                                 window = window, overlap = overlap,
-                                weight = abf.data$depth.normal)
-      if (nrow(abf.het) > 0) {
-         abf.b.win <- windowValues(x = abf.het$Bf,
-                                   positions = abf.het$n.base,
-                                   chromosomes = abf.het$chromosome,
+                                weight = seqz.data$depth.normal)
+      if (nrow(seqz.het) > 0) {
+         seqz.b.win <- windowValues(x = seqz.het$Bf,
+                                   positions = seqz.het$n.base,
+                                   chromosomes = seqz.het$chromosome,
                                    window = window, overlap = overlap,
-                                   weight = abf.het$good.s.reads)
+                                   weight = seqz.het$good.s.reads)
          breaks    <- NULL
-         breaks    <- try(find.breaks(abf.het, gamma = gamma, 
+         breaks    <- try(find.breaks(seqz.het, gamma = gamma, 
                                       kmin = kmin, baf.thres = c(0, 0.5)),
                           silent = FALSE)
          if (!is.null(breaks)){
-            seg.s1    <- segment.breaks(abf.data, breaks = breaks, weighted.mean = weighted.mean)            
+            seg.s1    <- segment.breaks(seqz.data, breaks = breaks, weighted.mean = weighted.mean)            
          } else {
-            seg.s1 <- segment.breaks(abf.data,
+            seg.s1 <- segment.breaks(seqz.data,
                                      breaks = data.frame(chrom = chr,
-                                                         start.pos = min(abf.data$n.base, na.rm = TRUE),
-                                                         end.pos = max(abf.data$n.base, na.rm = TRUE)),
+                                                         start.pos = min(seqz.data$n.base, na.rm = TRUE),
+                                                         end.pos = max(seqz.data$n.base, na.rm = TRUE)),
                                      weighted.mean = weighted.mean)
          }
          
       } else {
-         abf.b.win <- list()
-         abf.b.win[[1]] <- data.frame(start = min(abf.data$n.base, na.rm = TRUE),
-                                      end = max(abf.data$n.base, na.rm = TRUE), mean = 0.5,
+         seqz.b.win <- list()
+         seqz.b.win[[1]] <- data.frame(start = min(seqz.data$n.base, na.rm = TRUE),
+                                      end = max(seqz.data$n.base, na.rm = TRUE), mean = 0.5,
                                       q0 = 0.5,  q1 = 0.5, N = 1)
-         seg.s1 <- segment.breaks(abf.data,
+         seg.s1 <- segment.breaks(seqz.data,
                                   breaks = data.frame(chrom = chr,
-                                                      start.pos = min(abf.data$n.base, na.rm = TRUE),
-                                                      end.pos = max(abf.data$n.base, na.rm = TRUE)),
+                                                      start.pos = min(seqz.data$n.base, na.rm = TRUE),
+                                                      end.pos = max(seqz.data$n.base, na.rm = TRUE)),
                                   weighted.mean = weighted.mean)
                                   
       }
-      mut.tab   <- mutation.table(abf.data, mufreq.treshold = mufreq.treshold,
+      mut.tab   <- mutation.table(seqz.data, mufreq.treshold = mufreq.treshold,
                                   min.reads = min.reads, min.reads.normal = min.reads.normal,
                                   max.mut.types = max.mut.types, min.type.freq = min.type.freq,
                                   min.fw.freq = min.fw.freq, segments = seg.s1)
-      windows.baf[[which(chromosome.list == chr)]]   <- abf.b.win[[1]]
-      windows.ratio[[which(chromosome.list == chr)]] <- abf.r.win[[1]]
+      windows.baf[[which(chromosome.list == chr)]]   <- seqz.b.win[[1]]
+      windows.ratio[[which(chromosome.list == chr)]] <- seqz.r.win[[1]]
       mutation.list[[which(chromosome.list == chr)]] <- mut.tab
       segments.list[[which(chromosome.list == chr)]] <- seg.s1
-      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum(sum = abf.data$depth.sample, na.rm = TRUE),
-                                                                 N  = length(abf.data$depth.sample) )
+      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum(sum = seqz.data$depth.sample, na.rm = TRUE),
+                                                                 N  = length(seqz.data$depth.sample) )
       if (verbose){
         
         cat(paste(nrow(mut.tab), 'variant calls;',
-                 nrow(abf.het), 'heterozygous positions;',
-                 sum(abf.hom), 'homozygous positions.', sep = " "), "\n") 
+                 nrow(seqz.het), 'heterozygous positions;',
+                 sum(seqz.hom), 'homozygous positions.', sep = " "), "\n") 
       }
    }
    names(windows.baf)   <- chromosome.list
