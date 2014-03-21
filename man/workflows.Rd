@@ -5,7 +5,7 @@
 \title{Use sequenza to estimate tumor purity and ploidy.}
 
 \description{
-  The main interface of the package, to run several of the functions of \code{sequenza} in a standardized pipeline.
+  These three functions are intended to be the main interface of the package, to run several of the functions of \code{sequenza} in a standardized pipeline.
 }
 
 \usage{
@@ -21,18 +21,18 @@
                priors.table = data.frame(CN = 2, value = 2),
                chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L))
 
-  sequenza.results(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = './',
+  sequenza.results(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = getwd(),
                    cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
                    ratio.priority = FALSE, XY = c(X = "X", Y = "Y"),
                    chromosome.list = 1:24)
 }
 
 \arguments{
-  \item{file}{an seqz file.}
+  \item{file}{the name of the seqz file to read.}
   \item{gz}{logical. If TRUE (the default) the function expects a gzipped file.}
   \item{window}{size of windows used when plotting mean and quartile ranges of depth ratios and B-allele frequencies. Smaller windows will take more time to compute.}
   \item{overlap}{integer specifying the number of overlapping windows.}
-  \item{gamma, kmin}{arguments passed to \code{aspcf} from the \code{copynumber} package.}
+  \item{gamma, kmin}{arguments passed to \code{\link{aspcf}} from the \pkg{copynumber} package.}
   \item{mufreq.treshold}{mutation frequency threshold.}
   \item{min.reads}{minimal number of reads above the quality threshold to accept the mutation call.}
   \item{min.reads.normal}{minimal number of reads used to determine the genotype in the normal sample.}
@@ -45,12 +45,12 @@
   \item{CNt.max}{maximum copy number to consider in the model.}  
   \item{segment.filter}{threshold segment length (in base pairs) to filter out short segments, that can cause noise when fitting the cellularity and ploidy parameters. The threshold will not affect the allele-specific segmentation.}
   \item{XY}{character vector of length 2 specifying the labels used for the X and Y chromosomes. Defaults to c(X = "X", Y = "Y").}
-  \item{cellularity}{vector of values to test as cellularity parameter.}
-  \item{ploidy}{vector of values to test as ploidy parameter.}
+  \item{cellularity}{vector of candidate cellularity parameters.}
+  \item{ploidy}{vector candidate ploidy parameters.}
   \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
   \item{ratio.priority}{logical, if TRUE only the depth ratio will be used to determine the copy number state, while the Bf value will be used to determine the number of B-alleles.}
   \item{chromosome.list}{Vector containing the index or the names of the chromosome to include in the model fitting.}
-  \item{weighted.mean}{boolean to select if the segments have to calculated using the read depth as a weights to calculate depth ratio and B-allele frequency means.}
+  \item{weighted.mean}{boolean to select if the segments should be calculated using the read depth as weights to calculate depth ratio and B-allele frequency means.}
   \item{verbose}{logical, indicating whether to print information about the chromosome being processed.}
   \item{sample.id}{identifier of the sample. It will be used as prefix of saved object.}
   \item{out.dir}{output directory where all the files and object will be stored.}
@@ -58,14 +58,23 @@
 }
 
 \details{
-   The function \code{sequenza.extract} utilizes a range of functions from the sequenza package to read the raw data, normalize the depth.ratio for GC-content bias, perform allele-specific segmentation, filter for noisy mutations and binning of the raw data for plotting. The computed objects are returned as a single list object. This object can be given to  \code{sequenza.fit}, which uses \code{baf.model.fit} to calculate the log-likelihood for all pairs of the ploidy and cellularity parameters.
+   The first function, \code{sequenza.extract}, utilizes a range of functions from the sequenza package to read the raw data, normalize the depth.ratio for GC-content bias, perform allele-specific segmentation, filter for noisy mutations and bin the raw data for plotting. The computed objects are returned as a single list object. 
    
-   The function \code{sequenza.fit} would save a number of object on a desired directory (default is the working directory).
-   The object are the list of segments with resulting copy numbers and major and minor alleles; the candidate mutation list with variant allele frequency, and copy number and number of mutated allele, in relation of the clonal population (for sub-clonal population it needs to be processed with furthers methods); A plot of all the chromosomes in one image, representing the major and minor alleles and the absolute copy number changes (genome_view); multiple plots with one chromosome per image, representing copy-number, B-allele frequency and mutation in parallel (chromosome_view); results of the model fitting (CP_contours and confints); and a summary of the copy number state of the sample (CN_bars).
+   The second function, \code{sequenza.fit}, accepts the output from \code{sequenza.extract} and calls \code{\link{baf.model.fit}} to calculate the log-likelihood for all pairs of the candidate ploidy and cellularity parameters.
+   
+   The third function, \code{sequenza.results}, saves a number of objects in a specified directory (default is the working directory). The objects are:
+\itemize{
+ \item The list of segments with resulting copy numbers and major and minor alleles. 
+ \item The candidate mutation list with variant allele frequency, and copy number and number of mutated allele, in relation of the clonal population (for sub-clonal population it needs to be processed with further methods). 
+ \item A plot of all the chromosomes in one image, representing the major and minor alleles and the absolute copy number changes (genome_view).
+ \item Multiple plots with one chromosome per image, representing copy-number, B-allele frequency and mutation in parallel (chromosome_view).
+ \item Results of the model fitting (CP_contours and confints_CP)
+ \item A summary of the copy number state of the sample (CN_bars).
+}
 }
 
 \seealso{
-  \code{genome.view}, \code{baf.bayes}, \code{cp.plot}, \code{get.ci}.
+  \code{\link{genome.view}}, \code{\link{baf.bayes}}, \code{\link{cp.plot}}, \code{\link{get.ci}}.
 }
 
 \examples{
@@ -74,6 +83,7 @@
 data.file <-  system.file("data", "example.seqz.txt.gz",
               package = "sequenza")
 test <- sequenza.extract(data.file)
-CP   <- sequenza.fit(test, mc.cores = 4)
+test.CP   <- sequenza.fit(test, mc.cores = 4)
+sequenza.results(test, test.CP, "example")
    }
 }
