@@ -7,8 +7,8 @@
 }
 
 \usage{
-model.points(cellularity = 0.5, ploidy = 2, types = cbind(CNn = 2, CNt = 2, Mt = 1),
-             avg.depth.ratio = 1)}
+model.points(cellularity, ploidy, types, avg.depth.ratio)
+}
 
 \arguments{
   \item{cellularity}{fraction of tumor cells in the sample.}
