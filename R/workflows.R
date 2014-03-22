@@ -17,7 +17,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    }
    for (chr in chromosome.list){
       if (verbose){
-         cat("processing ", chr, ": ") 
+         message("Processing ", chr, ": ", appendLF = FALSE) 
       }
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
       seqz.data   <- read.seqz(file, gz = gz, n.lines = c(file.lines$start, file.lines$end))
@@ -73,9 +73,9 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                                                  N  = length(seqz.data$depth.sample) )
       if (verbose){
         
-        cat(paste(nrow(mut.tab), 'variant calls;',
-                 nrow(seqz.het), 'heterozygous positions;',
-                 sum(seqz.hom), 'homozygous positions.', sep = " "), "\n") 
+        message(nrow(mut.tab), ' variant calls; ',
+                 nrow(seqz.het), ' heterozygous positions; ',
+                 sum(seqz.hom), ' homozygous positions.') 
       }
    }
    names(windows.baf)   <- chromosome.list
@@ -120,31 +120,34 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
                  mc.cores = mc.cores, ratio.priority = ratio.priority)
 }
 
-sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = './',
+sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = getwd(),
                              cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
                              ratio.priority = FALSE, XY = c(X = "X", Y = "Y"), chromosome.list = 1:24){
-   cp.file   <- paste(sample.id, "CP_contours.pdf", sep = '_')
-   cint.file <- paste(sample.id, "confints_CP.txt", sep = '_')
-   chrw.file <- paste(sample.id, "chromosome_view.pdf", sep = '_')
-   geno.file <- paste(sample.id, "genome_view.pdf", sep = '_')
-   cn.file   <- paste(sample.id, "CN_bars.pdf", sep = '_')
-   muts.file <- paste(sample.id, "mutations.txt", sep = '_')
-   segs.file <- paste(sample.id, "segments.txt", sep = '_')
-   robj.extr <- paste(sample.id, "sequenza_extract.RData", sep= '_')
-   robj.fit  <- paste(sample.id, "sequenza_fit.RData", sep= '_')  
+   if(!file.exists(out.dir)) {
+     dir.ok <- dir.create(path = out.dir, recursive = TRUE)
+     if(!dir.ok) stop('Directory does not exist and cannot be created: ', out.dir)
+   }
+   makeFilename <- function(x) file.path(out.dir, paste(sample.id, x, sep = '_'))
+   cp.file   <- makeFilename("CP_contours.pdf")
+   cint.file <- makeFilename("confints_CP.txt")
+   chrw.file <- makeFilename("chromosome_view.pdf")
+   geno.file <- makeFilename("genome_view.pdf")
+   cn.file   <- makeFilename("CN_bars.pdf")
+   muts.file <- makeFilename("mutations.txt")
+   segs.file <- makeFilename("segments.txt")
+   robj.extr <- makeFilename("sequenza_extract.RData")
+   robj.fit  <- makeFilename("sequenza_fit.RData")  
    avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
-   dir.create(path = out.dir, showWarnings = FALSE,
-              recursive = TRUE)
    assign(x = paste0(sample.id,"_sequenza_extract"), value = sequenza.extract)
-   save(list = paste0(sample.id,"_sequenza_extract"), file = paste(out.dir, robj.extr, sep = "/")) 
+   save(list = paste0(sample.id,"_sequenza_extract"), file = robj.extr) 
    if (is.null(sequenza.fit) && (is.null(cellularity) || is.null(ploidy))){
       stop("Either the sequenza.fit or both cellularity and ploidy argument are required.")
    }
    if (!is.null(sequenza.fit)){
       assign(x = paste0(sample.id,"_sequenza_fit"), value = sequenza.fit)
-      save(list = paste0(sample.id,"_sequenza_fit"), file = paste(out.dir, robj.fit, sep = "/"))       
+      save(list = paste0(sample.id,"_sequenza_fit"), file = robj.fit)       
       cint <- get.ci(sequenza.fit)
-      pdf(paste(out.dir, cp.file, sep = "/"))
+      pdf(cp.file)
          cp.plot(sequenza.fit)
          cp.plot.contours(sequenza.fit, add = TRUE, likThresh = c(0.95), col = "red", pch = 20)
          if (!is.null(cellularity) || !is.null(ploidy)) {
@@ -160,8 +163,8 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
          }
       dev.off()
    }
-   seg.tab     <- na.exclude(do.call(rbind, sequenza.extract$segments[chromosome.list = chromosome.list]))
-   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list = chromosome.list]))
+   seg.tab     <- na.exclude(do.call(rbind, sequenza.extract$segments[chromosome.list]))
+   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
    if (female){
       segs.is.xy <- seg.tab$chromosome == XY["Y"]
       mut.is.xy  <- mut.tab$chromosome == XY["Y"]
@@ -187,8 +190,8 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
          seg.res    <- rbind(seg.res, seg.xy)
       }
    }
-   write.table(seg.res, paste(out.dir, segs.file, sep = "/"),
-               col.names = TRUE, row.names = FALSE, sep="\t")   
+   write.table(seg.res, file = segs.file,
+               col.names = TRUE, row.names = FALSE, sep = "\t")   
 
    mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy], CNt.max = CNt.max,
                             depth.ratio = mut.tab$adjusted.ratio[!mut.is.xy],
@@ -205,10 +208,10 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
          mut.res    <- rbind(mut.res, mut.xy)
       }
    }
-   write.table(mut.res, paste(out.dir, muts.file, sep = "/"),
-               col.names = TRUE, row.names = FALSE, sep="\t")   
+   write.table(mut.res, file = muts.file,
+               col.names = TRUE, row.names = FALSE, sep = "\t")   
    
-   pdf(paste(out.dir, chrw.file, sep = "/"))
+   pdf(chrw.file)
    for (i in unique(seg.res$chromosome)) {
       
       if (!female && i %in% XY){
@@ -224,17 +227,17 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
                       avg.depth.ratio = avg.depth.ratio, CNn = CNn, min.N.ratio = 1)
    }
    dev.off()
-   pdf(paste(out.dir, geno.file, sep = "/"), height = 5, width = 15)
+   pdf(geno.file, height = 5, width = 15)
       genome.view(seg.res)
       genome.view(seg.res, "CN")
    dev.off()
    barscn <- data.frame(size = seg.res$end.pos - seg.res$start.pos,
                      CNt = seg.res$CNt)
-   cn.sizes <- split(barscn$size,barscn$CNt)
+   cn.sizes <- split(barscn$size, barscn$CNt)
    cn.sizes <- sapply(cn.sizes, 'sum')
-   pdf(paste(out.dir, cn.file, sep = "/"))
-   barplot(round(cn.sizes/sum(cn.sizes)* 100, 0), names = names(cn.sizes), las = 1,
-                      ylab = "Percentage (%)", xlab = "copy number")
+   pdf(cn.file)
+   barplot(round(cn.sizes / sum(cn.sizes) * 100), names = names(cn.sizes), las = 1,
+                      ylab = "Percentage (%)", xlab = "Copy number")
    dev.off()
    
    ## Write down the results.... ploidy etc...
@@ -242,7 +245,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
       res.tab <- data.frame(cellularity     = c(cint$confint.y[1], cint$max.y[1], cint$confint.y[2]),
                            ploidy.estimate = c(cint$confint.x[1], cint$max.x[1], cint$confint.x[2]),
                            ploidy.mean.cn  = weighted.mean(x = as.integer(names(cn.sizes)), w = cn.sizes))
-      write.table(res.tab, paste(out.dir, cint.file, sep = "/"), col.names = TRUE,
+      write.table(res.tab, cint.file, col.names = TRUE,
                   row.names = FALSE, sep = "\t")
    }
 }
