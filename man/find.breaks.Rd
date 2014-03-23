@@ -9,7 +9,7 @@
 
 \usage{
 find.breaks(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...)
-segment.breaks(seqz.tab, breaks, weighted.mean = TRUE)
+segment.breaks(seqz.tab, breaks, min.reads.baf = 1, weighted.mean = TRUE)
 }
 
 \arguments{
@@ -17,6 +17,7 @@ segment.breaks(seqz.tab, breaks, weighted.mean = TRUE)
   \item{seqz.tab}{a complete seqz file.}
   \item{gamma, kmin, baf.thres, verbose}{arguments passed to \code{aspcf}.}
   \item{breaks}{breaks as output \code{find.breaks}.}
+  \item{min.reads.baf}{treshold on the depth of the positions included to calculate the average BAF for segment.}
   \item{weighted.mean}{boolean to select if the segments have to calculated using the read depth as a weights to calculate depth ratio and B-allele frequency means.}
   \item{...}{additional arguments passed to \code{aspcf}.}
 }

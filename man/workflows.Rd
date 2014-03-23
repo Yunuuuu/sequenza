@@ -11,7 +11,7 @@
 \usage{
   sequenza.extract(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80,
                    kmin = 10, mufreq.treshold = 0.10, min.reads = 40,
-                   min.reads.normal = 10, max.mut.types = 1,
+                   min.reads.normal = 10, min.reads.baf = 1, max.mut.types = 1,
                    min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE,
                    chromosome.list = NULL, weighted.mean = TRUE)
 
@@ -36,6 +36,7 @@
   \item{mufreq.treshold}{mutation frequency threshold.}
   \item{min.reads}{minimal number of reads above the quality threshold to accept the mutation call.}
   \item{min.reads.normal}{minimal number of reads used to determine the genotype in the normal sample.}
+  \item{min.reads.baf}{treshold on the depth of the positions included to calculate the average BAF for segment.}
   \item{max.mut.types}{maximal number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 bases). Default is 3, to accept "noisy" mutation calls.}
   \item{min.type.freq}{minimal frequency of aberrant types.}
     \item{min.fw.freq}{minimal frequency of variant reads detected in the forward strand. Setting it to 0, all the variant calls with strand frequency in the interval outside 0 and 1, margin not comprised, would be discarded.}

@@ -237,20 +237,22 @@ find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), 
                c("chrom", "start.pos", "end.pos")]
 }
 
-segment.breaks <- function(seqz.tab, breaks, weighted.mean = TRUE) {
+segment.breaks <- function(seqz.tab, breaks, min.read.baf = 1,
+                           weighted.mean = TRUE) {
    if (weighted.mean == TRUE){
       w.r     <- sqrt(seqz.tab$depth.sample)
       rw      <- seqz.tab$adjusted.ratio * w.r
       w.b     <- sqrt(seqz.tab$good.s.reads)
       bw      <- seqz.tab$Bf * w.b
-      seqz.tab <- cbind(seqz.tab[, c("chromosome", "n.base", "ref.zygosity")],
+      seqz.tab <- cbind(seqz.tab[, c("chromosome", "n.base", "ref.zygosity", "good.s.reads")],
                     rw = rw, w.r = w.r, bw = bw, w.b = w.b)
    }
    chr.order <- unique(seqz.tab$chromosome)
    seqz.tab <- split(seqz.tab, f = seqz.tab$chromosome)
    segments <- list()
    for (i in 1:length(seqz.tab)) {
-      seqz.b.i     <- seqz.tab[[i]][seqz.tab[[i]]$ref.zygosity == 'het', ]
+      seqz.b.i    <- seqz.tab[[i]][seqz.tab[[i]]$ref.zygosity == 'het', ]
+      seqz.b.i    <- seqz.b.i[seqz.b.i$good.s.reads >= min.read.baf, ]
       breaks.i    <- breaks[breaks$chrom == names(seqz.tab)[i], ]
       nb          <- nrow(breaks.i)
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))
