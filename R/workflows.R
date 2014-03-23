@@ -69,7 +69,8 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       windows.ratio[[which(chromosome.list == chr)]] <- seqz.r.win[[1]]
       mutation.list[[which(chromosome.list == chr)]] <- mut.tab
       segments.list[[which(chromosome.list == chr)]] <- seg.s1
-      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum(sum = seqz.data$depth.sample, na.rm = TRUE),
+      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum = sum(as.numeric(seqz.data$depth.sample),
+                                                                       na.rm = TRUE),
                                                                  N  = length(seqz.data$depth.sample) )
       if (verbose){
         
