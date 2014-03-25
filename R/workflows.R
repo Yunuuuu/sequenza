@@ -1,6 +1,6 @@
 sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80, kmin = 10,
                              mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
-                             min.read.baf = 1, max.mut.types = 1, min.type.freq = 0.9,
+                             min.reads.baf = 1, max.mut.types = 1, min.type.freq = 0.9,
                              min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
                              weighted.mean = TRUE){
    gc.stats <- gc.sample.stats(file, gz = gz)
@@ -25,7 +25,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       seqz.data$adjusted.ratio <- round(seqz.data$depth.ratio / gc.vect[as.character(seqz.data$GC.percent)], 3)
       seqz.hom <- seqz.data$ref.zygosity == 'hom'
       seqz.het <- seqz.data[!seqz.hom, ]
-      het.filt <- seqz.het$good.s.reads >= min.read.baf
+      het.filt <- seqz.het$good.s.reads >= min.reads.baf
       seqz.r.win <- windowValues(x = seqz.data$adjusted.ratio,
                                 positions = seqz.data$n.base,
                                 chromosomes = seqz.data$chromosome,
@@ -43,7 +43,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                           silent = FALSE)
          if (!is.null(breaks)){
             seg.s1    <- segment.breaks(seqz.tab = seqz.data, breaks = breaks,
-                                        min.read.baf = min.read.baf, weighted.mean = weighted.mean)            
+                                        min.reads.baf = min.reads.baf, weighted.mean = weighted.mean)            
          } else {
             seg.s1 <- segment.breaks(seqz.data,
                                      breaks = data.frame(chrom = chr,

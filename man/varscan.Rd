@@ -3,7 +3,7 @@
 \title{Import VarScan output files, for use with the Sequenza algorithm.}
 
 \description{
-   This function reads the output files from the \comman{somatic} and \command{copynumber} programs, which are part of VarScan version 2. The resulting object can be used, in lieu of a \dQuote{seqz} object, within Sequenza.
+   This function reads the output files from the \command{somatic} and \command{copynumber} programs, which are part of VarScan version 2. The resulting object can be used, in lieu of a \dQuote{seqz} object, within Sequenza.
 }
 
 \usage{
@@ -11,7 +11,7 @@
 }
 
 \arguments{
-  \item{varscan.somatic}{a data frame from the output file of \comman{somatic}.}
+  \item{varscan.somatic}{a data frame from the output file of \command{somatic}.}
   \item{varscan.copynumber}{a data frame from the output file of \command{copynumber} (optional).}
 }
 

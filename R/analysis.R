@@ -237,7 +237,7 @@ find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), 
                c("chrom", "start.pos", "end.pos")]
 }
 
-segment.breaks <- function(seqz.tab, breaks, min.read.baf = 1,
+segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
                            weighted.mean = TRUE) {
    if (weighted.mean == TRUE){
       w.r     <- sqrt(seqz.tab$depth.sample)
@@ -252,7 +252,7 @@ segment.breaks <- function(seqz.tab, breaks, min.read.baf = 1,
    segments <- list()
    for (i in 1:length(seqz.tab)) {
       seqz.b.i    <- seqz.tab[[i]][seqz.tab[[i]]$ref.zygosity == 'het', ]
-      seqz.b.i    <- seqz.b.i[seqz.b.i$good.s.reads >= min.read.baf, ]
+      seqz.b.i    <- seqz.b.i[seqz.b.i$good.s.reads >= min.reads.baf, ]
       breaks.i    <- breaks[breaks$chrom == names(seqz.tab)[i], ]
       nb          <- nrow(breaks.i)
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))

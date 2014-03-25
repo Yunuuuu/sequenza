@@ -16,9 +16,11 @@
 
 \format{
   A list containing three items:
- \item{x}{numeric vector of tested ploidy values.}
- \item{y}{numeric vector of tested cellularity values.}
- \item{z}{numeric matrix of log-likelihoods for each \var{(x,y)} pair.}
+ \describe{ 
+   \item{x}{numeric vector of tested ploidy values.}
+   \item{y}{numeric vector of tested cellularity values.}
+   \item{z}{numeric matrix of log-likelihoods for each \var{(x,y)} pair.}
+  }
 }
 
 \examples{
