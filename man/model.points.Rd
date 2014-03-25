@@ -1,6 +1,6 @@
 \name{model.points}
 \alias{model.points}
-\title{Generate mutation frequency and depth ratio model point at given cellularity and ploidy value.}
+\title{Generate mutation frequency and depth ratio model point at given cellularity and ploidy value}
 
 \description{
   \code{model.points} combines \code{theoretical.mufreq} and \code{theoretical.depth.ratio} to model the theoretical mutation frequency and depth ratio based on given values of cellularity and ploidy.

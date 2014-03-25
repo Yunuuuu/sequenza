@@ -1,9 +1,9 @@
 \name{VarScan2seqz}
 \alias{VarScan2seqz}
-\title{Import varscan output files, to be able to use it with sequenza algorithm.}
+\title{Import VarScan output files, for use with the Sequenza algorithm.}
 
 \description{
-   Create an seqz file from VarScan2 output files.
+   This function reads the output files from the \comman{somatic} and \command{copynumber} programs, which are part of VarScan version 2. The resulting object can be used, in lieu of a \dQuote{seqz} object, within Sequenza.
 }
 
 \usage{
@@ -11,11 +11,18 @@
 }
 
 \arguments{
-  \item{varscan.somatic}{data.frame from the output file of varscan somatic.}
-  \item{varscan.copynumber}{data.frame from the output file of varscan copynumber. it is not required. default NULL}
+  \item{varscan.somatic}{a data frame from the output file of \comman{somatic}.}
+  \item{varscan.copynumber}{a data frame from the output file of \command{copynumber} (optional).}
 }
 
 \details{
-  It is possible to run sequenza with the output of VarScan2, as version 2.3.6, but also previous release might be working as well.
-  The function will create a data.frame with the seqz format, as explained in \code{\link{read.seqz}} page.
+  It is possible to run sequenza with the output of VarScan2 version 2.3.6. Earlier versions may also work but have not been tested.
+}
+
+\value{
+A data frame with the seqz format, as returned by \code{\link{read.seqz}}.
+}
+
+\references{
+\url{http://varscan.sourceforge.net}
 }

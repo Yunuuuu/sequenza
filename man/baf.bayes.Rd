@@ -1,7 +1,7 @@
 \name{baf.bayes}
 \alias{baf.bayes}
 \alias{mufreq.bayes}
-\title{Model allele-specific copy numbers with specified cellularity and DNA-content parameters}
+\title{Model allele-specific copy numbers with specified cellularity and ploidy parameters}
 
 \description{
   Given a pair of cellularity and ploidy parameters, the function returns the most likely allele-specific copy numbers with the corresponding log-likelihood of the fit, for given values of B-allele frequency and depth ratio.
@@ -26,11 +26,11 @@
   \item{weight.ratio}{vector of weights for the depth ratio values.}
   \item{cellularity}{fraction of tumor cells in the sample.}
   \item{ploidy}{2 * ratio between total DNA content in a tumor cell and a normal cell.}
-  \item{avg.depth.ratio}{average normalized depth ratios.}
+  \item{avg.depth.ratio}{average normalized depth ratio.}
   \item{CNt.min}{minimum copy number to consider in the model.}
   \item{CNt.max}{maximum copy number to consider in the model.}
   \item{CNn}{copy number of the normal genome.}
-  \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
+  \item{priors.table}{data frame with columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so any values different from 1 will change the corresponding weight.}
   \item{ratio.priority}{logical, if TRUE only the depth ratio will be used to determine the copy number state, while the Bf value will be used to determine the number of B-alleles.}
 }
 
