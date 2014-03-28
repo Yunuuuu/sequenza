@@ -21,7 +21,7 @@ read.acgt(file, colClasses = c("character", "integer", "character", "integer",
 \arguments{
 \item{file}{file name}
 \item{nrows}{number of rows to read from the file. Default is -1 (all rows).}
-\item{fast}{logical. If TRUE the file will be pre-parsed to count the number of rows; in some cases this can speed up the file reading.}
+\item{fast}{logical. If TRUE the file will be pre-parsed to count the number of rows; on some systems this can speed up the file reading.}
 \item{gz}{logical. If TRUE (the default) the function expects a gzipped file.}
 \item{header}{logical, indicating whether the file contains the names of the variables as its first line.}
 \item{colClasses}{character.  A vector of classes to be assumed for the columns. By default the acgt and seqz format is expected.}
@@ -68,16 +68,18 @@ The \code{acgt} file format is similar to the \code{seqz} format, but contains o
    \dontrun{
 
 data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
+
 ## read chromosome 1 from an seqz file.
 seqz.data <- read.seqz(data.file, chr.name = 1)
 
-## fast accessing cromosome 17 using the file metrics
+## Fast access to chromosome X using the file metrics
 gc.stats <- gc.sample.stats(data.file)
 chrX <- gc.stats$file.metrics[gc.stats$file.metrics$chr == "X", ]
 seqz.data <- read.seqz(data.file, n.lines = c(chrX$start, chrX$end))
 
-## Comparison the running time of the two different methods.
+## Compare the running time of the two different methods.
 system.time(read.seqz(data.file, n.lines = c(chrX$start, chrX$end)))
 system.time(seqz.data <- read.seqz(data.file,chr.name="X"))
+
    }
 }

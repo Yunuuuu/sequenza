@@ -1,6 +1,6 @@
 \name{plotWindows}
 \alias{plotWindows}
-\title{Plot the specified windowed chromosome.}
+\title{Plot a windowed chromosome}
 
 \description{
   \code{plotWindows} is a convenient plot function that visualizes a specified chromosome attribute using the data frame produced by the function \code{windowValues}.

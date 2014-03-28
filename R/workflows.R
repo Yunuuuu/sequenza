@@ -1,7 +1,8 @@
 sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80, kmin = 10,
                              mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
-                             max.mut.types = 1, min.type.freq = 0.9, min.fw.freq = 0,
-                             verbose = TRUE, chromosome.list = NULL, weighted.mean = TRUE){
+                             min.reads.baf = 1, max.mut.types = 1, min.type.freq = 0.9,
+                             min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
+                             weighted.mean = TRUE){
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
    gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
@@ -24,23 +25,25 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       seqz.data$adjusted.ratio <- round(seqz.data$depth.ratio / gc.vect[as.character(seqz.data$GC.percent)], 3)
       seqz.hom <- seqz.data$ref.zygosity == 'hom'
       seqz.het <- seqz.data[!seqz.hom, ]
+      het.filt <- seqz.het$good.s.reads >= min.reads.baf
       seqz.r.win <- windowValues(x = seqz.data$adjusted.ratio,
                                 positions = seqz.data$n.base,
                                 chromosomes = seqz.data$chromosome,
                                 window = window, overlap = overlap,
                                 weight = seqz.data$depth.normal)
       if (nrow(seqz.het) > 0) {
-         seqz.b.win <- windowValues(x = seqz.het$Bf,
-                                   positions = seqz.het$n.base,
-                                   chromosomes = seqz.het$chromosome,
+         seqz.b.win <- windowValues(x = seqz.het$Bf[het.filt],
+                                   positions = seqz.het$n.base[het.filt],
+                                   chromosomes = seqz.het$chromosome[het.filt],
                                    window = window, overlap = overlap,
-                                   weight = seqz.het$good.s.reads)
+                                   weight = seqz.het$good.s.reads[het.filt])
          breaks    <- NULL
          breaks    <- try(find.breaks(seqz.het, gamma = gamma, 
                                       kmin = kmin, baf.thres = c(0, 0.5)),
                           silent = FALSE)
          if (!is.null(breaks)){
-            seg.s1    <- segment.breaks(seqz.data, breaks = breaks, weighted.mean = weighted.mean)            
+            seg.s1    <- segment.breaks(seqz.tab = seqz.data, breaks = breaks,
+                                        min.reads.baf = min.reads.baf, weighted.mean = weighted.mean)            
          } else {
             seg.s1 <- segment.breaks(seqz.data,
                                      breaks = data.frame(chrom = chr,
@@ -69,7 +72,8 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       windows.ratio[[which(chromosome.list == chr)]] <- seqz.r.win[[1]]
       mutation.list[[which(chromosome.list == chr)]] <- mut.tab
       segments.list[[which(chromosome.list == chr)]] <- seg.s1
-      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum(sum = seqz.data$depth.sample, na.rm = TRUE),
+      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum = sum(as.numeric(seqz.data$depth.sample),
+                                                                       na.rm = TRUE),
                                                                  N  = length(seqz.data$depth.sample) )
       if (verbose){
         

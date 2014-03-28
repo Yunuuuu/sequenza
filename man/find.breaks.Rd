@@ -4,25 +4,26 @@
 \title{Segmentation of sequencing data using an allele-specific copy number algorithm}
 
 \description{
-  This function uses \code{\link{aspcf}} from the package \code{copynumber} to segment depth ratio and B-allele frequency obtained from sequencing data.
+  This function uses \code{\link{aspcf}} from the package \pkg{copynumber} to segment depth ratio and B-allele frequency obtained from sequencing data.
 }
 
 \usage{
 find.breaks(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...)
-segment.breaks(seqz.tab, breaks, weighted.mean = TRUE)
+segment.breaks(seqz.tab, breaks, min.reads.baf = 1, weighted.mean = TRUE)
 }
 
 \arguments{
   \item{seqz.baf}{an seqz file containing only the heterozygous positions.}
   \item{seqz.tab}{a complete seqz file.}
   \item{gamma, kmin, baf.thres, verbose}{arguments passed to \code{aspcf}.}
-  \item{breaks}{breaks as output \code{find.breaks}.}
+  \item{breaks}{breaks as output by \code{find.breaks}.}
+  \item{min.reads.baf}{threshold on the depth of the positions included to calculate the average BAF for segment.}
   \item{weighted.mean}{boolean to select if the segments have to calculated using the read depth as a weights to calculate depth ratio and B-allele frequency means.}
-  \item{...}{additional arguments passed to \code{aspcf}.}
+  \item{...}{additional arguments passed to \code{\link{aspcf}}.}
 }
 
 \details{
-  \code{copynumber} is a package to perform efficient segmentation of SNP-array data. The function \code{find.breaks} uses an allele-specific algorithm from the \code{copynumber} package to find break points, where the default parameters have been optimized for sequencing data, but a careful choice of an optimal \code{gamma} value is advised.
+  \pkg{copynumber} is a package to perform efficient segmentation of SNP-array data. The function \code{find.breaks} uses an allele-specific algorithm from the \pkg{copynumber} package to find break points, where the default parameters have been optimized for sequencing data, but a careful choice of an optimal \code{gamma} value is advised.
 }
 
 \examples{

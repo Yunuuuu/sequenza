@@ -2,16 +2,16 @@
 \alias{sequenza.extract}
 \alias{sequenza.fit}
 \alias{sequenza.results}
-\title{Use sequenza to estimate tumor purity and ploidy.}
+\title{Sequenza convenience functions for standard analysis}
 
 \description{
-  These three functions are intended to be the main interface of the package, to run several of the functions of \code{sequenza} in a standardized pipeline.
+  These three functions are intended to be the main user interface of the package, to run several of the functions of \code{sequenza} in a standardized pipeline.
 }
 
 \usage{
   sequenza.extract(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80,
                    kmin = 10, mufreq.treshold = 0.10, min.reads = 40,
-                   min.reads.normal = 10, max.mut.types = 1,
+                   min.reads.normal = 10, min.reads.baf = 1, max.mut.types = 1,
                    min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE,
                    chromosome.list = NULL, weighted.mean = TRUE)
 
@@ -29,22 +29,23 @@
 
 \arguments{
   \item{file}{the name of the seqz file to read.}
-  \item{gz}{logical. If TRUE (the default) the function expects a gzipped file.}
+  \item{gz}{logical. If TRUE the function expects a gzipped file.}
   \item{window}{size of windows used when plotting mean and quartile ranges of depth ratios and B-allele frequencies. Smaller windows will take more time to compute.}
   \item{overlap}{integer specifying the number of overlapping windows.}
   \item{gamma, kmin}{arguments passed to \code{\link{aspcf}} from the \pkg{copynumber} package.}
   \item{mufreq.treshold}{mutation frequency threshold.}
-  \item{min.reads}{minimal number of reads above the quality threshold to accept the mutation call.}
-  \item{min.reads.normal}{minimal number of reads used to determine the genotype in the normal sample.}
-  \item{max.mut.types}{maximal number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 bases). Default is 3, to accept "noisy" mutation calls.}
-  \item{min.type.freq}{minimal frequency of aberrant types.}
-    \item{min.fw.freq}{minimal frequency of variant reads detected in the forward strand. Setting it to 0, all the variant calls with strand frequency in the interval outside 0 and 1, margin not comprised, would be discarded.}
+  \item{min.reads}{minimum number of reads above the quality threshold to accept the mutation call.}
+  \item{min.reads.normal}{minimum number of reads used to determine the genotype in the normal sample.}
+  \item{min.reads.baf}{threshold on the depth of the positions included to calculate the average BAF for segment.}
+  \item{max.mut.types}{maximum number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 bases). Default is 3, to accept "noisy" mutation calls.}
+  \item{min.type.freq}{minimum frequency of aberrant types.}
+    \item{min.fw.freq}{minimum frequency of variant reads detected in the forward strand. Setting it to 0, all the variant calls with strand frequency in the interval outside 0 and 1, margin not comprised, would be discarded.}
   \item{sequenza.extract}{a list of objects as output from the \code{sequenza.extract} function.}
   \item{sequenza.fit}{a list of objects as output from the \code{sequenza.fit} function.}
   \item{female}{logical, indicating whether the sample is male or female, to properly handle the X and Y chromosomes. Implementation only works for the human normal karyotype.}
   \item{CNt.max}{maximum copy number to consider in the model.}  
   \item{segment.filter}{threshold segment length (in base pairs) to filter out short segments, that can cause noise when fitting the cellularity and ploidy parameters. The threshold will not affect the allele-specific segmentation.}
-  \item{XY}{character vector of length 2 specifying the labels used for the X and Y chromosomes. Defaults to c(X = "X", Y = "Y").}
+  \item{XY}{character vector of length 2 specifying the labels used for the X and Y chromosomes.}
   \item{cellularity}{vector of candidate cellularity parameters.}
   \item{ploidy}{vector candidate ploidy parameters.}
   \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
@@ -52,9 +53,9 @@
   \item{chromosome.list}{Vector containing the index or the names of the chromosome to include in the model fitting.}
   \item{weighted.mean}{boolean to select if the segments should be calculated using the read depth as weights to calculate depth ratio and B-allele frequency means.}
   \item{verbose}{logical, indicating whether to print information about the chromosome being processed.}
-  \item{sample.id}{identifier of the sample. It will be used as prefix of saved object.}
-  \item{out.dir}{output directory where all the files and object will be stored.}
-  \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
+  \item{sample.id}{identifier of the sample, to be used as a prefix for saved objects.}
+  \item{out.dir}{output directory where the files and objects will be saved.}
+  \item{mc.cores}{number of cores to use; see \code{\link{mclapply}}.}
 }
 
 \details{
@@ -83,7 +84,8 @@
 data.file <-  system.file("data", "example.seqz.txt.gz",
               package = "sequenza")
 test <- sequenza.extract(data.file)
-test.CP   <- sequenza.fit(test, mc.cores = 4)
+test.CP   <- sequenza.fit(test)
 sequenza.results(test, test.CP, "example")
+
    }
 }
