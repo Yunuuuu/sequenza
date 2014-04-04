@@ -84,7 +84,7 @@ seqz.b.win <- windowValues(x = seqz.het$Bf,
              positions = seqz.het$position,
              chromosomes = seqz.het$chromosome,
              window = 1e6, overlap = 1,
-             weight = round(x = seqz.het$good.s.reads, digits = 0))
+             weight = round(x = seqz.het$good.reads, digits = 0))
 # create mutation table:
 mut.tab   <- mutation.table(seqz.data, mufreq.treshold = 0.15,
                             min.reads = 40, max.mut.types = 1,

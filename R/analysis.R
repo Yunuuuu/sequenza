@@ -184,7 +184,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
    chroms      <- unique(seqz.tab$chromosome)
    hom.filt    <- seqz.tab$ref.zygosity == 'hom'
    seqz.tab     <- seqz.tab[hom.filt, ]
-   reads.filt  <- seqz.tab$good.s.reads >= min.reads & seqz.tab$depth.normal >= min.reads.normal
+   reads.filt  <- seqz.tab$good.reads >= min.reads & seqz.tab$depth.normal >= min.reads.normal
    seqz.tab     <- seqz.tab[reads.filt, ]
    mufreq.filt <- seqz.tab$Af <= (1 - mufreq.treshold)
    seqz.tab     <- seqz.tab[mufreq.filt, ]
@@ -194,7 +194,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
          seqz.tab$adjusted.ratio[pos.filt] <- segments$depth.ratio[i]
       }
    }
-   seqz.dummy   <- data.frame(chromosome = chroms, position = 1, GC.percent = NA, good.s.reads = NA,
+   seqz.dummy   <- data.frame(chromosome = chroms, position = 1, GC.percent = NA, good.reads = NA,
                              adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)
    if (nrow(seqz.tab) >= 1) {
       mu.fracts   <- mut.fractions(AB.tumor = seqz.tab$AB.tumor, Af = seqz.tab$Af,
@@ -211,7 +211,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
          mufreq.filt <- mufreq.filt & type.filt  & prop.filt
       }
       mut.type    <- paste(seqz.tab$AB.normal, mu.fracts$base, sep = '>')
-      seqz.tab     <- seqz.tab[,c('chromosome', 'position', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
+      seqz.tab     <- seqz.tab[,c('chromosome', 'position', 'GC.percent', 'good.reads', 'adjusted.ratio')]
       seqz.tab     <- cbind(seqz.tab, F = mu.fracts$freq, mutation = mut.type)
       rbind(seqz.tab[mufreq.filt, ], seqz.dummy)
    } else {
@@ -242,9 +242,9 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
    if (weighted.mean == TRUE){
       w.r     <- sqrt(seqz.tab$depth.sample)
       rw      <- seqz.tab$adjusted.ratio * w.r
-      w.b     <- sqrt(seqz.tab$good.s.reads)
+      w.b     <- sqrt(seqz.tab$good.reads)
       bw      <- seqz.tab$Bf * w.b
-      seqz.tab <- cbind(seqz.tab[, c("chromosome", "position", "ref.zygosity", "good.s.reads")],
+      seqz.tab <- cbind(seqz.tab[, c("chromosome", "position", "ref.zygosity", "good.reads")],
                     rw = rw, w.r = w.r, bw = bw, w.b = w.b)
    }
    chr.order <- unique(seqz.tab$chromosome)
@@ -252,7 +252,7 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
    segments <- list()
    for (i in 1:length(seqz.tab)) {
       seqz.b.i    <- seqz.tab[[i]][seqz.tab[[i]]$ref.zygosity == 'het', ]
-      seqz.b.i    <- seqz.b.i[seqz.b.i$good.s.reads >= min.reads.baf, ]
+      seqz.b.i    <- seqz.b.i[seqz.b.i$good.reads >= min.reads.baf, ]
       breaks.i    <- breaks[breaks$chrom == names(seqz.tab)[i], ]
       nb          <- nrow(breaks.i)
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))

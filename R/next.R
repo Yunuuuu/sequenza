@@ -20,7 +20,7 @@ subclonal.matrix <- function(mut.tab, segments = NULL, cellularity = seq(0.1, 1,
                      FUN = function (i) {
                              sapply(X = cellularity, FUN = function(x) {
                                 mut.clonality(F = mut.tab$F[i],
-                                           depth = mut.tab$good.s.reads[i],
+                                           depth = mut.tab$good.reads[i],
                                            types = mut.types.list[[i]],
                                            cellularity = x)
                            })
@@ -32,14 +32,14 @@ subclonal.matrix <- function(mut.tab, segments = NULL, cellularity = seq(0.1, 1,
 }
 
 sequenza2PyClone <- function(mut.tab, seg.cn, sample.id, norm.cn = 2) {
-  mut.tab <- cbind(mut.tab[,c('chromosome', 'position', 'good.s.reads','F', 'mutation')], CNt = NA, A = NA, B = NA)
+  mut.tab <- cbind(mut.tab[,c('chromosome', 'position', 'good.reads','F', 'mutation')], CNt = NA, A = NA, B = NA)
   for (i in 1:nrow(seg.cn)) {
      pos.filt <- mut.tab$chromosome == seg.cn$chromosome[i] & mut.tab$position >= seg.cn$start.pos[i] & mut.tab$position <= seg.cn$end.pos[i]
      mut.tab[pos.filt, c("CNt", "A", "B")] <- seg.cn[i, c("CNt", "A", "B")]
   }
   id          <- paste(sample.id, mut.tab$chromosome, mut.tab$position, sep = ':')
-  var.counts  <- round(mut.tab$good.s.reads * mut.tab$F, 0)
-  nor.counts  <- mut.tab$good.s.reads - var.counts
+  var.counts  <- round(mut.tab$good.reads * mut.tab$F, 0)
+  nor.counts  <- mut.tab$good.reads - var.counts
   pyclone.tsv <- data.frame(mutation_id = id, ref_counts = nor.counts, var_counts = var.counts,
                             normal_cn = norm.cn,	minor_cn = mut.tab$B, major_cn = mut.tab$A,
                             variant_case = sample.id,	variant_freq = mut.tab$F,	genotype = mut.tab$mutation)
@@ -81,7 +81,7 @@ VarScan2seqz <- function(varscan.somatic, varscan.copynumber = NULL) {
                      base.ref = as.character(varscan.somatic$ref), depth.normal = depth.normal,
                      depth.sample = depth.sample, depth.ratio = depth.ratio,
                      Af = round(Af, 3), Bf = round(Bf, 3), ref.zygosity = ref.zygosity, GC.percent = 50,
-                     good.s.reads = round(depth.sample, 2), AB.normal = AB.normal,
+                     good.reads = round(depth.sample, 2), AB.normal = AB.normal,
                      AB.tumor = AB.tumor, stringsAsFactors = FALSE)
    normal.pos <- res$ref.zygosity == 'hom' & res$AB.tumor == '.'
    res <- res[res$depth.ratio > 0 & !is.infinite(res$depth.ratio) & !normal.pos, ]
@@ -99,7 +99,7 @@ VarScan2seqz <- function(varscan.somatic, varscan.copynumber = NULL) {
                           Af = 1, Bf = 0, ref.zygosity = 'hom',
                           GC.percent = c(varscan.copynumber$gc_content, varscan.copynumber$gc_content)[smart.id],
                           stringsAsFactors = FALSE)
-      mat.t <- cbind(mat.t, good.s.reads = mat.t$depth.sample, AB.normal = 'N', AB.tumor = '.')
+      mat.t <- cbind(mat.t, good.reads = mat.t$depth.sample, AB.normal = 'N', AB.tumor = '.')
       chrom.order <- unique(mat.t$chromosome)
       l.cnv <- split(mat.t, mat.t$chromosome)
       l.snp <- split(res, res$chromosome)     

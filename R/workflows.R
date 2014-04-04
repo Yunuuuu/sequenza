@@ -25,7 +25,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       seqz.data$adjusted.ratio <- round(seqz.data$depth.ratio / gc.vect[as.character(seqz.data$GC.percent)], 3)
       seqz.hom <- seqz.data$ref.zygosity == 'hom'
       seqz.het <- seqz.data[!seqz.hom, ]
-      het.filt <- seqz.het$good.s.reads >= min.reads.baf
+      het.filt <- seqz.het$good.reads >= min.reads.baf
       seqz.r.win <- windowValues(x = seqz.data$adjusted.ratio,
                                 positions = seqz.data$position,
                                 chromosomes = seqz.data$chromosome,
@@ -36,7 +36,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                    positions = seqz.het$position[het.filt],
                                    chromosomes = seqz.het$chromosome[het.filt],
                                    window = window, overlap = overlap,
-                                   weight = seqz.het$good.s.reads[het.filt])
+                                   weight = seqz.het$good.reads[het.filt])
          breaks    <- NULL
          breaks    <- try(find.breaks(seqz.het, gamma = gamma, 
                                       kmin = kmin, baf.thres = c(0, 0.5)),
