@@ -39,7 +39,7 @@ data(logR)
 @
 
 <<label=SNPdataPrep, eval=TRUE>>=
-sample.i <- data.frame(chromosome = BAF$chrs, n.base = BAF$pos, 
+sample.i <- data.frame(chromosome = BAF$chrs, position = BAF$pos, 
                       Bf = BAF$S1, adjusted.ratio = logR$S1,
                       depth.sample = 1, good.s.reads = 1,
                       ref.zygosity = 'hom', stringsAsFactors = FALSE)
@@ -66,14 +66,14 @@ sample.het.i <- sample.i[is.het, ]
 <<label=logRWin, eval=TRUE, results=hide>>=
  
 snp.r.win <- windowValues(x = sample.i$adjusted.ratio,
-                          positions = sample.i$n.base,
+                          positions = sample.i$position,
                           chromosomes = sample.i$chromosome,
                           window = 1e6, overlap = 1)
 @
 \subsection{Windowing B-allele frequencies values.}
 <<label=BAFWin, eval=TRUE, results=hide>>=
 snp.b.win <- windowValues(x = sample.het.i$Bf,
-                          positions = sample.het.i$n.base,
+                          positions = sample.het.i$position,
                           chromosomes = sample.het.i$chromosome,
                           window = 1e6, overlap = 1)
 @

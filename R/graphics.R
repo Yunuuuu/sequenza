@@ -159,8 +159,8 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       max.x <- max(c(max(baf.windows$end), max(ratio.windows$end)))
       xlim <- c(min.x, max.x)
    } else {
-      min.x <- min(c(min(baf.windows$start), min(ratio.windows$start), min(mut.tab$n.base)))
-      max.x <- max(c(max(baf.windows$end), max(ratio.windows$end), max(mut.tab$n.base)))
+      min.x <- min(c(min(baf.windows$start), min(ratio.windows$start), min(mut.tab$position)))
+      max.x <- max(c(max(baf.windows$end), max(ratio.windows$end), max(mut.tab$position)))
       xlim <- c(min.x, max.x)
       par(mar = c(0, 4, 0, 10), oma = c(5, 0, 4, 0), mfcol = c(3,1), xaxt='n', xpd = TRUE)
       mutation.colors <- c(
@@ -177,7 +177,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
          'C>T' = rgb(red = 255, green = 215, blue =   0, alpha = 120, maxColorValue = 255),
          'G>A' = rgb(red = 255, green = 215, blue =   0, alpha = 120, maxColorValue = 255)
       )
-      plot(x = mut.tab$n.base, y = mut.tab$F,
+      plot(x = mut.tab$position, y = mut.tab$F,
            ylab = "Mutant allele frequency", las = 1, pch = 19,
            col = c(mutation.colors, 'NA' = NA)[as.character(mut.tab$mutation)],
            ylim = c(min(mut.tab$F, na.rm = TRUE), 1), xlim = xlim)

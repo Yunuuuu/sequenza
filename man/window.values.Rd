@@ -41,14 +41,14 @@ data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 seqz.data <- read.seqz(data.file)
 # 1Mb windows, each window is overlapping with 1 other adjacent window: depth ratio
 seqz.ratio <- windowValues(x = seqz.data$depth.ratio,
-                           positions = seqz.data$n.base,
+                           positions = seqz.data$position,
                            chromosomes = seqz.data$chromosome, window = 1e6,
                            weight = seqz.data$depth.normal, start.coord = 1, overlap = 1)
 seqz.hom  <- seqz.data$ref.zygosity == 'hom'
 seqz.het  <- seqz.data[!seqz.hom, ]
 # 1Mb windows, each window is overlapping with 1 other adjacent window: B-allele frequency
 seqz.bafs  <- windowValues(x = seqz.het$Bf,
-                           positions = seqz.het$n.base,
+                           positions = seqz.het$position,
                            chromosomes = seqz.het$chromosome, window = 1e6,
                            weight = seqz.het$depth.sample,
                            start.coord = 1, overlap = 1)

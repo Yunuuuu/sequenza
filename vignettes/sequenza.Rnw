@@ -377,7 +377,7 @@ mut.alleles <- mufreq.bayes(mufreq = mut.tab$F,
                             avg.depth.ratio = avg.depth.ratio)
 
 head(mut.alleles)
-head(cbind(mut.tab[,c("chromosome","n.base","F","adjusted.ratio", "mutation")],
+head(cbind(mut.tab[,c("chromosome","position","F","adjusted.ratio", "mutation")],
            mut.alleles))
 @
 

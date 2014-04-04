@@ -75,13 +75,13 @@ seg.s1 <- segment.breaks(seqz.data, breaks = breaks)
 
 # Binning the values of depth ratio and B allele frequency
 seqz.r.win <- windowValues(x = seqz.data$adjusted.ratio,
-             positions = seqz.data$n.base,
+             positions = seqz.data$position,
              chromosomes = seqz.data$chromosome,
              window = 1e6, overlap = 1,
              weight = seqz.data$depth.normal)
 
 seqz.b.win <- windowValues(x = seqz.het$Bf,
-             positions = seqz.het$n.base,
+             positions = seqz.het$position,
              chromosomes = seqz.het$chromosome,
              window = 1e6, overlap = 1,
              weight = round(x = seqz.het$good.s.reads, digits = 0))

@@ -37,7 +37,7 @@ read.acgt(file, colClasses = c("character", "integer", "character", "integer",
 \value{
 seqz is a tab separated text file with column headers. The file has currently 13 columns. The first 3 columns are derived from the original \code{pileup} file and contain:
 \item{chromosome}{with the chromosome names}
-\item{n.base}{with the base positions}
+\item{position}{with the base positions}
 \item{base.ref}{with the base in the reference genome used (usually hg19). Note the \code{base.ref} is NOT the base of the germline.}
 The remaining 10 columns contain the following information:
 \item{depth.normal}{read depth observed in the normal sample}

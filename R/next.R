@@ -2,7 +2,7 @@ subclonal.matrix <- function(mut.tab, segments = NULL, cellularity = seq(0.1, 1,
   if (!is.null(segments)) {
     mut.tab$CNt <- 2
     for (i in 1:nrow(segments)) {
-      pos.filt <- mut.tab$chromosome == segments$chrom[i] & mut.tab$n.base >= segments$start.pos[i] & mut.tab$n.base <= segments$end.pos[i]
+      pos.filt <- mut.tab$chromosome == segments$chrom[i] & mut.tab$position >= segments$start.pos[i] & mut.tab$position <= segments$end.pos[i]
       mut.tab$CNt[pos.filt] <- segments$CNt[i]
     }
   }
@@ -32,12 +32,12 @@ subclonal.matrix <- function(mut.tab, segments = NULL, cellularity = seq(0.1, 1,
 }
 
 sequenza2PyClone <- function(mut.tab, seg.cn, sample.id, norm.cn = 2) {
-  mut.tab <- cbind(mut.tab[,c('chromosome', 'n.base', 'good.s.reads','F', 'mutation')], CNt = NA, A = NA, B = NA)
+  mut.tab <- cbind(mut.tab[,c('chromosome', 'position', 'good.s.reads','F', 'mutation')], CNt = NA, A = NA, B = NA)
   for (i in 1:nrow(seg.cn)) {
-     pos.filt <- mut.tab$chromosome == seg.cn$chromosome[i] & mut.tab$n.base >= seg.cn$start.pos[i] & mut.tab$n.base <= seg.cn$end.pos[i]
+     pos.filt <- mut.tab$chromosome == seg.cn$chromosome[i] & mut.tab$position >= seg.cn$start.pos[i] & mut.tab$position <= seg.cn$end.pos[i]
      mut.tab[pos.filt, c("CNt", "A", "B")] <- seg.cn[i, c("CNt", "A", "B")]
   }
-  id          <- paste(sample.id, mut.tab$chromosome, mut.tab$n.base, sep = ':')
+  id          <- paste(sample.id, mut.tab$chromosome, mut.tab$position, sep = ':')
   var.counts  <- round(mut.tab$good.s.reads * mut.tab$F, 0)
   nor.counts  <- mut.tab$good.s.reads - var.counts
   pyclone.tsv <- data.frame(mutation_id = id, ref_counts = nor.counts, var_counts = var.counts,
@@ -77,7 +77,7 @@ VarScan2seqz <- function(varscan.somatic, varscan.copynumber = NULL) {
                                         replacement = ''))
    mut <- paste0(mut, varscan.somatic$tumor_var_freq[idx])
    AB.sample[idx] <- mut
-   res <- data.frame(chromosome = as.character(varscan.somatic$chrom), n.base = varscan.somatic$position,
+   res <- data.frame(chromosome = as.character(varscan.somatic$chrom), position = varscan.somatic$position,
                      base.ref = as.character(varscan.somatic$ref), depth.normal = depth.normal,
                      depth.sample = depth.sample, depth.ratio = depth.ratio,
                      Af = round(Af, 3), Bf = round(Bf, 3), ref.zygosity = ref.zygosity, GC.percent = 50,
@@ -92,7 +92,7 @@ VarScan2seqz <- function(varscan.somatic, varscan.copynumber = NULL) {
       varscan.copynumber$tumor_depth <- round(varscan.copynumber$tumor_depth, 0)
       varscan.copynumber$chrom <- as.character(varscan.copynumber$chrom)
       mat.t <- data.frame(chromosome = c(varscan.copynumber$chrom, varscan.copynumber$chrom)[smart.id],
-                          n.base = c(varscan.copynumber$chr_start, varscan.copynumber$chr_stop)[smart.id], base.ref = 'N',
+                          position = c(varscan.copynumber$chr_start, varscan.copynumber$chr_stop)[smart.id], base.ref = 'N',
                           depth.normal = c(varscan.copynumber$normal_depth, varscan.copynumber$normal_depth)[smart.id],
                           depth.sample = c(varscan.copynumber$tumor_depth, varscan.copynumber$tumor_depth)[smart.id],
                           depth.ratio  = c(varscan.copynumber$log2_ratio, varscan.copynumber$log2_ratio)[smart.id],
@@ -105,8 +105,8 @@ VarScan2seqz <- function(varscan.somatic, varscan.copynumber = NULL) {
       l.snp <- split(res, res$chromosome)     
       for (i in names(l.snp)){
          tab.i <- rbind(l.cnv[[i]], l.snp[[i]])
-         tab.i <- tab.i[order(tab.i$n.base), ]
-         #idx.i <- diff(tab.i$n.base)
+         tab.i <- tab.i[order(tab.i$position), ]
+         #idx.i <- diff(tab.i$position)
          #dups.i  <- which(idx.i == 0)
          #snp.i <- which(tab.i$GC.percent == -100)
          l.cnv[[i]] <- tab.i

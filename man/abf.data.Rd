@@ -20,7 +20,7 @@
 A data frame with a header row and 13 columns:
 \describe{
   \item{chromosome}{chromosome names}
-  \item{n.base}{base positions}
+  \item{position}{base positions}
   \item{base.ref}{the base in the reference genome used (usually hg19). Note that \code{base.ref} is NOT necessarily the base of the germline.}
   \item{depth.normal}{read depth observed in the normal sample}
   \item{depth.sample}{read depth observed in the tumor sample}

@@ -27,13 +27,13 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       seqz.het <- seqz.data[!seqz.hom, ]
       het.filt <- seqz.het$good.s.reads >= min.reads.baf
       seqz.r.win <- windowValues(x = seqz.data$adjusted.ratio,
-                                positions = seqz.data$n.base,
+                                positions = seqz.data$position,
                                 chromosomes = seqz.data$chromosome,
                                 window = window, overlap = overlap,
                                 weight = seqz.data$depth.normal)
       if (nrow(seqz.het) > 0) {
          seqz.b.win <- windowValues(x = seqz.het$Bf[het.filt],
-                                   positions = seqz.het$n.base[het.filt],
+                                   positions = seqz.het$position[het.filt],
                                    chromosomes = seqz.het$chromosome[het.filt],
                                    window = window, overlap = overlap,
                                    weight = seqz.het$good.s.reads[het.filt])
@@ -47,20 +47,20 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
          } else {
             seg.s1 <- segment.breaks(seqz.data,
                                      breaks = data.frame(chrom = chr,
-                                                         start.pos = min(seqz.data$n.base, na.rm = TRUE),
-                                                         end.pos = max(seqz.data$n.base, na.rm = TRUE)),
+                                                         start.pos = min(seqz.data$position, na.rm = TRUE),
+                                                         end.pos = max(seqz.data$position, na.rm = TRUE)),
                                      weighted.mean = weighted.mean)
          }
          
       } else {
          seqz.b.win <- list()
-         seqz.b.win[[1]] <- data.frame(start = min(seqz.data$n.base, na.rm = TRUE),
-                                      end = max(seqz.data$n.base, na.rm = TRUE), mean = 0.5,
+         seqz.b.win[[1]] <- data.frame(start = min(seqz.data$position, na.rm = TRUE),
+                                      end = max(seqz.data$position, na.rm = TRUE), mean = 0.5,
                                       q0 = 0.5,  q1 = 0.5, N = 1)
          seg.s1 <- segment.breaks(seqz.data,
                                   breaks = data.frame(chrom = chr,
-                                                      start.pos = min(seqz.data$n.base, na.rm = TRUE),
-                                                      end.pos = max(seqz.data$n.base, na.rm = TRUE)),
+                                                      start.pos = min(seqz.data$position, na.rm = TRUE),
+                                                      end.pos = max(seqz.data$position, na.rm = TRUE)),
                                   weighted.mean = weighted.mean)
                                   
       }

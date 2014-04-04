@@ -190,11 +190,11 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
    seqz.tab     <- seqz.tab[mufreq.filt, ]
    if (!is.null(segments)) {
       for (i in 1:nrow(segments)) {
-         pos.filt <- seqz.tab$chromosome == segments$chrom[i] & seqz.tab$n.base >= segments$start.pos[i] & seqz.tab$n.base <= segments$end.pos[i]
+         pos.filt <- seqz.tab$chromosome == segments$chrom[i] & seqz.tab$position >= segments$start.pos[i] & seqz.tab$position <= segments$end.pos[i]
          seqz.tab$adjusted.ratio[pos.filt] <- segments$depth.ratio[i]
       }
    }
-   seqz.dummy   <- data.frame(chromosome = chroms, n.base = 1, GC.percent = NA, good.s.reads = NA,
+   seqz.dummy   <- data.frame(chromosome = chroms, position = 1, GC.percent = NA, good.s.reads = NA,
                              adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)
    if (nrow(seqz.tab) >= 1) {
       mu.fracts   <- mut.fractions(AB.sample = seqz.tab$AB.sample, Af = seqz.tab$Af,
@@ -211,7 +211,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
          mufreq.filt <- mufreq.filt & type.filt  & prop.filt
       }
       mut.type    <- paste(seqz.tab$AB.germline, mu.fracts$base, sep = '>')
-      seqz.tab     <- seqz.tab[,c('chromosome', 'n.base', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
+      seqz.tab     <- seqz.tab[,c('chromosome', 'position', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
       seqz.tab     <- cbind(seqz.tab, F = mu.fracts$freq, mutation = mut.type)
       rbind(seqz.tab[mufreq.filt, ], seqz.dummy)
    } else {
@@ -222,10 +222,10 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
 find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...) {
    chromosome <- gsub(x = seqz.baf$chromosome, pattern = "chr", replacement = "")
    logR = data.frame(chrom = chromosome,
-                     pos = seqz.baf$n.base,
+                     pos = seqz.baf$position,
                      s1 = log2(seqz.baf$adjusted.ratio))
    BAF = data.frame(chrom = chromosome,
-                    pos = seqz.baf$n.base,
+                    pos = seqz.baf$position,
                     s1 = seqz.baf$Bf)
    logR.wins <- copynumber::winsorize(logR, verbose = verbose)
    allele.seg <- copynumber::aspcf(logR = logR.wins, BAF = BAF, baf.thres = baf.thres,
@@ -244,7 +244,7 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
       rw      <- seqz.tab$adjusted.ratio * w.r
       w.b     <- sqrt(seqz.tab$good.s.reads)
       bw      <- seqz.tab$Bf * w.b
-      seqz.tab <- cbind(seqz.tab[, c("chromosome", "n.base", "ref.zygosity", "good.s.reads")],
+      seqz.tab <- cbind(seqz.tab[, c("chromosome", "position", "ref.zygosity", "good.s.reads")],
                     rw = rw, w.r = w.r, bw = bw, w.b = w.b)
    }
    chr.order <- unique(seqz.tab$chromosome)
@@ -256,8 +256,8 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
       breaks.i    <- breaks[breaks$chrom == names(seqz.tab)[i], ]
       nb          <- nrow(breaks.i)
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))
-      fact.r.i    <- cut(seqz.tab[[i]]$n.base, breaks.vect)
-      fact.b.i    <- cut(seqz.b.i$n.base, breaks.vect)
+      fact.r.i    <- cut(seqz.tab[[i]]$position, breaks.vect)
+      fact.b.i    <- cut(seqz.b.i$position, breaks.vect)
       seg.i.s.r   <- sapply(X = split(seqz.tab[[i]]$chromosome, f = fact.r.i), FUN = length)
       seg.i.s.b   <- sapply(X = split(seqz.b.i$chromosome, f = fact.b.i), FUN = length)
       if (weighted.mean == TRUE){
