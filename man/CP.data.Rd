@@ -31,7 +31,9 @@
   str(CPsnp.example)
 
   ## Visualization of the object
-  image(CP.example)
+  image(x = CP.example$ploidy,
+        y = CP.example$cellularity,
+        z = CP.example$loglik)
 
   ## A better plot
   cp.plot(CP.example)
