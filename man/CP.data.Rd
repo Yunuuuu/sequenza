@@ -17,9 +17,9 @@
 \format{
   A list containing three items:
  \describe{ 
-   \item{x}{numeric vector of tested ploidy values.}
-   \item{y}{numeric vector of tested cellularity values.}
-   \item{z}{numeric matrix of log-likelihoods for each \var{(x,y)} pair.}
+   \item{ploidy}{numeric vector of tested ploidy values.}
+   \item{cellularity}{numeric vector of tested cellularity values.}
+   \item{loglik}{numeric matrix of log-likelihoods for each \var{(ploidy, cellularity)} pair.}
   }
 }
 
