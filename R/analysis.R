@@ -240,7 +240,7 @@ find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), 
 segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
                            weighted.mean = TRUE) {
    if (weighted.mean == TRUE){
-      w.r     <- sqrt(seqz.tab$depth.sample)
+      w.r     <- sqrt(seqz.tab$depth.tumor)
       rw      <- seqz.tab$adjusted.ratio * w.r
       w.b     <- sqrt(seqz.tab$good.reads)
       bw      <- seqz.tab$Bf * w.b

@@ -50,7 +50,7 @@ seqz.het  <- seqz.data[!seqz.hom, ]
 seqz.bafs  <- windowValues(x = seqz.het$Bf,
                            positions = seqz.het$position,
                            chromosomes = seqz.het$chromosome, window = 1e6,
-                           weight = seqz.het$depth.sample,
+                           weight = seqz.het$depth.tumor,
                            start.coord = 1, overlap = 1)
    }
 }

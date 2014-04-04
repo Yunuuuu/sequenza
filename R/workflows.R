@@ -72,9 +72,9 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       windows.ratio[[which(chromosome.list == chr)]] <- seqz.r.win[[1]]
       mutation.list[[which(chromosome.list == chr)]] <- mut.tab
       segments.list[[which(chromosome.list == chr)]] <- seg.s1
-      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum = sum(as.numeric(seqz.data$depth.sample),
+      coverage.list[[which(chromosome.list == chr)]] <- data.frame(sum = sum(as.numeric(seqz.data$depth.tumor),
                                                                        na.rm = TRUE),
-                                                                 N  = length(seqz.data$depth.sample) )
+                                                                 N  = length(seqz.data$depth.tumor) )
       if (verbose){
         
         message(nrow(mut.tab), ' variant calls; ',

@@ -41,8 +41,8 @@ seqz is a tab separated text file with column headers. The file has currently 13
 \item{base.ref}{with the base in the reference genome used (usually hg19). Note the \code{base.ref} is NOT the base of the germline.}
 The remaining 10 columns contain the following information:
 \item{depth.normal}{read depth observed in the normal sample}
-\item{depth.sample}{read depth observed in the tumor sample}
-\item{depth.ratio}{ratio of \code{depth.sample} and \code{depth.normal}}
+\item{depth.tumor}{read depth observed in the tumor sample}
+\item{depth.ratio}{ratio of \code{depth.tumor} and \code{depth.normal}}
 \item{Af}{A-allele frequency observed in the tumor sample}
 \item{Bf}{B-allele frequency observed in the tumor sample}
 \item{zygosity.normal}{zygosity of the reference sample. "hom" corresponds to AA or BB, whereas "het" corresponds to AB or BA}

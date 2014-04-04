@@ -23,8 +23,8 @@ A data frame with a header row and 13 columns:
   \item{position}{base positions}
   \item{base.ref}{the base in the reference genome used (usually hg19). Note that \code{base.ref} is NOT necessarily the base of the germline.}
   \item{depth.normal}{read depth observed in the normal sample}
-  \item{depth.sample}{read depth observed in the tumor sample}
-  \item{depth.ratio}{ratio of \code{depth.sample} and \code{depth.normal}}
+  \item{depth.tumor}{read depth observed in the tumor sample}
+  \item{depth.ratio}{ratio of \code{depth.tumor} and \code{depth.normal}}
   \item{Af}{A-allele frequency observed in the tumor sample}
   \item{Bf}{B-allele frequency observed in the tumor sample}
   \item{zygosity.normal}{zygosity of the reference sample. "hom" corresponds to AA or BB, whereas "het" corresponds to AB or BA}

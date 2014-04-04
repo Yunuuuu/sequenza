@@ -185,7 +185,7 @@ The files can be read even faster; after mapping the chromosomes location in the
 
 \subsection{Quality control and normalization}
 
-Each aligned base, in the next generation sequencing, is associated with a quality score. The \textit{sequenza-utils} software is capable of filtering the base with a quality score lower then a specified value (default, 20). The number of reads that have passed the filter is returned in the column \textit{good.reads}, while the \textit{depth.sample} column contains the raw depth indicated in the pileup.
+Each aligned base, in the next generation sequencing, is associated with a quality score. The \textit{sequenza-utils} software is capable of filtering the base with a quality score lower then a specified value (default, 20). The number of reads that have passed the filter is returned in the column \textit{good.reads}, while the \textit{depth.tumor} column contains the raw depth indicated in the pileup.
 
 \subsection{GC-normalization}
 
