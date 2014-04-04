@@ -131,12 +131,12 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
 }
 
 get.ci <- function(cp.table, level = 0.95) {
-  znormsort <- sort(cp.table$z, decreasing = TRUE)
+  znormsort <- sort(cp.table$loglik, decreasing = TRUE)
   znormcumLik <- cumsum(znormsort)
   n <- sapply(level, function(x) sum(znormcumLik < x) + 1)
   LikThresh <- znormsort[n]
-  values.x <- data.frame(x = cp.table$x, y = apply(cp.table$z, 1, max))
-  values.y <- data.frame(x = apply(cp.table$z, 2, max), y = cp.table$y)
+  values.x <- data.frame(x = cp.table$ploidy, y = apply(cp.table$loglik, 1, max))
+  values.y <- data.frame(x = apply(cp.table$loglik, 2, max), y = cp.table$cellularity)
   up.x  <- max(values.x$x[values.x$y >= LikThresh])
   low.x <- min(values.x$x[values.x$y >= LikThresh])
   max.x <- values.x$x[which.max(values.x$y)]
