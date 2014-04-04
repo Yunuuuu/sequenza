@@ -327,23 +327,23 @@ By exploring the results for \textit{cellularity} and \textit{ploidy} separately
 par(mfrow = c(2,2))
 cp.plot(CP.example)
 cp.plot.contours(CP.example, add = TRUE)
-plot(cint$values.y, ylab = "Cellularity",
+plot(cint$values.cellularity, ylab = "Cellularity",
      xlab = "likelihood", type = "n")
-select <- cint$confint.y[1] <= cint$values.y[,2] &
-          cint$values.y[,2] <= cint$confint.y[2]
-polygon(y = c(cint$confint.y[1], cint$values.y[select, 2], cint$confint.y[2]), 
-        x = c(0, cint$values.y[select, 1], 0), col='red', border=NA)
-lines(cint$values.y)
-abline(h = cint$max.y, lty = 2, lwd = 0.5)  
+select <- cint$confint.cellularity[1] <= cint$values.cellularity[,2] &
+          cint$values.cellularity[,2] <= cint$confint.cellularity[2]
+polygon(y = c(cint$confint.cellularity[1], cint$values.cellularity[select, 2], cint$confint.cellularity[2]), 
+        x = c(0, cint$values.cellularity[select, 1], 0), col='red', border=NA)
+lines(cint$values.cellularity)
+abline(h = cint$max.cellularity, lty = 2, lwd = 0.5)  
 
-plot(cint$values.x, xlab = "Ploidy",
+plot(cint$values.ploidy, xlab = "Ploidy",
      ylab = "likelihood", type = "n")
-select <- cint$confint.x[1] <= cint$values.x[,1] &
-          cint$values.x[,1] <= cint$confint.x[2]
-polygon(x = c(cint$confint.x[1], cint$values.x[select, 1], cint$confint.x[2]), 
-        y = c(0, cint$values.x[select, 2], 0), col='red', border=NA)
-lines(cint$values.x)
-abline(v = cint$max.x, lty = 2, lwd = 0.5)
+select <- cint$confint.ploidy[1] <= cint$values.ploidy[,1] &
+          cint$values.ploidy[,1] <= cint$confint.ploidy[2]
+polygon(x = c(cint$confint.ploidy[1], cint$values.ploidy[select, 1], cint$confint.ploidy[2]), 
+        y = c(0, cint$values.ploidy[select, 2], 0), col='red', border=NA)
+lines(cint$values.ploidy)
+abline(v = cint$max.ploidy, lty = 2, lwd = 0.5)
 
 @ 
       \caption{Plot of the log-likelihood with respective cellularity and ploidy probability distribution and confidence intervals.}
@@ -354,9 +354,9 @@ abline(v = cint$max.x, lty = 2, lwd = 0.5)
 
 The point estimate value corresponds to the point of maximum likelihood, detected after the confidence interval computation: 
 <<label=seParam, eval=TRUE>>=
-cellularity <- cint$max.y
+cellularity <- cint$max.cellularity
 cellularity
-ploidy <- cint$max.x
+ploidy <- cint$max.ploidy
 ploidy
 @
 In addition we need to calculate the average normalized depth ratio, used to set a value for the baseline copy number. 
