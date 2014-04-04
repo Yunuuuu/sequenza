@@ -155,10 +155,10 @@ get.ci <- function(cp.table, level = 0.95) {
   results
 }
 
-mut.fractions <- function(AB.tumor, Af, sample.strand) {
+mut.fractions <- function(AB.tumor, Af, tumor.strand) {
   F = 1 - Af
    base.mut <- lapply(X = AB.tumor, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
-   base.fw  <- lapply(X = sample.strand, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
+   base.fw  <- lapply(X = tumor.strand, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
    frequencify <- function (x) {
       base.name <- substr(unlist(x), 1, 1)
       base.val  <- as.numeric(substr(unlist(x), 2, nchar(x)))
@@ -198,7 +198,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
                              adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)
    if (nrow(seqz.tab) >= 1) {
       mu.fracts   <- mut.fractions(AB.tumor = seqz.tab$AB.tumor, Af = seqz.tab$Af,
-                                   sample.strand = seqz.tab$sample.strand)
+                                   tumor.strand = seqz.tab$tumor.strand)
       mufreq.filt <- mu.fracts$freq >= mufreq.treshold
       type.filt   <- mu.fracts$base.count <= max.mut.types
       prop.filt   <- mu.fracts$maj.base.freq >= min.type.freq

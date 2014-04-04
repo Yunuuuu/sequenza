@@ -32,7 +32,7 @@ A data frame with a header row and 13 columns:
   \item{good.reads}{number of reads that passed the quality threshold (threshold specified in the pre-processing software)}
   \item{AB.normal}{base found in the germline sample}
   \item{AB.tumor}{base found in the tumor sample}
-  \item{sample.strand}{frequency of the variant nucleotides detected on the forward orientation.}
+  \item{tumor.strand}{frequency of the variant nucleotides detected on the forward orientation.}
 }
 }
 
