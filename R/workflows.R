@@ -93,35 +93,58 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                avg.depth = round(coverage,0)))
 }
 
-sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, XY = c(X = "X", Y = "Y"),
-                         cellularity = seq(0.1, 1, 0.01), ploidy = seq(1, 7, 0.1), ratio.priority = FALSE,
-                         priors.table = data.frame(CN = 2, value = 2), chromosome.list = 1:24,
-                         mc.cores = getOption("mc.cores", 2L)){
-   if (is.null(chromosome.list)) {
-      segs.all      <- do.call(rbind, sequenza.extract$segments)
+sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, mufreq.treshold = 0.10, 
+                         XY = c(X = "X", Y = "Y"), cellularity = seq(0.1, 1, 0.01), ploidy = seq(1, 7, 0.1),
+                         ratio.priority = FALSE, method = "baf", priors.table = data.frame(CN = 2, value = 2),
+                         chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L)){
+   if (method == "baf") {
+      if (is.null(chromosome.list)) {
+         segs.all      <- do.call(rbind, sequenza.extract$segments)
+      } else {
+         segs.all      <- do.call(rbind, sequenza.extract$segments[chromosome.list])      
+      }
+      segs.len      <- segs.all$end.pos - segs.all$start.pos
+      segs.filt     <- segs.len >= segment.filter
+      avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
+      if (female){
+         segs.is.xy <- segs.all$chromosome == XY["Y"]
+      } else{
+         segs.is.xy <- segs.all$chromosome %in% XY
+      }
+      filt.test  <- segs.filt & !segs.is.xy
+      seg.test   <- segs.all[filt.test, ]
+      weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 150
+      baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
+                    weight.ratio = 2 * weights.seg, weight.Bf = weights.seg,
+                    avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
+                    ploidy = ploidy, priors.table = priors.table,
+                    mc.cores = mc.cores, ratio.priority = ratio.priority)
+   } else if (method == "mufreq") {
+      if (is.null(chromosome.list)) {
+         mut.all       <- do.call(rbind, sequenza.extract$mutations)
+         mut.all       <- na.exclude(mut.all)
+      } else {
+         mut.all       <- do.call(rbind, sequenza.extract$mutations[chromosome.list])
+         mut.all       <- na.exclude(mut.all)
+      }
+      mut.filt     <- mut.all$F >= mufreq.treshold
+      avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
+      if (female){
+         mut.is.xy  <- mut.all$chromosome == XY["Y"]
+      } else{
+         mut.is.xy  <- mut.all$chromosome %in% XY
+      }
+      filt.test  <- mut.filt & !mut.is.xy
+      mut.test   <- mut.all[filt.test, ]
+      w.mufreq   <- round(mut.test$good.reads, 0)
+      mufreq.model.fit(mufreq = mut.test$F, depth.ratio = mut.test$adjusted.ratio,
+                    weight.ratio = 2 * w.mufreq, weight.mufreq = w.mufreq,
+                    avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
+                    ploidy = ploidy, priors.table = priors.table,
+                    mc.cores = mc.cores)    
    } else {
-      segs.all      <- do.call(rbind, sequenza.extract$segments[chromosome.list])      
+      stop("The only available methods are \"baf\" and \"mufreq\"")
    }
-   #mut.all       <- do.call(rbind, sequenza.extract$mutations)
-   #mut.all       <- na.exclude(mut.all)
-   segs.len      <- segs.all$end.pos - segs.all$start.pos
-   segs.filt     <- segs.len >= segment.filter
-   avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
-   if (female){
-      segs.is.xy <- segs.all$chromosome == XY["Y"]
-      #mut.is.xy  <- mut.all$chromosome == XY["Y"]
-   } else{
-      segs.is.xy <- segs.all$chromosome %in% XY
-      #mut.is.xy  <- mut.all$chromosome %in% XY
-   }
-   filt.test  <- segs.filt & !segs.is.xy
-   seg.test   <- segs.all[filt.test, ]
-   weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 150
-   baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
-                 weight.ratio = 2 * weights.seg, weight.Bf = weights.seg,
-                 avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
-                 ploidy = ploidy, priors.table = priors.table,
-                 mc.cores = mc.cores, ratio.priority = ratio.priority)
 }
 
 sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = getwd(),

@@ -16,8 +16,9 @@
                    chromosome.list = NULL, weighted.mean = TRUE)
 
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
-               XY = c(X = "X", Y = "Y"), cellularity = seq(0.1,1,0.01),
-               ploidy = seq(1, 7, 0.1), ratio.priority = FALSE,
+               mufreq.treshold = 0.10, XY = c(X = "X", Y = "Y"),
+               cellularity = seq(0.1,1,0.01), ploidy = seq(1, 7, 0.1),
+               ratio.priority = FALSE, method = "baf",
                priors.table = data.frame(CN = 2, value = 2),
                chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L))
 
@@ -37,6 +38,7 @@
   \item{min.reads}{minimum number of reads above the quality threshold to accept the mutation call.}
   \item{min.reads.normal}{minimum number of reads used to determine the genotype in the normal sample.}
   \item{min.reads.baf}{threshold on the depth of the positions included to calculate the average BAF for segment.}
+  \item{method}{method to use to fit the data; possible values are \code{baf} to use \code{baf.model.fit} or \code{mufreq} to use the \code{mufreq.model.fit} function to fit the data.}
   \item{max.mut.types}{maximum number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 bases). Default is 3, to accept "noisy" mutation calls.}
   \item{min.type.freq}{minimum frequency of aberrant types.}
     \item{min.fw.freq}{minimum frequency of variant reads detected in the forward strand. Setting it to 0, all the variant calls with strand frequency in the interval outside 0 and 1, margin not comprised, would be discarded.}
