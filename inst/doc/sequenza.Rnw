@@ -311,7 +311,7 @@ CP.example <- sequenza.fit(test)
 data(CP.example)
 @
 
-The result is a list in the format \textit{list(x, y, z)}, which is directly usable by standard graphical functions, such as \texttt{image}. However we provide functions to explore and better display the results, and to extract the point estimate and confidence intervals.
+The result is a list in a format \textit{list(ploidy, collularity, loglik)}, corresponding to the conventional format \textit{list(x, y, z)}, easily usable by standard graphical functions, such as \texttt{image}. However we provide functions to explore and better display the results, and to extract the point estimate and confidence intervals.
 
 \subsection{Results of model fitting}
 
