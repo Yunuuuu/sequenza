@@ -155,9 +155,9 @@ get.ci <- function(cp.table, interval = 0.95) {
   results
 }
 
-mut.fractions <- function(AB.sample, Af, sample.strand) {
+mut.fractions <- function(AB.tumor, Af, sample.strand) {
   F = 1 - Af
-   base.mut <- lapply(X = AB.sample, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
+   base.mut <- lapply(X = AB.tumor, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
    base.fw  <- lapply(X = sample.strand, FUN = function(x) unlist(strsplit(as.character(x), split = '[:]')))
    frequencify <- function (x) {
       base.name <- substr(unlist(x), 1, 1)
@@ -197,7 +197,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
    seqz.dummy   <- data.frame(chromosome = chroms, position = 1, GC.percent = NA, good.s.reads = NA,
                              adjusted.ratio = NA, F = 0, mutation = 'NA', stringsAsFactors= FALSE)
    if (nrow(seqz.tab) >= 1) {
-      mu.fracts   <- mut.fractions(AB.sample = seqz.tab$AB.sample, Af = seqz.tab$Af,
+      mu.fracts   <- mut.fractions(AB.tumor = seqz.tab$AB.tumor, Af = seqz.tab$Af,
                                    sample.strand = seqz.tab$sample.strand)
       mufreq.filt <- mu.fracts$freq >= mufreq.treshold
       type.filt   <- mu.fracts$base.count <= max.mut.types
@@ -210,7 +210,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
       } else {
          mufreq.filt <- mufreq.filt & type.filt  & prop.filt
       }
-      mut.type    <- paste(seqz.tab$AB.germline, mu.fracts$base, sep = '>')
+      mut.type    <- paste(seqz.tab$AB.normal, mu.fracts$base, sep = '>')
       seqz.tab     <- seqz.tab[,c('chromosome', 'position', 'GC.percent', 'good.s.reads', 'adjusted.ratio')]
       seqz.tab     <- cbind(seqz.tab, F = mu.fracts$freq, mutation = mut.type)
       rbind(seqz.tab[mufreq.filt, ], seqz.dummy)

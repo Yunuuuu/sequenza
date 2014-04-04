@@ -30,8 +30,8 @@ A data frame with a header row and 13 columns:
   \item{ref.zygosity}{zygosity of the reference sample. "hom" corresponds to AA or BB, whereas "het" corresponds to AB or BA}
   \item{GC.percent}{GC-content (percent), calculated from the reference genome in fixed nucleotide windows }
   \item{good.s.reads}{number of reads that passed the quality threshold (threshold specified in the pre-processing software)}
-  \item{AB.germline}{base found in the germline sample}
-  \item{AB.sample}{base found in the tumor sample}
+  \item{AB.normal}{base found in the germline sample}
+  \item{AB.tumor}{base found in the tumor sample}
   \item{sample.strand}{frequency of the variant nucleotides detected on the forward orientation.}
 }
 }

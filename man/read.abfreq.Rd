@@ -48,8 +48,8 @@ The remaining 10 columns contain the following information:
 \item{ref.zygosity}{zygosity of the reference sample. "hom" corresponds to AA or BB, whereas "het" corresponds to AB or BA}
 \item{GC.percent}{GC-content (percent), calculated from the reference genome in fixed nucleotide windows }
 \item{good.s.reads}{number of reads that passed the quality threshold (threshold specified in the pre-processing software)}
-\item{AB.germline}{base found in the germline sample}
-\item{AB.sample}{base found in the tumor sample}
+\item{AB.normal}{base found in the germline sample}
+\item{AB.tumor}{base found in the tumor sample}
 
 The \code{acgt} file format is similar to the \code{seqz} format, but contains only 8 columns. The first 3 are the same as in the \code{seqz} file, derived from the pileup format. The remaining 5 columns contain the following information:
 \item{read.depth}{read depth. The column is derived from the pileup file}

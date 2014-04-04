@@ -687,7 +687,7 @@ def main():
       elif used_module == "pileup2seqz":
          args = pileup2seqz(parser, parser_pileup2seqz)
          with xopen('-', "wb") as fileout:
-            out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "ref.zygosity", "GC.percent", "good.s.reads", "AB.germline", "AB.sample", "sample.strand"]
+            out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "ref.zygosity", "GC.percent", "good.s.reads", "AB.normal", "AB.tumor", "sample.strand"]
             p1 = args.reference
             p2 = args.sample
             gc = args.gc
