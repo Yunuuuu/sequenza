@@ -26,7 +26,7 @@
 \value{
   \item{ploidy}{tested values of the ploidy parameter}
   \item{cellularity}{values of cellularity tested}
-  \item{L}{log-likelihood of each pair of cellularity/ploidy parameters.}
+  \item{loglik}{log-likelihood of each pair of cellularity/ploidy parameters.}
 }
 
 \details{
