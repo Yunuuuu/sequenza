@@ -350,7 +350,7 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                      strands_bases = [str(bases_list[ll])+str(round(p2_mu[6][ll]/float(p2_mu[2+ll]), 3)) for ll in no_zero_idx if ll != i]
                      strands_bases = ":".join(map(str, strands_bases))
                   #homoz_p2 = p2_mu[2 + i]/sum_p2
-                  # chromosome, n_base, base_ref, depth_normal, depth_sample, depth.ratio, Af, Bf, ref.zygosity, GC-content, percentage reads above quality, AB.ref, AB.tum
+                  # chromosome, n_base, base_ref, depth_normal, depth_sample, depth.ratio, Af, Bf, zygosity.normal, GC-content, percentage reads above quality, AB.ref, AB.tum
                   line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(homoz_p2, 3), 0, 'hom', gc, int(sum_p2), bases_list[i], no_zero_bases, strands_bases]
                   return line_out
                else:
@@ -687,7 +687,7 @@ def main():
       elif used_module == "pileup2seqz":
          args = pileup2seqz(parser, parser_pileup2seqz)
          with xopen('-', "wb") as fileout:
-            out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "ref.zygosity", "GC.percent", "good.reads", "AB.normal", "AB.tumor", "sample.strand"]
+            out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.sample", "depth.ratio", "Af", "Bf", "zygosity.normal", "GC.percent", "good.reads", "AB.normal", "AB.tumor", "sample.strand"]
             p1 = args.reference
             p2 = args.sample
             gc = args.gc

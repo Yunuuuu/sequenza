@@ -42,7 +42,7 @@ data(logR)
 sample.i <- data.frame(chromosome = BAF$chrs, position = BAF$pos, 
                       Bf = BAF$S1, adjusted.ratio = logR$S1,
                       depth.sample = 1, good.reads = 1,
-                      ref.zygosity = 'hom', stringsAsFactors = FALSE)
+                      zygosity.normal = 'hom', stringsAsFactors = FALSE)
 @
 \subsubsection{Correcting logR with a normal sample, or with the mean logR value}
 Without a reference sample (normal germline sample) we can try to divide for the mean value. It would be correct to use the germline logR.
@@ -58,7 +58,7 @@ In the example we are lowering the threshold while taking the SNP from the same 
 <<label=hetFind, eval=TRUE>>=
 het.lim <- 0.2
 is.het <- sample.i$Bf >= het.lim & sample.i$Bf <= 1 - het.lim
-sample.i$ref.zygosity[is.het] <- 'het'
+sample.i$zygosity.normal[is.het] <- 'het'
 sample.i$Bf[sample.i$Bf >= 0.5] <- 1 - sample.i$Bf[sample.i$Bf >= 0.5]
 sample.het.i <- sample.i[is.het, ]
 @

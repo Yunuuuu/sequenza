@@ -65,7 +65,7 @@ seqz.data  <- read.seqz(data.file, chr.name = 1)
 seqz.data$adjusted.ratio <- seqz.data$depth.ratio /
                            gc.vect[as.character(seqz.data$GC.percent)]
 # Select the heterozygous positions
-seqz.hom  <- seqz.data$ref.zygosity == 'hom'
+seqz.hom  <- seqz.data$zygosity.normal == 'hom'
 seqz.het  <- seqz.data[!seqz.hom, ]
 # Detect breakpoints
 breaks <- find.breaks(seqz.het, gamma = 80, kmin = 10, baf.thres = c(0, 0.5))

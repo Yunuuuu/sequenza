@@ -44,7 +44,7 @@ seqz.ratio <- windowValues(x = seqz.data$depth.ratio,
                            positions = seqz.data$position,
                            chromosomes = seqz.data$chromosome, window = 1e6,
                            weight = seqz.data$depth.normal, start.coord = 1, overlap = 1)
-seqz.hom  <- seqz.data$ref.zygosity == 'hom'
+seqz.hom  <- seqz.data$zygosity.normal == 'hom'
 seqz.het  <- seqz.data[!seqz.hom, ]
 # 1Mb windows, each window is overlapping with 1 other adjacent window: B-allele frequency
 seqz.bafs  <- windowValues(x = seqz.het$Bf,

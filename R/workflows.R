@@ -23,7 +23,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
       seqz.data   <- read.seqz(file, gz = gz, n.lines = c(file.lines$start, file.lines$end))
       seqz.data$adjusted.ratio <- round(seqz.data$depth.ratio / gc.vect[as.character(seqz.data$GC.percent)], 3)
-      seqz.hom <- seqz.data$ref.zygosity == 'hom'
+      seqz.hom <- seqz.data$zygosity.normal == 'hom'
       seqz.het <- seqz.data[!seqz.hom, ]
       het.filt <- seqz.het$good.reads >= min.reads.baf
       seqz.r.win <- windowValues(x = seqz.data$adjusted.ratio,

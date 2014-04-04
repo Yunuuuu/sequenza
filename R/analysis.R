@@ -182,7 +182,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
                            max.mut.types = 3, min.type.freq = 0.9, min.fw.freq = 0,
                            segments = NULL) {
    chroms      <- unique(seqz.tab$chromosome)
-   hom.filt    <- seqz.tab$ref.zygosity == 'hom'
+   hom.filt    <- seqz.tab$zygosity.normal == 'hom'
    seqz.tab     <- seqz.tab[hom.filt, ]
    reads.filt  <- seqz.tab$good.reads >= min.reads & seqz.tab$depth.normal >= min.reads.normal
    seqz.tab     <- seqz.tab[reads.filt, ]
@@ -244,14 +244,14 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
       rw      <- seqz.tab$adjusted.ratio * w.r
       w.b     <- sqrt(seqz.tab$good.reads)
       bw      <- seqz.tab$Bf * w.b
-      seqz.tab <- cbind(seqz.tab[, c("chromosome", "position", "ref.zygosity", "good.reads")],
+      seqz.tab <- cbind(seqz.tab[, c("chromosome", "position", "zygosity.normal", "good.reads")],
                     rw = rw, w.r = w.r, bw = bw, w.b = w.b)
    }
    chr.order <- unique(seqz.tab$chromosome)
    seqz.tab <- split(seqz.tab, f = seqz.tab$chromosome)
    segments <- list()
    for (i in 1:length(seqz.tab)) {
-      seqz.b.i    <- seqz.tab[[i]][seqz.tab[[i]]$ref.zygosity == 'het', ]
+      seqz.b.i    <- seqz.tab[[i]][seqz.tab[[i]]$zygosity.normal == 'het', ]
       seqz.b.i    <- seqz.b.i[seqz.b.i$good.reads >= min.reads.baf, ]
       breaks.i    <- breaks[breaks$chrom == names(seqz.tab)[i], ]
       nb          <- nrow(breaks.i)
