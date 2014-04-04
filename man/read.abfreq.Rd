@@ -34,8 +34,9 @@ read.acgt(file, colClasses = c("character", "integer", "character", "integer",
 \code{read.seqz} is a function that allows to efficiently access a file by chromosome or by number of line. The specific content of a \code{seqz} file or an \code{acgt} is explained in the \code{value} section.
 }
 
-\value{
-seqz is a tab separated text file with column headers. The file has currently 13 columns. The first 3 columns are derived from the original \code{pileup} file and contain:
+\format{
+seqz is a tab separated text file with column headers. The file has currently 14 columns. The first 3 columns are derived from the original \code{pileup} file and contain:
+\describe{
 \item{chromosome}{with the chromosome names}
 \item{position}{with the base positions}
 \item{base.ref}{with the base in the reference genome used (usually hg19). Note the \code{base.ref} is NOT the base of the germline.}
@@ -50,15 +51,19 @@ The remaining 10 columns contain the following information:
 \item{good.reads}{number of reads that passed the quality threshold (threshold specified in the pre-processing software)}
 \item{AB.normal}{base found in the germline sample}
 \item{AB.tumor}{base found in the tumor sample}
+\item{tumor.strand}{frequency of the variant nucleotides detected on the forward orientation.}
+}
 
 The \code{acgt} file format is similar to the \code{seqz} format, but contains only 8 columns. The first 3 are the same as in the \code{seqz} file, derived from the pileup format. The remaining 5 columns contain the following information:
+\describe{
 \item{read.depth}{read depth. The column is derived from the pileup file}
 \item{A}{number of times A was observed among the reads that were above the quality threshold}
 \item{C}{number of times C was observed among the reads that were above the quality threshold}
 \item{G}{number of times G was observed among the reads that were above the quality threshold}
 \item{T}{number of times T was observed among the reads that were above the quality threshold}
+\item{strand}{string indicating the frequencies of reads in the forward strand for A, C, G and T, respectively, separated by ":".}
 }
-
+}
 
 \seealso{
   \code{read.delim}.
