@@ -16,8 +16,8 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95),
    LikThresh <- znormsort[n]
    names(LikThresh) <- paste0(likThresh * 100, '%')
 
-   contour(cp.table, levels = znormsort[n], col = col,
-           drawlabels = FALSE,
+   contour(x = cp.table$ploidy, y = cp.table$cellularity, z = cp.table$loglik,
+           levels = znormsort[n], col = col, drawlabels = FALSE,
            xlab = "Ploidy", ylab = "Cellularity", ...)
    max.xy <- which(cp.table$loglik == max(cp.table$loglik), arr.ind = TRUE)
    points(x = cp.table$ploidy[max.xy[, "row"]],
