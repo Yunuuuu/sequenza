@@ -178,7 +178,7 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
    max.lik <- max(result$L)
    LogSumLik <- log(sum(exp(result$L - max.lik))) + max.lik
    znorm <- exp(z - LogSumLik)
-   list(x = x, y = y, z = znorm)
+   list(ploidy = x, cellularity = y, loglik = znorm)
 }
 
 baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
@@ -201,5 +201,5 @@ baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
    max.lik <- max(result$L)
    LogSumLik <- log(sum(exp(result$L - max.lik))) + max.lik
    znorm <- exp(z - LogSumLik)
-   list(x = x, y = y, z = znorm)
+   list(ploidy = x, cellularity = y, loglik = znorm)
 }

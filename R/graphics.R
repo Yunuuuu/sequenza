@@ -1,16 +1,16 @@
 cp.plot <- function (cp.table,  
                      xlab = "Ploidy", ylab = "Cellularity", zlab = "Scaled rank likelihood", 
                      colFn = colorRampPalette(c('white', 'lightblue')), ...) {
-  z <- matrix(rank(cp.table$z), nrow = nrow(cp.table$z)) / length(cp.table$z)
+  z <- matrix(rank(cp.table$loglik), nrow = nrow(cp.table$loglik)) / length(cp.table$loglik)
   map <- makecmap(c(0, 1), colFn = colFn, include.lowest = TRUE)
-  colorgram(x = cp.table$x, y = cp.table$y, z = z, 
+  colorgram(x = cp.table$ploidy, y = cp.table$cellularity, z = z, 
             map = map, las = 1, 
             xlab = xlab, ylab = ylab, zlab = zlab, ...)
 }
 
 cp.plot.contours <- function(cp.table, likThresh = c(0.95),
                              col = palette(), legend.pos = 'bottomright', pch = 18, ...) {
-   znormsort <- sort(cp.table$z, decreasing = TRUE)
+   znormsort <- sort(cp.table$loglik, decreasing = TRUE)
    znormcumLik <- cumsum(znormsort)
    n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
    LikThresh <- znormsort[n]
@@ -19,9 +19,9 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95),
    contour(cp.table, levels = znormsort[n], col = col,
            drawlabels = FALSE,
            xlab = "Ploidy", ylab = "Cellularity", ...)
-   max.xy <- which(cp.table$z == max(cp.table$z), arr.ind = TRUE)
-   points(x = cp.table$x[max.xy[, "row"]],
-          y = cp.table$y[max.xy[, "col"]], pch = pch)
+   max.xy <- which(cp.table$loglik == max(cp.table$loglik), arr.ind = TRUE)
+   points(x = cp.table$ploidy[max.xy[, "row"]],
+          y = cp.table$cellularity[max.xy[, "col"]], pch = pch)
    if(!is.na(legend.pos)) {
       legend(legend.pos, legend = c(paste("C.R.", names(LikThresh), sep = " "), "Point estimate"),
              col = c(col[1:length(LikThresh)], "black"), lty = c(rep(1, length(LikThresh)), NA),
