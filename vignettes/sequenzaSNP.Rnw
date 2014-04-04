@@ -47,8 +47,7 @@ sample.i <- data.frame(chromosome = BAF$chrs, position = BAF$pos,
 \subsubsection{Correcting logR with a normal sample, or with the mean logR value}
 Without a reference sample (normal germline sample) we can try to divide for the mean value. It would be correct to use the germline logR.
 <<label=logRMeansub, eval=TRUE>>=
-#sample.i$adjusted.ratio <- 2^(sample.i$adjusted.ratio)
-#sample.i$adjusted.ratio <- sample.i$adjusted.ratio / mean(sample.i$adjusted.ratio)
+
 sample.i$adjusted.ratio <- 2^(sample.i$adjusted.ratio/0.55)
 
 @
@@ -121,8 +120,8 @@ data(CPsnp.example)
 <<label=getCPparamSNP, eval = TRUE>>=
 cint <- get.ci(CPsnp.example)
 
-cellularity <- cint$max.y
-ploidy   <- cint$max.x
+cellularity <- cint$max.cellularity
+ploidy   <- cint$max.ploidy
 @
 
 
