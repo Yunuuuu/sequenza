@@ -1,5 +1,6 @@
 Changes in version 2.0.0 (2014-04-04)
- - Change seqz names header and some function arguments/formats to improve usability 
+ - Change seqz names header and some function arguments/formats to improve usability
+ - Add to sequenza.fit a method argument to calculate cellularity and ploidy also from mutations
  - Change the recommended file extension from ".abfreq" to ".seqz" for clarity.
  - The "seqz" file now contains a column with strand orientation information.
  - "cp.plot" now plots the scaled log-likelood.
