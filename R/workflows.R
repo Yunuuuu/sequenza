@@ -147,7 +147,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
    }
 }
 
-sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = getwd(),
+sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.dir = getwd(),
                              cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
                              ratio.priority = FALSE, XY = c(X = "X", Y = "Y"), chromosome.list = 1:24){
    if(!file.exists(out.dir)) {
@@ -163,20 +163,20 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    muts.file <- makeFilename("mutations.txt")
    segs.file <- makeFilename("segments.txt")
    robj.extr <- makeFilename("sequenza_extract.RData")
-   robj.fit  <- makeFilename("sequenza_fit.RData")  
+   robj.fit  <- makeFilename("sequenza_cp_table.RData")  
    avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
    assign(x = paste0(sample.id,"_sequenza_extract"), value = sequenza.extract)
    save(list = paste0(sample.id,"_sequenza_extract"), file = robj.extr) 
-   if (is.null(sequenza.fit) && (is.null(cellularity) || is.null(ploidy))){
-      stop("Either the sequenza.fit or both cellularity and ploidy argument are required.")
+   if (is.null(cp.table) && (is.null(cellularity) || is.null(ploidy))){
+      stop("Either the cp.table or both cellularity and ploidy argument are required.")
    }
-   if (!is.null(sequenza.fit)){
-      assign(x = paste0(sample.id,"_sequenza_fit"), value = sequenza.fit)
-      save(list = paste0(sample.id,"_sequenza_fit"), file = robj.fit)       
-      cint <- get.ci(sequenza.fit)
+   if (!is.null(cp.table)){
+      assign(x = paste0(sample.id,"_sequenza_cp_table"), value = cp.table)
+      save(list = paste0(sample.id,"_sequenza_cp_table"), file = robj.fit)       
+      cint <- get.ci(cp.table)
       pdf(cp.file)
-         cp.plot(sequenza.fit)
-         cp.plot.contours(sequenza.fit, add = TRUE, likThresh = c(0.95), col = "red", pch = 20)
+         cp.plot(cp.table)
+         cp.plot.contours(cp.table, add = TRUE, likThresh = c(0.95), col = "red", pch = 20)
          if (!is.null(cellularity) || !is.null(ploidy)) {
             if (is.null(cellularity)) cellularity <- cint$max.y
             if (is.null(ploidy)) ploidy <- cint$max.x
@@ -268,7 +268,7 @@ sequenza.results <- function(sequenza.extract, sequenza.fit = NULL, sample.id, o
    dev.off()
    
    ## Write down the results.... ploidy etc...
-   if (!is.null(sequenza.fit)){
+   if (!is.null(cp.table)){
       res.tab <- data.frame(cellularity     = c(cint$confint.y[1], cint$max.y[1], cint$confint.y[2]),
                            ploidy.estimate = c(cint$confint.x[1], cint$max.x[1], cint$confint.x[2]),
                            ploidy.mean.cn  = weighted.mean(x = as.integer(names(cn.sizes)), w = cn.sizes))

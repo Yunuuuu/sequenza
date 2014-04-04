@@ -318,7 +318,7 @@ The result is a list in a format \textit{list(ploidy, collularity, loglik)}, cor
 The last part of the workflow is to apply the estimated parameters. There is an all-in-one function that plots and saves the results, giving control on file names and output  directory:
 
 <<label=sequenzaRes, echo=TRUE, eval=FALSE, results=hide>>=
-sequenza.results(sequenza.extract = test, sequenza.fit = CP.example,
+sequenza.results(sequenza.extract = test, cp.table = CP.example,
                  sample.id = "Test", out.dir="TEST")
 @
 
@@ -326,7 +326,7 @@ Although this standard way of presenting the result would be appropriate for mos
 
 \subsubsection{Confidence intervals, confidence region and point estimate}
 
-The object resulting from \texttt{sequenza.fit} has two vectors, x and y, indicating respectively the tested values of ploidy and cellularity, and a matrix z with x columns and y rows, containing the estimated log-likelihood.
+The object resulting from \texttt{sequenza.fit} has two vectors, \textit{ploidy} and \textit{cellularity}, indicating respectively the tested values of ploidy and cellularity, and a matrix, \textit{loglik}, with columns and rows corresponding to the previously indicated vectors, containing the estimated log-likelihood for the combinations of cellularity and ploidy.
 Confidence intervals for these two parameters can be calculated using the function \texttt{get.ci}.
 <<label=ConfIntCP, echo=TRUE>>=
 cint <- get.ci(CP.example)

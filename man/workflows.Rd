@@ -22,7 +22,7 @@
                priors.table = data.frame(CN = 2, value = 2),
                chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L))
 
-  sequenza.results(sequenza.extract, sequenza.fit = NULL, sample.id, out.dir = getwd(),
+  sequenza.results(sequenza.extract, cp.table = NULL, sample.id, out.dir = getwd(),
                    cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
                    ratio.priority = FALSE, XY = c(X = "X", Y = "Y"),
                    chromosome.list = 1:24)
@@ -43,7 +43,7 @@
   \item{min.type.freq}{minimum frequency of aberrant types.}
     \item{min.fw.freq}{minimum frequency of variant reads detected in the forward strand. Setting it to 0, all the variant calls with strand frequency in the interval outside 0 and 1, margin not comprised, would be discarded.}
   \item{sequenza.extract}{a list of objects as output from the \code{sequenza.extract} function.}
-  \item{sequenza.fit}{a list of objects as output from the \code{sequenza.fit} function.}
+  \item{cp.table}{a list of objects as output from the \code{sequenza.fit} function.}
   \item{female}{logical, indicating whether the sample is male or female, to properly handle the X and Y chromosomes. Implementation only works for the human normal karyotype.}
   \item{CNt.max}{maximum copy number to consider in the model.}  
   \item{segment.filter}{threshold segment length (in base pairs) to filter out short segments, that can cause noise when fitting the cellularity and ploidy parameters. The threshold will not affect the allele-specific segmentation.}
