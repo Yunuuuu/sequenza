@@ -111,7 +111,9 @@ mut.alleles <- mufreq.bayes(mufreq = mut.tab.clean$F,
                             depth.ratio = mut.tab.clean$adjusted.ratio,
                             cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio)
-head(cbind(mut.tab.clean[,c("chromosome","position","F","adjusted.ratio", "mutation")], mut.alleles))
+head(cbind(mut.tab.clean[,c("chromosome","position","F",
+                            "adjusted.ratio", "mutation")],
+           mut.alleles))
 
 
    }
