@@ -178,15 +178,15 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
          cp.plot(cp.table)
          cp.plot.contours(cp.table, add = TRUE, likThresh = c(0.95), col = "red", pch = 20)
          if (!is.null(cellularity) || !is.null(ploidy)) {
-            if (is.null(cellularity)) cellularity <- cint$max.y
-            if (is.null(ploidy)) ploidy <- cint$max.x
+            if (is.null(cellularity)) cellularity <- cint$max.cellularity
+            if (is.null(ploidy)) ploidy <- cint$max.ploidy
             points(x = ploidy, y = cellularity, pch = 5)
             text(x = ploidy, y = cellularity, 
                  labels = "User selection",
                  pos = 3, offset = 0.5)
          } else {
-            cellularity <- cint$max.y
-            ploidy <- cint$max.x
+            cellularity <- cint$max.cellularity
+            ploidy <- cint$max.ploidy
          }
       dev.off()
    }
@@ -269,8 +269,8 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    
    ## Write down the results.... ploidy etc...
    if (!is.null(cp.table)){
-      res.tab <- data.frame(cellularity     = c(cint$confint.y[1], cint$max.y[1], cint$confint.y[2]),
-                           ploidy.estimate = c(cint$confint.x[1], cint$max.x[1], cint$confint.x[2]),
+      res.tab <- data.frame(cellularity     = c(cint$confint.cellularity[1], cint$max.cellularity[1], cint$confint.cellularity[2]),
+                           ploidy.estimate = c(cint$confint.ploidy[1], cint$max.ploidy[1], cint$confint.ploidy[2]),
                            ploidy.mean.cn  = weighted.mean(x = as.integer(names(cn.sizes)), w = cn.sizes))
       write.table(res.tab, cint.file, col.names = TRUE,
                   row.names = FALSE, sep = "\t")
