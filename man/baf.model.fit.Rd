@@ -78,8 +78,8 @@ CP <- baf.model.fit(Bf = seg.filtered$Bf, depth.ratio = seg.filtered$depth.ratio
                     ploidy = seq(0.5,3,0.05))
 
 confint <- get.ci(CP)
-ploidy   <- confint$max.x
-cellularity <- confint$max.y
+ploidy   <- confint$max.ploidy
+cellularity <- confint$max.cellularity
 
    }
 }
