@@ -39,5 +39,5 @@ theoretical.mufreq(Mt, CNt, CNn = 2, cellularity)
 }
 
 \seealso{
-  \code{model.points}.
+  \code{\link{model.points}}
 }

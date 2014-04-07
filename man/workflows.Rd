@@ -38,7 +38,7 @@
   \item{min.reads}{minimum number of reads above the quality threshold to accept the mutation call.}
   \item{min.reads.normal}{minimum number of reads used to determine the genotype in the normal sample.}
   \item{min.reads.baf}{threshold on the depth of the positions included to calculate the average BAF for segment.}
-  \item{method}{method to use to fit the data; possible values are \code{baf} to use \code{baf.model.fit} or \code{mufreq} to use the \code{mufreq.model.fit} function to fit the data.}
+  \item{method}{method to use to fit the data; possible values are \code{baf} to use \code{\link{baf.model.fit}} or \code{mufreq} to use the \code{\link{mufreq.model.fit}} function to fit the data.}
   \item{max.mut.types}{maximum number of different base substitutions per position. Integer from 1 to 3 (since there are only 4 bases). Default is 3, to accept "noisy" mutation calls.}
   \item{min.type.freq}{minimum frequency of aberrant types.}
     \item{min.fw.freq}{minimum frequency of variant reads detected in the forward strand. Setting it to 0, all the variant calls with strand frequency in the interval outside 0 and 1, margin not comprised, would be discarded.}

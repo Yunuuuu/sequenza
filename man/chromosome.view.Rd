@@ -21,7 +21,7 @@ genome.view(seg.cn, info.type = "AB", ...)
 \arguments{
   \item{baf.windows}{matrix containing the windowed B-allele frequency values for one chromosome.}
   \item{ratio.windows}{matrix containing the windowed depth ratio values for one chromosome.}
-  \item{mut.tab}{mutation table of one chromosome. If specified, the mutations will be drawn in a top panel. \code{mut.tab} must be output from the \code{mutation.table} function.}
+  \item{mut.tab}{mutation table of one chromosome. If specified, the mutations will be drawn in a top panel. \code{mut.tab} must be output from the \code{\link{mutation.table}} function.}
   \item{segments}{segmentation for one chromosome. If specified, the segmented B-allele frequency and depth ratio values will be shown as red lines.}
   \item{min.N.baf}{minimum number of observations required in a BAF window for plotting.}
   \item{min.N.ratio}{minimum number of observations required in a depth ratio window for plotting.}
@@ -31,7 +31,7 @@ genome.view(seg.cn, info.type = "AB", ...)
   \item{ploidy}{value of the estimated \code{ploidy} parameter.}
   \item{avg.depth.ratio}{the average value of the normalized depth ratio.}
   \item{main}{main title of the plot.}
-  \item{legend.inset}{the inset argument to pass to the \code{legend} function. Defines the distance between the mutation legend and the plot border.}
+  \item{legend.inset}{the inset argument to pass to the \code{\link{legend}} function. Defines the distance between the mutation legend and the plot border.}
   \item{BAF.style}{the style to visualize the theoretical thresholds for the B allele frequency panel. Possible values are "lines", "blocks", "none". Default is "none".}
   \item{model.lwd}{width of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
   \item{model.lty}{line type of the theoretical lines, if the segments matrix contains the columns A, B and CNt.}
@@ -39,15 +39,15 @@ genome.view(seg.cn, info.type = "AB", ...)
   \item{x.chr.space}{step in megabase on the positions to visualize on the x-axis.}
   \item{seg.cn}{genome wide segments, with the columns A, B and CNt.}
   \item{info.type}{information to plot in \code{genome.view}. Available options are "CNt" to draw the copy numbers and "AB" (default) to draw the two alleles.}
-  \item{...}{optional arguments passed to \code{plot}.}
+  \item{...}{optional arguments passed to \code{\link{plot}}.}
 }
 
 \details{
-  \code{chromosome.view} is a convenient plotting function using \code{plot.windows} and some handy \code{par} parameters, to display the raw sequencing results along with the model fitting.
+  \code{chromosome.view} is a convenient plotting function using \code{\link{plot.windows}} and some handy \code{\link{par}} parameters, to display the raw sequencing results along with the model fitting.
 }
 
 \seealso{
-  \code{windowValues}, \code{plot.windows}, \code{mutation.table}, \code{find.breaks}.
+  \code{\link{windowValues}}, \code{\link{find.breaks}}.
 }
 
 \examples{

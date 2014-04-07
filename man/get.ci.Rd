@@ -15,6 +15,7 @@
 }
 
 \value{
+  A list with 6 items:
   \item{values.ploidy}{matrix of ploidy values with respective likelihood.}
   \item{confint.ploidy}{boundaries of the confidence interval of the estimated ploidy.}
   \item{max.ploidy}{point estimate of the ploidy value that has the maximum likelihood.}

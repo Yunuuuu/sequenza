@@ -19,24 +19,25 @@
 \arguments{
   \item{cellularity}{vector of cellularity parameter values to be tested.}
   \item{ploidy}{vector of ploidy parameter values to be tested.}
-  \item{mc.cores}{number of cores to use, defined as in the \code{parallel} package.}
-  \item{...}{any argument accepted by \code{mufreq.bayes} or \code{baf.bayes}.}
+  \item{mc.cores}{number of cores to use, defined as in \code{\link{mclapply}}.}
+  \item{...}{any argument accepted by \code{\link{mufreq.bayes}} or \code{\link{baf.bayes}}.}
 }
 
 \value{
+  A list of three items:
   \item{ploidy}{tested values of the ploidy parameter}
-  \item{cellularity}{values of cellularity tested}
+  \item{cellularity}{tested values of the cellularity parameter}
   \item{loglik}{log-likelihood of each pair of cellularity/ploidy parameters.}
 }
 
 \details{
-  \code{baf.model.fit} uses the function \code{baf.bayes} to infer the log-likelihood of the model fit using the possible combinations of cellularity and ploidy values provided in the arguments.
-  Similarly \code{mufreq.model.fit} fits the mutation/depth ratio model using the function \code{mufreq.bayes}.
-  \code{baf.model.fit} is generally used to infer cellularity and ploidy on segmented chromosomes, while \code{mufreq.model.fit} can also be used to estimate those parameters from mutations, and in addition can be useful to give a rough estimate of sub-clonal fractions. Be aware  that the mutation frequency is more sensitive to sampling bias, and is generally more noisy compared to the segmented B-allele frequency.
+  \code{baf.model.fit} uses the function \code{\link{baf.bayes}} to infer the log-likelihood of the model fit using the possible combinations of cellularity and ploidy values provided in the arguments.
+  Similarly \code{mufreq.model.fit} fits the mutation/depth ratio model using the function \code{\link{mufreq.bayes}}.
+  \code{baf.model.fit} is generally used to infer cellularity and ploidy on segmented chromosomes, while \code{mufreq.model.fit} can also be used to estimate these parameters from mutations, and in addition can be useful to give a rough estimate of sub-clonal fractions. Be aware  that the mutation frequency is more sensitive to sampling bias, and is generally more noisy compared to the segmented B-allele frequency.
 }
 
 \seealso{
-  \code{baf.bayes}, \code{mufreq.bayes}, \code{cp.plot}, \code{get.ci}.
+  \code{\link{cp.plot}} for visualization of the resulting object, and \code{\link{get.ci}} to extract confidence intervals.
 }
 
 \examples{

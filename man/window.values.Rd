@@ -23,7 +23,7 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0,
 \details{
   DNA sequencing produces an amount of data too large to be handled by standard graphical devices. In addition, for samples analyzed with older machines and with low or middle coverage (20x to 50x), measures such as read depth are subject to big variations due to technical noise. Using \code{windowValues} prior to plotting reduces the amount of data that will be plotted, and reduces noise.
 
-  The output of \code{windowValues} can be used as input for \code{plotWindows}.
+  The output of \code{windowValues} can be used as input for \code{\link{plotWindows}}.
 }
 
 \value{
@@ -31,7 +31,7 @@ windowValues(x, positions, chromosomes, window = 1e6, overlap = 0,
 }
 
 \seealso{
-  \code{plotWindows}, \code{mutation.table}
+  \code{mutation.table}
 }
 
 \examples{

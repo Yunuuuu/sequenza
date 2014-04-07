@@ -4,7 +4,7 @@
 \title{Plot log-likelihood for the tested values of cellularity and ploidy}
 
 \description{
-  This function uses the \code{colorgram} function from the package \code{squash} to plot log-likelihood for the tested combinations of cellularity and ploidy
+  This function uses the \code{\link{colorgram}} function from the package \pkg{squash} to plot log-likelihood for the tested combinations of cellularity and ploidy
 }
 
 \usage{
@@ -16,7 +16,7 @@
 }
 
 \arguments{
-  \item{cp.table}{matrix, as output from \code{\link{baf.model.fit}} or \code{\link{mufreq.model.fit}}.}
+  \item{cp.table}{list, as output from \code{\link{baf.model.fit}} or \code{\link{mufreq.model.fit}}.}
   \item{xlab}{xlab parameter as in the function \code{\link{colorgram}}.}
   \item{ylab}{ylab parameter as in the function \code{\link{colorgram}}.}
   \item{zlab}{zlab parameter as in the function \code{\link{colorgram}}.}
@@ -30,7 +30,6 @@
 
 
 \seealso{
-  \code{baf.model.fit}, \code{mufreq.model.fit}.
 }
 
 \examples{
