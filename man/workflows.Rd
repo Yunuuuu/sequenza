@@ -87,7 +87,8 @@ data.file <-  system.file("data", "example.seqz.txt.gz",
               package = "sequenza")
 test <- sequenza.extract(data.file)
 test.CP   <- sequenza.fit(test)
-sequenza.results(test, test.CP, "example")
+sequenza.results(test, test.CP, out.dir = "example",
+                 sample.id = "example")
 
    }
 }
