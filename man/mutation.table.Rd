@@ -1,6 +1,5 @@
 \name{mutation.table}
 \alias{mutation.table}
-\alias{mut.fractions}
 \title{Identify mutations}
 
 \description{
