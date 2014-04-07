@@ -374,7 +374,7 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                            line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
                            return line_out
                         elif het_a_p2 < het_b_p2:
-                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
+                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[ii]+bases_list[i], ".", "0"]
                            return line_out
                   else:
                      pass
