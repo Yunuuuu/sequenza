@@ -32,8 +32,8 @@ The remaining 10 columns contain the following information:
 \item{GC.percent}{GC-content (percent), calculated from the reference genome in fixed nucleotide windows }
 \item{good.reads}{number of reads that passed the quality threshold (threshold specified in the pre-processing software), in the tumor specimen}
 \item{AB.normal}{base(s) found in the germline sample; for heterozygous positions AB are sorted using the values of Af and Bf respectively}
-\item{AB.tumor}{base(s) found in the tumor sample not present in the normal specimen. The field include all the varian found separated by a colon. Each variant contains base and observed frequecy}
-\item{tumor.strand}{frequency of the variant nucleotides detected on the forward orientation. The fiels have a consistent structure with \code{AB.tumor}, indicating the fraction, relative to the total number of reads observing the specific variant, orienteted in the forward direction}
+\item{AB.tumor}{base(s) found in the tumor sample not present in the normal specimen. The field include all the variants found in the tumor alignment, separated by a colon. Each variant contains the base and the observed frequency}
+\item{tumor.strand}{frequency of the variant nucleotides detected on the forward orientation. The field have a consistent structure with \code{AB.tumor}, indicating the fraction, relative to the total number of reads presenting the specific variant, orientated in the forward direction}
 }
 
 }
