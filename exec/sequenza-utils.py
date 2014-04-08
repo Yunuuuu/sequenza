@@ -1,5 +1,9 @@
 #!/usr/bin/env python2.7
 
+###
+###   This script is part of Sequenza
+###   http://www.cbs.dtu.dk/biotools/sequenza/
+###
 
 import argparse, os, sys, gzip, math, multiprocessing, time, logging, json, gc
 from itertools import izip_longest
@@ -7,8 +11,8 @@ from multiprocessing.pool import ThreadPool
 from functools import partial
 from multiprocessing.queues import SimpleQueue
 
-VERSION = "1.0.0"
-DATE    = "19 March 2014"
+VERSION = "1.1.0"
+DATE    = "08 April 2014"
 AUTHOR  = "Favero Francesco"
 MAIL    = "favero@cbs.dtu.dk"
 
@@ -632,7 +636,7 @@ def main():
    Execute the function with args
    '''
    parser = DefaultHelpParser(prog = __file__, formatter_class=lambda prog: SubcommandHelpFormatter(prog, max_help_position=20, width=75),
-                              description='Sequenza Utils is an ensemble of tools capable of perform various tasks, primarily aimed to convert bam/pileup files to a format usable by the sequenza R package',
+                              description='This script is part of Sequenza http://www.cbs.dtu.dk/biotools/sequenza/ \n Sequenza Utils is an ensemble of tools capable of perform various tasks, primarily aimed to convert bam/pileup files to a format usable by the sequenza R package.',
                               usage= '%(prog)s module [options]', epilog = 'This is version {0} - Francesco Favero - {1}'.format(VERSION, DATE))
    subparsers = parser.add_subparsers(dest='module')
    subparsers.metavar = None
