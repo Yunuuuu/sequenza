@@ -588,9 +588,9 @@ def pileup2seqz(parser, subparser):
    parser_ABgenotype    = subparser.add_argument_group(title='Genotyper',description='Options regarding the genotyping.')
    parser_ABperformance = subparser.add_argument_group(title='Performance', description='Options affecting the performance.')
    parser_ABqualitysets = subparser.add_argument_group(title='Quality and Format', description='Options that change the quality threshold and format.')
-   parser_ABinput.add_argument('-r', '--reference', dest = 'reference', required = True,
+   parser_ABinput.add_argument('-n', '--normal', dest = 'normal', required = True,
                    help='The pileup of the reference/normal sample')
-   parser_ABinput.add_argument('-s', '--sample', dest = 'sample', required = True,
+   parser_ABinput.add_argument('-t', '--tumor', dest = 'tumor', required = True,
                    help='The pileup of the tumor sample')
    parser_ABinput.add_argument('-gc', dest = 'gc', metavar = 'gc', required = True,
                    help='The GC-content file coming from UCSC genome browser, or generated in the same UCSC format')
@@ -598,7 +598,7 @@ def pileup2seqz(parser, subparser):
                    help='Minimum nucleotide quality score for consider in the counts. Default 20.')
    parser_ABqualitysets.add_argument('-f', '--qformat', dest = 'qformat', default = "sanger",
                    help='Quality format, options are sanger or illumina, it will add an offset of 33 or 64 respectively to the qlimit value. Default "sanger".')
-   parser_ABqualitysets.add_argument('-n', dest = 'n', type = int, default = 20,
+   parser_ABqualitysets.add_argument('-N', dest = 'n', type = int, default = 20,
                    help='Threshold to filter positions by the sum of read depth of the two samples. Default 20.')
    parser_ABgenotype.add_argument('--hom', dest = 'hom', type = float, default = 0.9,
                    help='Threshold to select homozygous positions. Default 0.9.')
@@ -692,8 +692,8 @@ def main():
          args = pileup2seqz(parser, parser_pileup2seqz)
          with xopen('-', "wb") as fileout:
             out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal", "GC.percent", "good.reads", "AB.normal", "AB.tumor", "tumor.strand"]
-            p1 = args.reference
-            p2 = args.sample
+            p1 = args.normal
+            p2 = args.tumor
             gc = args.gc
             stream_mpileup = IterableQueue()
             line_worker_partial = partial(line_worker, depth_sum=args.n, qlimit=args.qlimit, qformat=args.qformat, hom_t=args.hom, het_t=args.het)
