@@ -43,7 +43,7 @@ genome.view(seg.cn, info.type = "AB", ...)
 }
 
 \details{
-  \code{chromosome.view} is a convenient plotting function using \code{\link{plot.windows}} and some handy \code{\link{par}} parameters, to display the raw sequencing results along with the model fitting.
+  \code{chromosome.view} is a convenient plotting function using \code{\link{plotWindows}} and some handy \code{\link{par}} parameters, to display the raw sequencing results along with the model fitting.
 }
 
 \seealso{

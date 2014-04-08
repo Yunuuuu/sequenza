@@ -28,10 +28,6 @@
   \item{...}{additional arguments accepted by the function \code{\link{colorgram}} for \code{cp.plot}, or \code{\link{contour}} for \code{cp.plot.contours}.}
 }
 
-
-\seealso{
-}
-
 \examples{
 
 data(CP.example)
