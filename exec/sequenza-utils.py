@@ -519,7 +519,7 @@ def process_gc_from_pipe(in_queue, window_size):
       if seq_list != 'EOF':
          if type(seq_list) == str:
             if seq_list.startswith('>'):
-               chromosome = seq_list.strip('>')
+               chromosome = seq_list.strip('>').split(" ")[0]
                print "variableStep chrom=" + chromosome + " span=" + str(int(window_size))
                base_counter = 1
          else:
