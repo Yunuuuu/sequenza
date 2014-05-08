@@ -11,8 +11,8 @@ from multiprocessing.pool import ThreadPool
 from functools import partial
 from multiprocessing.queues import SimpleQueue
 
-VERSION = "1.2.0"
-DATE    = "08 May 2014"
+VERSION = "1.1.0"
+DATE    = "08 April 2014"
 AUTHOR  = "Favero Francesco"
 MAIL    = "favero@cbs.dtu.dk"
 
@@ -429,7 +429,7 @@ class abfreReduce:
       self._gc              = float(line_ls[9])
       self._n               = 1
       self.line_dict = {'top': '', 'middle': [], 'end': ''}
-      if line_ls[12] != '.':
+      if line_ls[12]+line_ls[8] != '.hom':
          self.line_dict['top'] = line_ls
    def __addline__(self, line_ls, line):
       self._last_position    = int(line_ls[1])
@@ -438,7 +438,7 @@ class abfreReduce:
       self._ratio           += float(line_ls[5])
       self._gc              += float(line_ls[9])
       self._n               += 1
-      if line_ls[12] != '.':
+      if line_ls[12]+line_ls[8] != '.hom':
          self.line_dict['middle'].append(line_ls)
    def __do_dict__(self):
       gc = str(int(round(self._gc/self._n, 0)))
