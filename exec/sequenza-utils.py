@@ -502,14 +502,15 @@ def seq_map(seq_list):
    """
    ...
    """
-   counter = {"A":0,"C":0,"G":0,"N":0,"T":0}
+   counter = {"A":0, "C":0, "G":0, "N":0, "T":0, "R":0, "Y":0, "S":0, "W":0, "K":0, "M":0, "B":0, "D":0, "H":0, "V":0}
    for nucleotide in seq_list:
       counter[nucleotide] +=1
    return counter
 
 def process_gc_from_pipe(in_queue, window_size):
    """
-   whatever...
+   Process fasta from a multiprocessing.queue and
+   compute the percentage og GC whitin a given window
    """
    base_counter  = 1
    window_size   = float(window_size)
@@ -527,19 +528,19 @@ def process_gc_from_pipe(in_queue, window_size):
             stats    = seq_map(seq_list)
             seq_len  = len(seq_list)
             if seq_len == window_size:
-               if stats['N']/window_size >= 0.75:
+               if (stats['N'] + stats['R'] + stats['Y'] + stats['K'] + stats['M'] + stats['B'] + stats['D'] + stats['H'] + stats['V'])/window_size >= 0.75:
                   base_counter = base_counter + window_size
                   pass
                else:
-                  gc_percent = 100 * (stats['G'] + stats['C'])/window_size
+                  gc_percent = 100 * ((stats['G'] + stats['C'] + stats['S'])/window_size)
                   print str(int(base_counter)) + "\t" + str(gc_percent)
                   base_counter = base_counter + window_size
             else:
-               if stats['N'] / seq_len >= 0.75:
+               if (stats['N'] + stats['R'] + stats['Y'] + stats['K'] + stats['M'] + stats['B'] + stats['D'] + stats['H'] + stats['V'])/window_size >= 0.75:
                   base_counter = base_counter + seq_len
                   pass
                else:
-                  gc_percent   = 100 * (stats['G'] + stats['C'])/seq_len
+                  gc_percent   = 100 * ((stats['G'] + stats['C'] + stats['S'])/float(seq_len))
                   print str(int(base_counter)) + "\t" + str(gc_percent)
                   base_counter = base_counter + seq_len
       else:
