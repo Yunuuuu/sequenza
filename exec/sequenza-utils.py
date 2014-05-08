@@ -11,8 +11,8 @@ from multiprocessing.pool import ThreadPool
 from functools import partial
 from multiprocessing.queues import SimpleQueue
 
-VERSION = "1.1.0"
-DATE    = "08 April 2014"
+VERSION = "1.2.0"
+DATE    = "08 May 2014"
 AUTHOR  = "Favero Francesco"
 MAIL    = "favero@cbs.dtu.dk"
 
