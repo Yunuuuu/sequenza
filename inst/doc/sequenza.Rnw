@@ -131,8 +131,8 @@ A \textit{seqz} file contains genotype information, alleles and mutation frequen
 The seqz file is generated like this:
 \begin{lstlisting}[style=BashInputStyle]
    sequenza-utils.py pileup2seqz -gc hg19.gc50Base.txt.gz \
-                                   -r normal.pileup.gz \
-                                   -s tumor.pileup.gz | gzip > out.seqz.gz
+                                   -n normal.pileup.gz \
+                                   -t tumor.pileup.gz | gzip > out.seqz.gz
 \end{lstlisting}
 
 Alternatively, if you haven't already generated the pileup files, and you are not interested in storing the pileup for further use, you may want to create two named pipes (\textit{FIFOs}) directing \texttt{samtools} output directly into \texttt{sequenza-utils.py}:
@@ -141,8 +141,8 @@ Alternatively, if you haven't already generated the pileup files, and you are no
    samtools mpileup -f hg19.fasta -Q 20 normal.bam > normal.fifo &
    samtools mpileup -f hg19.fasta -Q 20 tumor.bam > tumor.fifo &
    sequenza-utils.py pileup2seqz -gc hg19.gc50Base.txt.gz \
-                                   -r normal.fifo \
-                                   -s tumor.fifo | gzip > out.seqz.gz
+                                   -n normal.fifo \
+                                   -t tumor.fifo | gzip > out.seqz.gz
    rm normal.fifo tumor.fifo
 \end{lstlisting}
 
@@ -151,7 +151,7 @@ This binning decreases the memory requirement to load the data into R, and it al
 
 \begin{lstlisting}[style=BashInputStyle]
    sequenza-utils.py seqz-binning -w  50 \
-                                   out.seqz.gz | gzip > out_small.seqz.gz
+                                  -a out.seqz.gz | gzip > out_small.seqz.gz
 \end{lstlisting}
 
 Where the parameter \textit{-w} indicate a window size (in bases), to be used for the binning. The heterozygous positions and the positions carrying variant calls remain untouched. 
