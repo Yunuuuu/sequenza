@@ -233,8 +233,10 @@ find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), 
     if (length(grep("chr", seqz.baf$chromosome)) > 0) {
         allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")
     }
-    allele.seg[allele.seg$end.pos - allele.seg$start.pos != 0,
-               c("chrom", "start.pos", "end.pos")]
+   breaks   <- allele.seg[, c("chrom", "start.pos", "end.pos")]
+   not.uniq <- which(breaks$end.pos == c(breaks$start.pos[-1],0))
+   breaks$end.pos[not.uniq]<- breaks$end.pos[not.uniq] - 1
+   breaks
 }
 
 segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
