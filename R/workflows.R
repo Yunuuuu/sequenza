@@ -190,7 +190,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
          }
       dev.off()
    }
-   seg.tab     <- na.exclude(do.call(rbind, sequenza.extract$segments[chromosome.list]))
+   seg.tab     <- do.call(rbind, sequenza.extract$segments[chromosome.list])
    mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
    if (female){
       segs.is.xy <- seg.tab$chromosome == XY["Y"]
