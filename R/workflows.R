@@ -2,7 +2,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                              mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
                              min.reads.baf = 1, max.mut.types = 1, min.type.freq = 0.9,
                              min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
-                             weighted.mean = TRUE){
+                             breaks = NULL, breaks.method = "het", weighted.mean = TRUE){
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
    gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
@@ -11,6 +11,11 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    mutation.list <- list()
    segments.list <- list()
    coverage.list <- list()
+   if (is.null(dim(breaks))) {
+      breaks.all <- NULL
+   } else {
+      breaks.all <- breaks
+   }
    if (is.null(chromosome.list)) {
      chromosome.list <- chr.vect
    } else {
@@ -32,16 +37,47 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                 window = window, overlap = overlap,
                                 weight = seqz.data$depth.normal)
       if (nrow(seqz.het) > 0) {
+         breaks.method.i <- breaks.method
+         
          seqz.b.win <- windowValues(x = seqz.het$Bf[het.filt],
                                    positions = seqz.het$position[het.filt],
                                    chromosomes = seqz.het$chromosome[het.filt],
                                    window = window, overlap = overlap,
                                    weight = seqz.het$good.reads[het.filt])
-         breaks    <- NULL
-         breaks    <- try(find.breaks(seqz.het, gamma = gamma, 
-                                      kmin = kmin, baf.thres = c(0, 0.5)),
-                          silent = FALSE)
-         if (!is.null(breaks)){
+         if (is.null(breaks.all)){
+            if (breaks.method.i == "full") {
+               breaks <- try(find.breaks(seqz.data, gamma = gamma, 
+                                         kmin = kmin, baf.thres = c(0, 0.5)),
+                             silent = FALSE)
+            } else if (breaks.method.i == "het"){
+               breaks <- try(find.breaks(seqz.het, gamma = gamma, 
+                                         kmin = kmin, baf.thres = c(0, 0.5)),
+                             silent = FALSE)               
+            } else if (breaks.method.i == "fast"){
+               BAF <- data.frame(chrom = chr, pos = c(seqz.b.win[[1]]$start, tail(seqz.b.win[[1]]$end, n = 1)),
+                                 s1 = c(seqz.b.win[[1]]$mean, tail(seqz.b.win[[1]]$mean, n = 1)))
+               BAF$s1[is.na(BAF$s1)] <- 0
+               logR <- data.frame(chrom = chr, pos = c(seqz.r.win[[1]]$start, tail(seqz.r.win[[1]]$end, n = 1)),
+                                 s1 = c(log2(seqz.r.win[[1]]$mean), log2(tail(seqz.r.win[[1]]$mean, n = 1))))
+               not.cover <- is.na(logR$s1)
+               BAF  <- BAF[!not.cover, ]
+               logR <- logR[!not.cover, ]
+               logR.wins <- copynumber::winsorize(logR, verbose = FALSE)
+               allele.seg <- copynumber::aspcf(logR = logR.wins, BAF = BAF, baf.thres = c(0, 0.5),
+                                               verbose = FALSE, gamma = gamma, kmin = kmin)
+               if (length(grep("chr", chr)) > 0) {
+                  allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")
+               }
+               breaks   <- allele.seg[, c("chrom", "start.pos", "end.pos")]
+               not.uniq <- which(breaks$end.pos == c(breaks$start.pos[-1],0))
+               breaks$end.pos[not.uniq] <- breaks$end.pos[not.uniq] - 1
+            } else {
+               error("The implemented segmentation methods are \'full\', \'het\' and \'fast\'.")
+            }
+         } else {
+            breaks <- breaks.all[breaks.all$chrom == chr, ]
+         }
+         if (!is.null(breaks) & nrow(breaks) > 0){
             seg.s1    <- segment.breaks(seqz.tab = seqz.data, breaks = breaks,
                                         min.reads.baf = min.reads.baf, weighted.mean = weighted.mean)            
          } else {
