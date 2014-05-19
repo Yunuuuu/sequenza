@@ -190,7 +190,7 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
    seqz.tab     <- seqz.tab[mufreq.filt, ]
    if (!is.null(segments)) {
       for (i in 1:nrow(segments)) {
-         pos.filt <- seqz.tab$chromosome == segments$chrom[i] & seqz.tab$position >= segments$start.pos[i] & seqz.tab$position <= segments$end.pos[i]
+         pos.filt <- seqz.tab$chromosome == segments$chromosome[i] & seqz.tab$position >= segments$start.pos[i] & seqz.tab$position <= segments$end.pos[i]
          seqz.tab$adjusted.ratio[pos.filt] <- segments$depth.ratio[i]
       }
    }
