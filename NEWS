@@ -1,3 +1,9 @@
+Changes in version 2.0.1 (2014-05-19)
+ - Fix documentation doscrepancies on the sequenza-utils.py execution.
+ - add breaks as optional argument - enable to input custom segmentations - 
+ - add different segmentation data, fast, het and full, allowing different resolution option.
+ - minor fixes.
+
 Changes in version 2.0.0 (2014-04-08)
  - Change seqz names header and some function arguments/formats to improve usability
  - Add to sequenza.fit a method argument to calculate cellularity and ploidy also from mutations

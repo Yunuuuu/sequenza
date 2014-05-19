@@ -219,17 +219,25 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15, min.reads = 40, min
    }
 }
 
-find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5), verbose = FALSE, ...) {
+find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5),
+                        verbose = FALSE, seg.algo = "aspcf", ...) {
    chromosome <- gsub(x = seqz.baf$chromosome, pattern = "chr", replacement = "")
    logR = data.frame(chrom = chromosome,
                      pos = seqz.baf$position,
                      s1 = log2(seqz.baf$adjusted.ratio))
-   BAF = data.frame(chrom = chromosome,
-                    pos = seqz.baf$position,
-                    s1 = seqz.baf$Bf)
    logR.wins <- copynumber::winsorize(logR, verbose = verbose)
-   allele.seg <- copynumber::aspcf(logR = logR.wins, BAF = BAF, baf.thres = baf.thres,
-                       verbose = verbose, gamma = gamma, kmin = kmin, ...)
+   if (seg.algo == "aspcf"){
+      BAF = data.frame(chrom = chromosome,
+                       pos = seqz.baf$position,
+                       s1 = seqz.baf$Bf)
+      allele.seg <- copynumber::aspcf(logR = logR.wins, BAF = BAF, baf.thres = baf.thres,
+                          verbose = verbose, gamma = gamma, kmin = kmin, ...)
+   } else if (seg.algo == "pcf") {
+      allele.seg <- copynumber::pcf(data = logR.wins, verbose = verbose,
+                                    gamma = gamma, kmin = kmin, ...)
+   } else {
+      stop("Supported segmentation algorithms are only \'aspcf\' or \'pcf\' from the copynumber package.")
+   }
     if (length(grep("chr", seqz.baf$chromosome)) > 0) {
         allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")
     }

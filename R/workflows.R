@@ -1,7 +1,7 @@
 sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80, kmin = 10,
-                             mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
-                             min.reads.baf = 1, max.mut.types = 1, min.type.freq = 0.9,
-                             min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
+                             gamma.pcf = 140, kmin.pcf = 40, mufreq.treshold = 0.10, min.reads = 40,
+                             min.reads.normal = 10, min.reads.baf = 1, max.mut.types = 1,
+                             min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
                              breaks = NULL, breaks.method = "het", weighted.mean = TRUE){
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
@@ -46,9 +46,20 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                    weight = seqz.het$good.reads[het.filt])
          if (is.null(breaks.all)){
             if (breaks.method.i == "full") {
-               breaks <- try(find.breaks(seqz.data, gamma = gamma, 
+               breaks <- find.breaks(seqz.data, gamma = gamma.pcf, 
+                                     kmin = kmin.pcf, seg.algo = "pcf")
+               breaks.het <- try(find.breaks(seqz.het, gamma = gamma, 
                                          kmin = kmin, baf.thres = c(0, 0.5)),
                              silent = FALSE)
+               if (!is.null(breaks.het)) {
+                  merged.breaks <- unique(sort(c(breaks$start.pos, breaks$end.pos, breaks.het$start.pos, breaks.het$end.pos)))
+                  merged.breaks <- merged.breaks[diff(merged.breaks) > 1]
+                  merged.start <- merged.breaks
+                  merged.start[-1] <- merged.start[-1]+1
+                  breaks <- data.frame(chrom = unique(breaks$chrom),
+                                       start.pos = merged.start[-(length(merged.start))],
+                                       end.pos = merged.breaks[-1])
+               }
             } else if (breaks.method.i == "het"){
                breaks <- try(find.breaks(seqz.het, gamma = gamma, 
                                          kmin = kmin, baf.thres = c(0, 0.5)),
@@ -72,7 +83,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                not.uniq <- which(breaks$end.pos == c(breaks$start.pos[-1],0))
                breaks$end.pos[not.uniq] <- breaks$end.pos[not.uniq] - 1
             } else {
-               error("The implemented segmentation methods are \'full\', \'het\' and \'fast\'.")
+               stop("The implemented segmentation methods are \'full\', \'het\' and \'fast\'.")
             }
          } else {
             breaks <- breaks.all[breaks.all$chrom == chr, ]
