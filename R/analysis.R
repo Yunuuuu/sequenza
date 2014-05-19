@@ -100,7 +100,7 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
                          weight = rep.int( x = 1, times = length(x)), start.coord = 1) {
   weight   <- sqrt(weight)
   overlap  <- as.integer(overlap)
-  window.offset <- window - round(window * (overlap / (overlap + 1)))
+  window.offset <- as.integer(window - round(window * (overlap / (overlap + 1))))
   chr.ordered <- unique(chromosomes)
   data.splitByChr    <- split(data.frame(pos = positions, x = x, weight = weight), 
                               f = factor(chromosomes, levels = chr.ordered))
@@ -109,7 +109,7 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
     if (!is.null(start.coord)) {
       range.pos[1] <- as.integer(start.coord)
     }
-    beam.coords <- seq(range.pos[1], range.pos[2], by = window.offset)
+    beam.coords <- seq.int(range.pos[1], range.pos[2], by = window.offset)
     if (max(beam.coords) != range.pos[2] ) {
       beam.coords <- c(beam.coords, range.pos[2])
     }
