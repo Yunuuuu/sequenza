@@ -147,6 +147,9 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
             max.post   <- model.lik[which.max(model.lik[,4]),]
          }
       }
+      if (is.na(mat[x,]$Bf)) {
+         max.post[2:3] <- NA
+      }
       max.post
    }
    bafs.L           <- mapply(FUN = bayes.fit, rows.x,
