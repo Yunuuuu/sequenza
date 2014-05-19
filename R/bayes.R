@@ -129,8 +129,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
          score.b    <- baf.dbinom(baf = mat[x,]$Bf, depth.t = mat[x,]$weight.Bf, test.baf)
          post.model <- score.r * score.b
       } else {
-         # factor of 1e-12 to penalise segments with no BAF
-         post.model <- score.r * 1e-12         
+         post.model <- score.r         
       }
 
       post.model[post.model == 0] <- min.offset
