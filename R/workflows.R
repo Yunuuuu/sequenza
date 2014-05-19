@@ -1,7 +1,7 @@
 sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80, kmin = 10,
-                             mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
-                             min.reads.baf = 1, max.mut.types = 1, min.type.freq = 0.9,
-                             min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
+                             gamma.pcf = 140, kmin.pcf = 40, mufreq.treshold = 0.10, min.reads = 40,
+                             min.reads.normal = 10, min.reads.baf = 1, max.mut.types = 1,
+                             min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
                              breaks = NULL, breaks.method = "het", weighted.mean = TRUE){
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
@@ -46,9 +46,15 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                    weight = seqz.het$good.reads[het.filt])
          if (is.null(breaks.all)){
             if (breaks.method.i == "full") {
-               breaks <- try(find.breaks(seqz.data, gamma = gamma, 
+               breaks <- find.breaks(seqz.data, gamma = gamma.pcf, 
+                                     kmin = kmin.pcf, seg.algo = "pcf")
+               breaks.het <- try(find.breaks(seqz.het, gamma = gamma, 
                                          kmin = kmin, baf.thres = c(0, 0.5)),
                              silent = FALSE)
+               if (!is.null(breaks.het)) {
+                  # merging the two breaks here
+                  print("TODO, merge breaks")
+               }
             } else if (breaks.method.i == "het"){
                breaks <- try(find.breaks(seqz.het, gamma = gamma, 
                                          kmin = kmin, baf.thres = c(0, 0.5)),
