@@ -52,8 +52,13 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                          kmin = kmin, baf.thres = c(0, 0.5)),
                              silent = FALSE)
                if (!is.null(breaks.het)) {
-                  # merging the two breaks here
-                  print("TODO, merge breaks")
+                  merged.breaks <- unique(sort(c(breaks$start.pos, breaks$end.pos, breaks.het$start.pos, breaks.het$end.pos)))
+                  merged.breaks <- merged.breaks[diff(merged.breaks) > 1]
+                  merged.start <- merged.breaks
+                  merged.start[-1] <- merged.start[-1]+1
+                  breaks <- data.frame(chrom = unique(breaks$chrom),
+                                       start.pos = merged.start[-(length(merged.start))],
+                                       end.pos = merged.breaks[-1])
                }
             } else if (breaks.method.i == "het"){
                breaks <- try(find.breaks(seqz.het, gamma = gamma, 
