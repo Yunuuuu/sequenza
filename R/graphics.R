@@ -290,6 +290,7 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
    abs.list     <- mapply(cbind, seg.list, seg.pos, SIMPLIFY = FALSE)
    abs.segments <- do.call(rbind, abs.list)
    if (info.type == "AB") {
+      abs.segments <- na.exclude(abs.segments)
       plot(x = c(min(abs.segments$abs.start), max(abs.segments$abs.end)),
            y = c(-0.1, (max(abs.segments$A)+0.1)), type = "n",
            ylab = "Copy number", xlab = "Position (Mb)",
