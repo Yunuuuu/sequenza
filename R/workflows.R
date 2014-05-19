@@ -78,7 +78,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                not.uniq <- which(breaks$end.pos == c(breaks$start.pos[-1],0))
                breaks$end.pos[not.uniq] <- breaks$end.pos[not.uniq] - 1
             } else {
-               error("The implemented segmentation methods are \'full\', \'het\' and \'fast\'.")
+               stop("The implemented segmentation methods are \'full\', \'het\' and \'fast\'.")
             }
          } else {
             breaks <- breaks.all[breaks.all$chrom == chr, ]
