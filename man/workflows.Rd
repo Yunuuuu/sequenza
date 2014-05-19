@@ -10,10 +10,11 @@
 
 \usage{
   sequenza.extract(file, gz = TRUE, window = 1e6, overlap = 1, gamma = 80,
-                   kmin = 10, mufreq.treshold = 0.10, min.reads = 40,
-                   min.reads.normal = 10, min.reads.baf = 1, max.mut.types = 1,
-                   min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE,
-                   chromosome.list = NULL, weighted.mean = TRUE)
+                   kmin = 10, gamma.pcf = 140, kmin.pcf = 40, mufreq.treshold = 0.10,
+                   min.reads = 40, min.reads.normal = 10, min.reads.baf = 1,
+                   max.mut.types = 1, min.type.freq = 0.9, min.fw.freq = 0,
+                   verbose = TRUE, chromosome.list = NULL, breaks = NULL,
+                   breaks.method = "het",weighted.mean = TRUE)
 
   sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
                mufreq.treshold = 0.10, XY = c(X = "X", Y = "Y"),
@@ -34,6 +35,9 @@
   \item{window}{size of windows used when plotting mean and quartile ranges of depth ratios and B-allele frequencies. Smaller windows will take more time to compute.}
   \item{overlap}{integer specifying the number of overlapping windows.}
   \item{gamma, kmin}{arguments passed to \code{\link{aspcf}} from the \pkg{copynumber} package.}
+  \item{gamma.pcf, kmin.pcf}{arguments passed to \code{\link{pcf}} from the \pkg{copynumber} package. The arguments are effective only when \code{breaks.method} is set to "full".}
+  \item{breaks}{Optional data.frame in the format chrom, start.pos, end.pos, defining a pre-existing segmentation. When the argument is set the built-in segmentation will be skipped in favor of the suggested breaks.}
+  \item{breaks.method}{Argument indicating the resolution of the segmentation. Possible values are \code{fast}, \code{het} and \code{full}, where \code{fast} allows the lower resolution and \code{full} the higher. Custom values of \code{gamma} and \code{kmin} need to be adjusted to have optimal results.}
   \item{mufreq.treshold}{mutation frequency threshold.}
   \item{min.reads}{minimum number of reads above the quality threshold to accept the mutation call.}
   \item{min.reads.normal}{minimum number of reads used to determine the genotype in the normal sample.}
