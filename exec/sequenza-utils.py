@@ -89,7 +89,7 @@ def pileup_partial_split(pileup_line):
 
 class multiPileups:
    '''
-   Definig an iterable object merging two pilups
+   Definig an iterable object merging two pileups
    '''
    def __init__(self, p1, p2):
       self.p1 = p1
@@ -130,11 +130,9 @@ class multiPileups:
          except StopIteration:
             going_on = False
             raise StopIteration
-   '''
    def close(self):
       self.p1.close()
       self.p2.close()
-   '''
    def __iter__(self):
       return (iter(self.next, self._sentinel))
 
@@ -161,7 +159,7 @@ def next_gcfile(self):
 
 class GCmultiPileups:
    '''
-   Add GC-content to the pilup, and still make an iterable object
+   Add GC-content to the pileup, and still make an iterable object
    '''
    def __init__(self,multiPileups,gc):
       self.gc          = gc
@@ -188,11 +186,58 @@ class GCmultiPileups:
                self.pile_line = self.mpileup.next()
             else:
                self = next_gcfile(self)
-   '''
    def close(self):
       self.mpileup.close()
       self.gc.close()
+   def __iter__(self):
+      return (iter(self.next, self._sentinel))
+
+class GCmultiPileupsAltDepth:
    '''
+   Add alternative depth to the GCpileup, and again, keep it iterable
+   '''
+   def __init__(self,GCmultiPileups,p2):
+      self.mpileup = GCmultiPileups
+      self.p2      = p2
+      self._last_chromosome = None
+   _sentinel        = object()
+   def next(self):
+      self.pile_line = self.mpileup.next()
+      try:
+         chromosome2, position2, line2 = pileup_partial_split(self.p2.next())
+      except ValueError:
+         raise StopIteration
+      if self.pile_line[0] == chromosome2:
+         self._last_chromosome = self.pile_line[0]
+      going_on = True
+      while going_on:
+         '''
+         If one of the files ever finish it would rise StopIteration
+         and it would stop the iteration cleanly
+         '''
+         try:
+            if self.pile_line[0] == chromosome2:
+               self._last_chromosome = self.pile_line[0]
+               if self.pile_line[1] == position2:
+                  ref2, depth2, line2 = line2.split('\t', 2)
+                  self.pile_line.append(depth2.strip())
+                  return self.pile_line
+                  going_on = False
+               elif self.pile_line[1] > position2:
+                  chromosome2, position2, line2 = pileup_partial_split(self.p2.next())
+               elif self.pile_line[1] < position2:
+                  self.pile_line = self.mpileup.next()
+            else:
+               if self.pile_line[0] != self._last_chromosome:
+                  chromosome2, position2, line2 = pileup_partial_split(self.p2.next())
+               else:
+                  self.pile_line = self.mpileup.next()
+         except StopIteration:
+            going_on = False
+            raise StopIteration
+   def close(self):
+      self.mpileup.close()
+      self.p2.close()
    def __iter__(self):
       return (iter(self.next, self._sentinel))
 
@@ -320,14 +365,17 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
       sys.exit('Something went wrong on the block counting!!')
 
 
-def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=0.35):
+def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=0.35, alt_pileup=False):
    '''
    After the 3 files are syncronized we need to transform the pileup in a
    readable format, find the alleles, and compute the allele frequency in tumor
    '''
    if line:
       bases_list = ['A', 'C', 'G', 'T']
-      chromosome, position, ref, p1_str, p2_str, gc = line
+      if alt_pileup:
+         chromosome, position, ref, p1_str, p2_str, gc, alt_depth = line
+      else:
+         chromosome, position, ref, p1_str, p2_str, gc = line
       p1_list = p1_str.split()
       p2_list = p2_str.split()
       if int(p1_list[0]) + int(p2_list[0]) >= depth_sum and len(p1_list) == len(p2_list):
@@ -354,8 +402,11 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                      strands_bases = [str(bases_list[ll])+str(round(p2_mu[6][ll]/float(p2_mu[2+ll]), 3)) for ll in no_zero_idx if ll != i]
                      strands_bases = ":".join(map(str, strands_bases))
                   #homoz_p2 = p2_mu[2 + i]/sum_p2
-                  # chromosome, n_base, base_ref, depth_normal, depth_sample, depth.ratio, Af, Bf, zygosity.normal, GC-content, percentage reads above quality, AB.ref, AB.tum
-                  line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(homoz_p2, 3), 0, 'hom', gc, int(sum_p2), bases_list[i], no_zero_bases, strands_bases]
+                  # chromosome, n_base, base_ref, depth_normal, depth_sample, depth.ratio, Af, Bf, zygosity.normal, GC-content, reads above quality, AB.ref, AB.tum, percentage AB.tum in fw
+                  if alt_pileup:
+                     line_out = [chromosome, position, p1_mu[0], alt_depth, p2_mu[1], round(p2_mu[1]/float(alt_depth), 3), round(homoz_p2, 3), 0, 'hom', gc, int(sum_p2), bases_list[i], no_zero_bases, strands_bases]
+                  else:
+                     line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(homoz_p2, 3), 0, 'hom', gc, int(sum_p2), bases_list[i], no_zero_bases, strands_bases]
                   return line_out
                else:
                   pass
@@ -375,10 +426,16 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                         het_a_p2 = p2_mu[2 + i]/sum_p2
                         het_b_p2 = p2_mu[2 + ii]/sum_p2
                         if  het_a_p2 >= het_b_p2:
-                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
+                           if alt_pileup:
+                              line_out = [chromosome, position, p1_mu[0], alt_depth, p2_mu[1], round(p2_mu[1]/float(alt_depth), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
+                           else:
+                              line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
                            return line_out
                         elif het_a_p2 < het_b_p2:
-                           line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[ii]+bases_list[i], ".", "0"]
+                           if alt_pileup:
+                              line_out = [chromosome, position, p1_mu[0], alt_depth, p2_mu[1], round(p2_mu[1]/float(alt_depth), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[ii]+bases_list[i], ".", "0"]
+                           else:
+                              line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[ii]+bases_list[i], ".", "0"]
                            return line_out
                   else:
                      pass
@@ -595,6 +652,8 @@ def pileup2seqz(parser, subparser):
                    help='The pileup of the tumor sample')
    parser_ABinput.add_argument('-gc', dest = 'gc', metavar = 'gc', required = True,
                    help='The GC-content file coming from UCSC genome browser, or generated in the same UCSC format')
+   parser_ABinput.add_argument('-n2', '--normal2', dest = 'normal2', type = str, default = None,
+                   help='EXPERIMENTAL: Optional pileup used only to cumpute the depth.normal and depth-ratio, instead of \"normal\"')
    parser_ABqualitysets.add_argument('-q', '--qlimit', dest = 'qlimit', default = 20, type = int,
                    help='Minimum nucleotide quality score for consider in the counts. Default 20.')
    parser_ABqualitysets.add_argument('-f', '--qformat', dest = 'qformat', default = "sanger",
@@ -696,24 +755,45 @@ def main():
             p1 = args.normal
             p2 = args.tumor
             gc = args.gc
+            n2 = args.normal2
             stream_mpileup = IterableQueue()
-            line_worker_partial = partial(line_worker, depth_sum=args.n, qlimit=args.qlimit, qformat=args.qformat, hom_t=args.hom, het_t=args.het)
-            with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file:
-               pup = multiPileups(normal,tumor)
-               pup = GCmultiPileups(pup, gc_file)
-               fileout.write("\t".join(out_header) + '\n')
-               if args.chunk > 1 or args.nproc > 0:
-                  #p = ThreadPool(processes=args.nproc)
-                  p = multiprocessing.Pool(processes=args.nproc)
-                  for res in p.imap(line_worker_partial, pup,chunksize=args.chunk):
-                     #for res in results.get(99):
-                     if res:
-                        fileout.write('\t'.join(map(str,res))+'\n')
-               else:
-                  for line in pup:
-                     res = line_worker_partial(line)
-                     if res:
-                        fileout.write('\t'.join(map(str,res))+'\n')
+            if not n2:
+               line_worker_partial = partial(line_worker, depth_sum=args.n, qlimit=args.qlimit, qformat=args.qformat, hom_t=args.hom, het_t=args.het)
+               with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file:
+                  pup = multiPileups(normal,tumor)
+                  pup = GCmultiPileups(pup, gc_file)
+                  fileout.write("\t".join(out_header) + '\n')
+                  if args.chunk > 1 or args.nproc > 0:
+                     #p = ThreadPool(processes=args.nproc)
+                     p = multiprocessing.Pool(processes=args.nproc)
+                     for res in p.imap(line_worker_partial, pup,chunksize=args.chunk):
+                        #for res in results.get(99):
+                        if res:
+                           fileout.write('\t'.join(map(str,res))+'\n')
+                  else:
+                     for line in pup:
+                        res = line_worker_partial(line)
+                        if res:
+                           fileout.write('\t'.join(map(str,res))+'\n')
+            else:
+               line_worker_partial = partial(line_worker, depth_sum=args.n, qlimit=args.qlimit, qformat=args.qformat, hom_t=args.hom, het_t=args.het, alt_pileup=True) 
+               with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file, xopen(n2, 'rb') as alt_normal:
+                  pup = multiPileups(normal,tumor)
+                  pup = GCmultiPileups(pup, gc_file)
+                  pup = GCmultiPileupsAltDepth(pup, alt_normal)
+                  fileout.write("\t".join(out_header) + '\n')
+                  if args.chunk > 1 or args.nproc > 0:
+                     #p = ThreadPool(processes=args.nproc)
+                     p = multiprocessing.Pool(processes=args.nproc)
+                     for res in p.imap(line_worker_partial, pup,chunksize=args.chunk):
+                        #for res in results.get(99):
+                        if res:
+                           fileout.write('\t'.join(map(str,res))+'\n')
+                  else:
+                     for line in pup:
+                        res = line_worker_partial(line)
+                        if res:
+                           fileout.write('\t'.join(map(str,res))+'\n')
 
 
       elif used_module == "GC-windows":
