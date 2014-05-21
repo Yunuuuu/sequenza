@@ -685,7 +685,7 @@ def merge_pileups(parser, subparser):
    return parser.parse_args()
 
 def reduce_seqz(parser, subparser):
-   subparser.add_argument('-a', '--seqz', dest = 'seqz', required = True,
+   subparser.add_argument('-s', '--seqz', dest = 'seqz', required = True,
                    help='An seqz file from the pileup2seqz function.')
    subparser.add_argument('-w', '--window', dest = 'w', type = int, default = 50,
                    help='Window size used to binning the original seqz file. Default is 50.')
