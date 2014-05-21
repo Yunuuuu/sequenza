@@ -288,6 +288,8 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
       qlimit = qlimit + 33
    elif qformat == 'illumina':
       qlimit = qlimit + 64
+   else:
+      sys.exit("Supported quality format are only \"illumina\" and \"sanger\"(default).")
    quality      = quality.strip()
    block = {'seq':'','length':0}
    start     = False
