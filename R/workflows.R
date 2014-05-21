@@ -104,12 +104,17 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
          seqz.b.win[[1]] <- data.frame(start = min(seqz.data$position, na.rm = TRUE),
                                       end = max(seqz.data$position, na.rm = TRUE), mean = 0.5,
                                       q0 = 0.5,  q1 = 0.5, N = 1)
+         if (breaks.method == "full") {
+            breaks <- find.breaks(seqz.data, gamma = gamma.pcf, 
+                                  kmin = kmin.pcf, seg.algo = "pcf")
+         } else {
+            breaks = data.frame(chrom = chr,
+                                start.pos = min(seqz.data$position, na.rm = TRUE),
+                                end.pos = max(seqz.data$position, na.rm = TRUE))
+         }
          seg.s1 <- segment.breaks(seqz.data,
-                                  breaks = data.frame(chrom = chr,
-                                                      start.pos = min(seqz.data$position, na.rm = TRUE),
-                                                      end.pos = max(seqz.data$position, na.rm = TRUE)),
+                                  breaks = breaks,
                                   weighted.mean = weighted.mean)
-                                  
       }
       mut.tab   <- mutation.table(seqz.data, mufreq.treshold = mufreq.treshold,
                                   min.reads = min.reads, min.reads.normal = min.reads.normal,
