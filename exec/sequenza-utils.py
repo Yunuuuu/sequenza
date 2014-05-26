@@ -89,7 +89,7 @@ def pileup_partial_split(pileup_line):
 
 class multiPileups:
    '''
-   Definig an iterable object merging two pileups
+   Define an iterable object merging two pileups
    '''
    def __init__(self, p1, p2):
       self.p1 = p1
@@ -107,8 +107,8 @@ class multiPileups:
       going_on = True
       while going_on:
          '''
-         If one of the files ever finish it would rise StopIteration
-         and it would stop the iteration cleanly
+         If one of the files finishes, it will raise StopIteration
+         and will stop the iteration cleanly
          '''
          try:
             if chromosome1 == chromosome2:
@@ -155,7 +155,7 @@ def next_gcfile(self):
       if self._chromosome:
          raise StopIteration
       else:
-         sys.exit("Error! The GC-content file is supported as the goldenpath hg19.gc5Base.txt.gz format.")
+         sys.exit("Error: the GC-content file is not in the expected format. See for example http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/gc5Base/ ")
 
 class GCmultiPileups:
    '''
@@ -569,7 +569,7 @@ def seq_map(seq_list):
 def process_gc_from_pipe(in_queue, window_size):
    """
    Process fasta from a multiprocessing.queue and
-   compute the percentage og GC whitin a given window
+   compute the percentage of GC within a given window
    """
    base_counter  = 1
    window_size   = float(window_size)
@@ -620,27 +620,27 @@ class DefaultHelpParser(argparse.ArgumentParser):
 
 def pileup2acgt(parser, subparser):
    subparser.add_argument('pileup', metavar='pileup',
-                   help='pileup (SAMtools) file in input, if a gzipped file will be selected it will be opened in gzip mode, if file name is - it would be loaded from STDIN.')
+                   help='Name of the input pileup (SAMtools) file. If the filename ends in .gz it will be opened in gzip mode. If the file name is - it will be read from STDIN.')
    subparser.add_argument('-n', dest='n', type=int,
-                   help='The minimum read depth on the base to consider the mutation on it.')
-   parser_pup2muoutput      = subparser.add_argument_group(title='Output', description='Argument that involve the output destination.')
+                   help='The minimum read depth on a base required to make a mutation call.')
+   parser_pup2muoutput      = subparser.add_argument_group(title='Output', description='Arguments that involve the output destination.')
    parser_pup2muoutput.add_argument('-o', '--output', dest='output', type = str, default = '-',
-                       help='Destination of the output file. To use gzip compression name the file ending by .gz. (default STDOUT).')
+                       help='Name of the output file. To use gzip compression name the file ending in .gz. (default STDOUT).')
    parser_pup2muoutput.add_argument('--quiet', dest='quiet', action="store_true",
-                       help='Do not output additional debugging.')
-   parser_pup2muperformance = subparser.add_argument_group(title='Performance', description='Argument that can effect the performance.')
+                       help='Do not output additional debugging information.')
+   parser_pup2muperformance = subparser.add_argument_group(title='Performance', description='Arguments that can effect the performance.')
    parser_pup2muperformance.add_argument('-p', '--processes', dest='nproc', default="0", type=int,
-                   help='Set the number of processes to split the parsing job. If it is set to 0 (default), the job will occurs with no forking to other processes. If it is bigger then 0 it is more efficient with an adequate chunk size, otherwise with smaller chuncks (eg.: < 1000) it will loose performance.')
+                   help='Set the number of processes to split the parsing job. If set to 0 (default), the job will occur with no forking to other processes.')
    parser_pup2muperformance.add_argument('-c', '--chunk', dest='chunk', default="0", type=int,
-                   help='Set the size (number of lines) of the portion of the file to assign to each process. If is set to 0 (default) wil set to default also the --processes parameter (-p 0). An adequate chunk size defends on the number of processes and on the file size (chunk size bigger then total number of line is not good). However a chunk size ~ 1000 leads to better performance.')
+                   help='Set the number of input lines to assign to each process, if NPROC > 0. (Default = 1000)')
    parser_pup2muqualitysets = subparser.add_argument_group(title='Quality and Format', description='Argument that change the quality threshold or the quality format.')
    parser_pup2muqualitysets.add_argument('-q', '--qlimit', dest='qlimit', default=20,type=int,
-                   help='Minimum nucleotide quality score for consider in the counts.')
+                   help='Minimum nucleotide quality score for inclusion in the counts.')
    parser_pup2muqualitysets.add_argument('-f', '--qformat', dest='qformat', default="sanger",
-                   help='Quality format, options are sanger or illumina, it will add an offset of 33 or 64 respectively to the qlimit value.')
+                   help='Quality format, options are "sanger" or "illumina". This will add an offset of 33 or 64 respectively to the qlimit value.')
    parser_pup2muinfo        = subparser.add_argument_group(title='Info',description='Other Information.')
    parser_pup2muinfo.add_argument('-v', '--version', action="version", version='%(prog)s version: ' + VERSION + ". " + DATE,
-                   help='Just display the version information and exit.')
+                   help='Display the version information and exit.')
    return parser.parse_args()
 
 def pileup2seqz(parser, subparser):
@@ -649,17 +649,17 @@ def pileup2seqz(parser, subparser):
    parser_ABperformance = subparser.add_argument_group(title='Performance', description='Options affecting the performance.')
    parser_ABqualitysets = subparser.add_argument_group(title='Quality and Format', description='Options that change the quality threshold and format.')
    parser_ABinput.add_argument('-n', '--normal', dest = 'normal', required = True,
-                   help='The pileup of the reference/normal sample')
+                   help='Name of the pileup file from the reference/normal sample')
    parser_ABinput.add_argument('-t', '--tumor', dest = 'tumor', required = True,
-                   help='The pileup of the tumor sample')
+                   help='Name of the pileup file from the tumor sample')
    parser_ABinput.add_argument('-gc', dest = 'gc', metavar = 'gc', required = True,
                    help='The GC-content file coming from UCSC genome browser, or generated in the same UCSC format')
    parser_ABinput.add_argument('-n2', '--normal2', dest = 'normal2', type = str, default = None,
-                   help='EXPERIMENTAL: Optional pileup used only to cumpute the depth.normal and depth-ratio, instead of \"normal\"')
+                   help='EXPERIMENTAL: Optional pileup used only to compute the depth.normal and depth-ratio, instead of \"normal\"')
    parser_ABqualitysets.add_argument('-q', '--qlimit', dest = 'qlimit', default = 20, type = int,
-                   help='Minimum nucleotide quality score for consider in the counts. Default 20.')
+                   help='Minimum nucleotide quality score for inclusion in the counts. Default 20.')
    parser_ABqualitysets.add_argument('-f', '--qformat', dest = 'qformat', default = "sanger",
-                   help='Quality format, options are sanger or illumina, it will add an offset of 33 or 64 respectively to the qlimit value. Default "sanger".')
+                   help='Quality format, options are "sanger" or "illumina". This will add an offset of 33 or 64 respectively to the qlimit value. Default "sanger".')
    parser_ABqualitysets.add_argument('-N', dest = 'n', type = int, default = 20,
                    help='Threshold to filter positions by the sum of read depth of the two samples. Default 20.')
    parser_ABgenotype.add_argument('--hom', dest = 'hom', type = float, default = 0.9,
@@ -667,7 +667,7 @@ def pileup2seqz(parser, subparser):
    parser_ABgenotype.add_argument('--het', dest = 'het', type = float, default = 0.25,
                    help='Threshold to select heterozygous positions. Default 0.25.')
    parser_ABperformance.add_argument('-p', '--processes', dest='nproc', default="0", type=int,
-                   help='Set the number of processes to split the genotyping. If it is set to 0 (default), the job will occurs with no forking to other processes. If it is bigger then 0 it is more efficient with an adequate chunk size, otherwise with smaller chunks (eg.: < 1000) it will loose performance. Default 0')
+                   help='Set the number of processes to split the genotyping. If set to 0 (default), the job will occur with no forking to other processes. If it is bigger then 0 it is more efficient with an adequate chunk size, otherwise with smaller chunks (eg.: < 1000) it will loose performance. Default 0')
    parser_ABperformance.add_argument('-c', '--chunk', dest='chunk', default="1", type=int,
                    help='Set the number of lines to assign to each process. If is set to 1 (default) will set to default also the --processes parameter (-p 0). An adequate chunk size defends on the number of processes and on the file size (chunk size bigger then total number of line is not good). However a chunk size ~ 1000 leads to better performance. Default 1.')
    return parser.parse_args()
@@ -681,16 +681,16 @@ def GC_windows(parser, subparser):
 
 def merge_pileups(parser, subparser):
    subparser.add_argument('-1', '--pileup1', dest = 'p1', required = True,
-                   help='The first pileup')
+                   help='Name of the first pileup file')
    subparser.add_argument('-2', '--pileup2', dest = 'p2', required = True,
-                   help='The second pileup, will show as the last columns set')
+                   help='Name of the second pileup, will show as the last columns set')
    return parser.parse_args()
 
 def reduce_seqz(parser, subparser):
    subparser.add_argument('-s', '--seqz', dest = 'seqz', required = True,
                    help='An seqz file from the pileup2seqz function.')
    subparser.add_argument('-w', '--window', dest = 'w', type = int, default = 50,
-                   help='Window size used to binning the original seqz file. Default is 50.')
+                   help='Window size used for binning the original seqz file. Default is 50.')
    return parser.parse_args()
 
 def main():
@@ -698,15 +698,15 @@ def main():
    Execute the function with args
    '''
    parser = DefaultHelpParser(prog = __file__, formatter_class=lambda prog: SubcommandHelpFormatter(prog, max_help_position=20, width=75),
-                              description='This script is part of Sequenza http://www.cbs.dtu.dk/biotools/sequenza/ \n Sequenza Utils is an ensemble of tools capable of perform various tasks, primarily aimed to convert bam/pileup files to a format usable by the sequenza R package.',
-                              usage= '%(prog)s module [options]', epilog = 'This is version {0} - Francesco Favero - {1}'.format(VERSION, DATE))
+                              description='\nsequenza-utils.py \nThis script is part of Sequenza http://www.cbs.dtu.dk/biotools/sequenza/ \n\nSequenza Utils is a set of tools to perform various tasks, primarily aimed to convert bam/pileup files to a format usable by the sequenza R package.',
+                              usage= 'sequenza-utils.py command [options]', epilog = 'This is version {0} - Francesco Favero - {1}'.format(VERSION, DATE))
    subparsers = parser.add_subparsers(dest='module')
    subparsers.metavar = None
-   parser_pileup2seqz  = subparsers.add_parser('pileup2seqz', help = ' given a paired set of pileup (normal and matching tumor), and GC-content genome-wide information returns the common positions with A and B alleles frequencies',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=39, width=90))
-   parser_reduce_seqz = subparsers.add_parser('seqz-binning', help = 'Binning the seqz file to reduce file size and memory requirement for the analysis.')
-   parser_pup2mu = subparsers.add_parser('pileup2acgt', help = 'convert pileup format to ACGT format',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=30, width=90))
-   parser_gc_window  = subparsers.add_parser('GC-windows', help = 'Given a fasta file and a window size it computes the GC percentage across the sequences, and returns a file in the same format as gc5Base from UCSC')
-   parser_merge_pileups = subparsers.add_parser('merge-pileups', help = 'Merging two pileups, it finds the common positions and return an mpileup file adding the second pilep as last 3 columns.')
+   parser_pileup2seqz  = subparsers.add_parser('pileup2seqz', help = 'Process a paired set of pileup files (tumor and matching normal), and GC-content genome-wide information, to extract the common positions with A and B alleles frequencies',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=39, width=90))
+   parser_reduce_seqz = subparsers.add_parser('seqz-binning', help = 'Perform binning of the seqz file to reduce file size and memory requirement for the analysis.')
+   parser_pup2mu = subparsers.add_parser('pileup2acgt', help = 'Convert pileup format to ACGT format',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=30, width=90))
+   parser_gc_window  = subparsers.add_parser('GC-windows', help = 'Compute the average GC content in sliding windows from a fasta file, output in the same format as gc5Base from UCSC')
+   parser_merge_pileups = subparsers.add_parser('merge-pileups', help = 'Merge two pileups by finding the common positions, and return an mpileup file adding the second pileup as the last 3 columns.')
    try:
       used_module =  sys.argv[1]
       if used_module == "pileup2acgt":
@@ -724,7 +724,7 @@ def main():
                logging.warning("Converting " + args.pileup + " -- size = %0.1f MB --" % file_size + " to ACGT..." )
             else:
                logging.warning("Converting " + args.pileup + " from STDIN to ACGT..." )
-            logging.warning("Using chunks of " + str(args.chunk) + " line(s), and splitting the job in " + str(args.nproc+1)  + " process(es).")
+            logging.warning("Using chunks of " + str(args.chunk) + " line(s), and splitting the job into " + str(args.nproc+1)  + " process(es).")
          with xopen(args.output, "wb") as fileout:
             with xopen(args.pileup, "rb") as f:
                fileout.write('chr' + "\t" + 'n_base' + "\t" + 'ref_base' + "\t" +  'read.depth' + "\t" + 'A' + "\t" + 'C' + "\t" + 'G' + "\t" + 'T' + "\t" + "strand" + '\n')
