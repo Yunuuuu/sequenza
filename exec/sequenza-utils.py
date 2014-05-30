@@ -631,7 +631,7 @@ def pileup2acgt(parser, subparser):
    parser_pup2muperformance = subparser.add_argument_group(title='Performance', description='Arguments that can effect the performance.')
    parser_pup2muperformance.add_argument('-p', '--processes', dest='nproc', default="0", type=int,
                    help='Set the number of processes to split the parsing job. If set to 0 (default), the job will occur with no forking to other processes.')
-   parser_pup2muperformance.add_argument('-c', '--chunk', dest='chunk', default="0", type=int,
+   parser_pup2muperformance.add_argument('-c', '--chunk', dest='chunk', default="1000", type=int,
                    help='Set the number of input lines to assign to each process, if NPROC > 0. (Default = 1000)')
    parser_pup2muqualitysets = subparser.add_argument_group(title='Quality and Format', description='Argument that change the quality threshold or the quality format.')
    parser_pup2muqualitysets.add_argument('-q', '--qlimit', dest='qlimit', default=20,type=int,
@@ -667,9 +667,9 @@ def pileup2seqz(parser, subparser):
    parser_ABgenotype.add_argument('--het', dest = 'het', type = float, default = 0.25,
                    help='Threshold to select heterozygous positions. Default 0.25.')
    parser_ABperformance.add_argument('-p', '--processes', dest='nproc', default="0", type=int,
-                   help='Set the number of processes to split the genotyping. If set to 0 (default), the job will occur with no forking to other processes. If it is bigger then 0 it is more efficient with an adequate chunk size, otherwise with smaller chunks (eg.: < 1000) it will loose performance. Default 0')
-   parser_ABperformance.add_argument('-c', '--chunk', dest='chunk', default="1", type=int,
-                   help='Set the number of lines to assign to each process. If is set to 1 (default) will set to default also the --processes parameter (-p 0). An adequate chunk size defends on the number of processes and on the file size (chunk size bigger then total number of line is not good). However a chunk size ~ 1000 leads to better performance. Default 1.')
+                   help='Set the number of processes to split the parsing job. If set to 0 (default), the job will occur with no forking to other processes.')
+   parser_ABperformance.add_argument('-c', '--chunk', dest='chunk', default="1000", type=int,
+                   help='Set the number of input lines to assign to each process, if NPROC > 0. (Default = 1000)')
    return parser.parse_args()
 
 def GC_windows(parser, subparser):
