@@ -151,7 +151,7 @@ This binning decreases the memory requirement to load the data into R, and it al
 
 \begin{lstlisting}[style=BashInputStyle]
    sequenza-utils.py seqz-binning -w  50 \
-                                  -a out.seqz.gz | gzip > out_small.seqz.gz
+                                  -s out.seqz.gz | gzip > out_small.seqz.gz
 \end{lstlisting}
 
 Where the parameter \textit{-w} indicate a window size (in bases), to be used for the binning. The heterozygous positions and the positions carrying variant calls remain untouched. 
