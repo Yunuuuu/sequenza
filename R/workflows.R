@@ -271,25 +271,26 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    }
    write.table(seg.res, file = segs.file,
                col.names = TRUE, row.names = FALSE, sep = "\t")   
-
-   mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy], CNt.max = CNt.max,
-                            depth.ratio = mut.tab$adjusted.ratio[!mut.is.xy],
-                            cellularity = cellularity, ploidy = ploidy,
-                            avg.depth.ratio = avg.depth.ratio, CNn = 2)
-   mut.res     <- cbind(mut.tab[!mut.is.xy, ], mut.alleles)
-   if (!female){
-      if (sum(mut.is.xy) >= 1) {
-         mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[mut.is.xy], CNt.max = CNt.max,
-                                  depth.ratio = mut.tab$adjusted.ratio[mut.is.xy],
-                                  cellularity = cellularity, ploidy = ploidy,
-                                  avg.depth.ratio = avg.depth.ratio, CNn = 1)
-         mut.xy     <- cbind(mut.tab[mut.is.xy, ], mut.alleles)
-         mut.res    <- rbind(mut.res, mut.xy)
+   if(nrow(mut.tab) > 0) {
+      cat(mut.tab[1,])
+      mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy], CNt.max = CNt.max,
+                               depth.ratio = mut.tab$adjusted.ratio[!mut.is.xy],
+                               cellularity = cellularity, ploidy = ploidy,
+                               avg.depth.ratio = avg.depth.ratio, CNn = 2)
+      mut.res     <- cbind(mut.tab[!mut.is.xy, ], mut.alleles)
+      if (!female){
+         if (sum(mut.is.xy) >= 1) {
+            mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[mut.is.xy], CNt.max = CNt.max,
+                                     depth.ratio = mut.tab$adjusted.ratio[mut.is.xy],
+                                     cellularity = cellularity, ploidy = ploidy,
+                                     avg.depth.ratio = avg.depth.ratio, CNn = 1)
+            mut.xy     <- cbind(mut.tab[mut.is.xy, ], mut.alleles)
+            mut.res    <- rbind(mut.res, mut.xy)
+         }
       }
-   }
-   write.table(mut.res, file = muts.file,
-               col.names = TRUE, row.names = FALSE, sep = "\t")   
-   
+      write.table(mut.res, file = muts.file,
+                  col.names = TRUE, row.names = FALSE, sep = "\t")   
+   }   
    pdf(chrw.file)
    for (i in unique(seg.res$chromosome)) {
       
@@ -307,7 +308,9 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    }
    dev.off()
    pdf(geno.file, height = 5, width = 15)
-      genome.view(seg.res)
+      if (sum(!is.na(seg.res$A)) > 0 ) {
+         genome.view(seg.res)
+      }
       genome.view(seg.res, "CN")
    dev.off()
    barscn <- data.frame(size = seg.res$end.pos - seg.res$start.pos,
