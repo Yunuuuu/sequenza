@@ -69,16 +69,18 @@ VarScan2seqz <- function(varscan.somatic, varscan.copynumber = NULL) {
    idx <- zygosity.normal == 'het'
    Bf[idx] <- 1 - Af[idx]
    idx <- zygosity.normal == 'hom' & varscan.somatic$somatic_status == 'Somatic'
-   mut.b <- cbind(as.character(iupac.nucs[varscan.somatic$tumor_gt[idx]]),
-                as.character(varscan.somatic$normal_gt[idx]))
-   mut.b <- sapply(X = 1:sum(idx),
-                 FUN = function(x) gsub(x = mut.b[x, 1],
+   if (sum(idx) > 0) {
+      mut.b <- cbind(as.character(iupac.nucs[varscan.somatic$tumor_gt[idx]]),
+                     as.character(varscan.somatic$normal_gt[idx]))
+      mut.b <- sapply(X = 1:sum(idx),
+                      FUN = function(x) gsub(x = mut.b[x, 1],
                                         pattern = mut.b[x, 2],
                                         replacement = ''))
-   mut   <- paste0(mut.b, varscan.somatic$tumor_var_freq[idx])
-   strand[idx]   <- paste0(mut.b,
-                           varscan.somatic$tumor_reads2_plus[idx]/(varscan.somatic$tumor_reads2_plus[idx]+varscan.somatic$tumor_reads2_minus[idx]))
-   AB.tumor[idx] <- mut
+      mut   <- paste0(mut.b, varscan.somatic$tumor_var_freq[idx])
+      strand[idx]   <- paste0(mut.b,
+                              varscan.somatic$tumor_reads2_plus[idx]/(varscan.somatic$tumor_reads2_plus[idx]+varscan.somatic$tumor_reads2_minus[idx]))
+      AB.tumor[idx] <- mut
+   }
    res <- data.frame(chromosome = as.character(varscan.somatic$chrom), position = varscan.somatic$position,
                      base.ref = as.character(varscan.somatic$ref), depth.normal = depth.normal,
                      depth.tumor = depth.tumor, depth.ratio = depth.ratio,
