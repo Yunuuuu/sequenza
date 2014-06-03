@@ -277,7 +277,6 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    write.table(seg.res, file = segs.file,
                col.names = TRUE, row.names = FALSE, sep = "\t")   
    if(nrow(mut.tab) > 0) {
-      cat(mut.tab[1,])
       mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy], CNt.max = CNt.max,
                                depth.ratio = mut.tab$adjusted.ratio[!mut.is.xy],
                                cellularity = cellularity, ploidy = ploidy,
