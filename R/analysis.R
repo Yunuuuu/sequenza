@@ -289,5 +289,6 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
    }
    segments <- do.call(rbind, segments[as.factor(chr.order)])
    row.names(segments) <- 1:nrow(segments)
-   segments
+   len.seg <- (segments$end.pos - segments$start.pos)/1e6
+   segments[(segments$N.ratio/len.seg) >= 2, ]
 }
