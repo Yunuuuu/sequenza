@@ -2,7 +2,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                              gamma.pcf = 140, kmin.pcf = 40, mufreq.treshold = 0.10, min.reads = 40,
                              min.reads.normal = 10, min.reads.baf = 1, max.mut.types = 1,
                              min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
-                             breaks = NULL, breaks.method = "het", weighted.mean = TRUE){
+                             breaks = NULL, breaks.method = "het", assembly = "hg19", weighted.mean = TRUE){
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
    gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
@@ -46,22 +46,27 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                    weight = seqz.het$good.reads[het.filt])
          if (is.null(breaks.all)){
             if (breaks.method.i == "full") {
-               breaks <- find.breaks(seqz.data, gamma = gamma.pcf, 
+               breaks <- find.breaks(seqz.data, gamma = gamma.pcf, assembly = assembly, 
                                      kmin = kmin.pcf, seg.algo = "pcf")
-               breaks.het <- try(find.breaks(seqz.het, gamma = gamma, 
+               breaks.het <- try(find.breaks(seqz.het, gamma = gamma, assembly = assembly,
                                          kmin = kmin, baf.thres = c(0, 0.5)),
                              silent = FALSE)
                if (!is.null(breaks.het)) {
-                  merged.breaks <- unique(sort(c(breaks$start.pos, breaks$end.pos, breaks.het$start.pos, breaks.het$end.pos)))
-                  merged.breaks <- merged.breaks[diff(merged.breaks) > 1]
-                  merged.start <- merged.breaks
-                  merged.start[-1] <- merged.start[-1]+1
-                  breaks <- data.frame(chrom = unique(breaks$chrom),
-                                       start.pos = merged.start[-(length(merged.start))],
-                                       end.pos = merged.breaks[-1])
+                  merge.breaks <- function (breaks, breaks.het) {
+                     merged.breaks <- unique(sort(c(breaks$start.pos, breaks$end.pos, breaks.het$start.pos, breaks.het$end.pos)))
+                     merged.breaks <- merged.breaks[diff(merged.breaks) > 1]
+                     merged.start <- merged.breaks
+                     merged.start[-1] <- merged.start[-1]+1
+                     breaks <- data.frame(chrom = unique(breaks$chrom),
+                                         start.pos = merged.start[-(length(merged.start))],
+                                         end.pos = merged.breaks[-1])
+                  }
+                  chr.p <- merge.breaks(breaks[breaks$arm == "p",], breaks.het[breaks.het$arm == "p",])
+                  chr.q <- merge.breaks(breaks[breaks$arm == "q",], breaks.het[breaks.het$arm == "q",])
+                  breaks <- rbind(chr.p, chr.q)
                }
             } else if (breaks.method.i == "het"){
-               breaks <- try(find.breaks(seqz.het, gamma = gamma, 
+               breaks <- try(find.breaks(seqz.het, gamma = gamma, assembly = assembly,
                                          kmin = kmin, baf.thres = c(0, 0.5)),
                              silent = FALSE)               
             } else if (breaks.method.i == "fast"){
@@ -105,7 +110,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                       end = max(seqz.data$position, na.rm = TRUE), mean = 0.5,
                                       q0 = 0.5,  q1 = 0.5, N = 1)
          if (breaks.method == "full") {
-            breaks <- find.breaks(seqz.data, gamma = gamma.pcf, 
+            breaks <- find.breaks(seqz.data, gamma = gamma.pcf, assembly = assembly,
                                   kmin = kmin.pcf, seg.algo = "pcf")
          } else {
             breaks = data.frame(chrom = chr,
