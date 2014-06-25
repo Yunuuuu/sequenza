@@ -270,20 +270,25 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
       fact.b.i    <- cut(seqz.b.i$position, breaks.vect)
       seg.i.s.r   <- sapply(X = split(seqz.tab[[i]]$chromosome, f = fact.r.i), FUN = length)
       seg.i.s.b   <- sapply(X = split(seqz.b.i$chromosome, f = fact.b.i), FUN = length)
+     
       if (weighted.mean == TRUE){
          seg.i.rw    <- sapply(X = split(seqz.tab[[i]]$rw, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
          seg.i.w.r   <- sapply(X = split(seqz.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
+         seg.i.r.sd  <- sapply(X = split(seqz.tab[[i]]$rw/seqz.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sd(a, na.rm = TRUE))
+         seg.i.b.sd  <- sapply(X = split(seqz.b.i$bw/seqz.b.i$w.b, f = fact.b.i), FUN = function(a) sd(a, na.rm = TRUE))         
          seg.i.bw    <- sapply(X = split(seqz.b.i$bw, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
          seg.i.w.b   <- sapply(X = split(seqz.b.i$w.b, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
          segments.i <- data.frame(chromosome  = names(seqz.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
-                               end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.bw/seg.i.w.b, N.BAF = seg.i.s.b,
-                               depth.ratio = seg.i.rw/seg.i.w.r, N.ratio = seg.i.s.r, stringsAsFactors = FALSE)
+                               end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.bw/seg.i.w.b, N.BAF = seg.i.s.b, sd.BAF = seg.i.b.sd,
+                               depth.ratio = seg.i.rw/seg.i.w.r, N.ratio = seg.i.s.r, sd.ratio = seg.i.r.sd, stringsAsFactors = FALSE)
       } else {
-        seg.i.r   <- sapply(X = split(seqz.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = mean)
-        seg.i.b   <- sapply(X = split(seqz.b.i$Bf, f = fact.b.i), FUN = mean)
+        seg.i.r    <- sapply(X = split(seqz.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = function(a) mean(a, na.rm = TRUE))
+        seg.i.b    <- sapply(X = split(seqz.b.i$Bf, f = fact.b.i), FUN = function(a) mean(a, na.rm = TRUE))
+        seg.i.r.sd <- sapply(X = split(seqz.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = function(a) sd(a, na.rm = TRUE))
+        seg.i.b.sd <- sapply(X = split(seqz.b.i$Bf, f = fact.b.i), FUN = function(a) sd(a, na.rm = TRUE)) 
         segments.i <- data.frame(chromosome  = names(seqz.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
-                                 end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.b, N.BAF = seg.i.s.b,
-                                 depth.ratio = seg.i.r, N.ratio = seg.i.s.r, stringsAsFactors = FALSE)
+                                 end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.b, N.BAF = seg.i.s.b, sd.BAF = seg.i.b.sd,
+                                 depth.ratio = seg.i.r, N.ratio = seg.i.s.r, sd.ratio = seg.i.r.sd, stringsAsFactors = FALSE)
       }
       segments[[i]] <- segments.i[seq(from = 1, to = nrow(segments.i), by = 2),]
    }

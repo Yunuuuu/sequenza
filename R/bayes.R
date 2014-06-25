@@ -90,19 +90,20 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.rat
 }
 
 baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
-                      weight.Bf = 100, weight.ratio = 100, CNt.min = 0,
+                      sd.Bf = 0.1, sd.ratio = 0.1, N.Bf = 100, N.ratio = 100, CNt.min = 0,
                       CNt.max = 7, CNn = 2, priors.table = data.frame(CN = CNt.min:CNt.max,
                       value = 1), ratio.priority = FALSE) {
 
    mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
-                            weight.Bf = weight.Bf, weight.ratio = weight.ratio)
+                            sd.Bf = sd.Bf, sd.ratio = sd.ratio,
+                            N.Bf = N.Bf, N.ratio = N.ratio)
    mufreq.depth.ratio <- model.points(cellularity = cellularity, ploidy = ploidy,
                                       types = cbind(CNn = CNn, CNt = CNt.min:CNt.max, Mt = 0),
                                       avg.depth.ratio = avg.depth.ratio)
    model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])
    model.baf          <- theoretical.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity)
-   # B-allele freq are never 0.5, always smaller. work around on this bias
-   model.baf$BAF[model.baf$A==model.baf$B] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$weight.Bf),
+   # B-allele freq are never 0.5, always smaller. just a work around on this.. to be better fixed!
+   model.baf$BAF[model.baf$A==model.baf$B] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$N.Bf),
                                                        na.rm = TRUE, probs = 0.95)
    if(CNt.min == 0) {
      model.baf          <- as.data.frame(rbind(c(0, 0, max(model.baf$BAF), 0), model.baf))
@@ -123,10 +124,11 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
       test.ratio <- model.pts$depth.ratio
       test.baf   <- model.pts$BAF
       min.offset <- 1e-323
-      score.r    <- depth.ratio.dbinom(size = mat[x,]$weight.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
+      #score.r    <- depth.ratio.dbinom(size = mat[x,]$sd.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
+      score.r    <- dnorm(sd = mat[x,]$sd.ratio/sqrt(mat[x,]$N.ratio), mean = mat[x,]$ratio, x = test.ratio)
       score.r    <- score.r * priors
       if (!is.na(mat[x,]$Bf)) {
-         score.b    <- baf.dbinom(baf = mat[x,]$Bf, depth.t = mat[x,]$weight.Bf, test.baf)
+         score.b    <- dnorm(mean = mat[x,]$Bf, sd = mat[x,]$sd.Bf/sqrt(mat[x,]$N.Bf), x = test.baf)
          post.model <- score.r * score.b
       } else {
          post.model <- score.r         

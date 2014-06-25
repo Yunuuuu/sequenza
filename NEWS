@@ -1,4 +1,5 @@
 Changes in version 2.0.1 (2014-05-19)
+ - Use dnorm instead of dbinom fro BAF and ratio inference.
  - Fix documentation doscrepancies on the sequenza-utils.py execution.
  - add breaks as optional argument - enable to input custom segmentations - 
  - add different segmentation data, fast, het and full, allowing different resolution option.

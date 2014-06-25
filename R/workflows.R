@@ -162,7 +162,9 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
       }
       segs.len      <- segs.all$end.pos - segs.all$start.pos
       segs.filt     <- segs.len >= segment.filter
-      avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
+      avg.depth.ratio <- mean(sequenza.extract$gc$adj[,2])
+      avg.sd.ratio  <- sum(segs.all$sd.ratio * segs.all$N.ratio)/sum(segs.all$N.ratio)
+      avg.sd.Bf     <- sum(segs.all$sd.BAF * segs.all$N.BAF)/sum(segs.all$N.BAF)
       if (female){
          segs.is.xy <- segs.all$chromosome == XY["Y"]
       } else{
@@ -170,9 +172,10 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
       }
       filt.test  <- segs.filt & !segs.is.xy
       seg.test   <- segs.all[filt.test, ]
-      weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 150
+      #weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 150
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
-                    weight.ratio = 2 * weights.seg, weight.Bf = weights.seg,
+                    sd.ratio = avg.sd.ratio, sd.Bf = avg.sd.Bf,
+                    N.ratio = seg.test$N.ratio, N.Bf = seg.test$N.BAF,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                     ploidy = ploidy, priors.table = priors.table,
                     mc.cores = mc.cores, ratio.priority = ratio.priority)
@@ -256,12 +259,14 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
       segs.is.xy <- seg.tab$chromosome %in% XY
       mut.is.xy  <- mut.tab$chromosome %in% XY
    }
-
+   avg.sd.ratio  <- sum(seg.tab$sd.ratio * seg.tab$N.ratio)/sum(seg.tab$N.ratio)
+   avg.sd.Bf     <- sum(seg.tab$sd.BAF * seg.tab$N.BAF)/sum(seg.tab$N.BAF)
    cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
                             depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
-                            avg.depth.ratio = avg.depth.ratio,
-                            ratio.priority = ratio.priority, CNn = 2)
+                            avg.depth.ratio = avg.depth.ratio, sd.Bf = avg.sd.Bf ,
+                            sd.ratio = avg.sd.ratio , N.Bf = seg.tab$N.BAF,
+                            N.ratio = seg.tab$N.ratio, ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (!female){
       if (sum(segs.is.xy) >= 1) {
