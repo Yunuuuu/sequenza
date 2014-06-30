@@ -265,13 +265,13 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
       segs.is.xy <- seg.tab$chromosome %in% XY
       mut.is.xy  <- mut.tab$chromosome %in% XY
    }
-   avg.sd.ratio  <- sum(seg.tab$sd.ratio * seg.tab$N.ratio)/sum(seg.tab$N.ratio)
-   avg.sd.Bf     <- sum(seg.tab$sd.BAF * seg.tab$N.BAF)/sum(seg.tab$N.BAF)
+   avg.sd.ratio  <- sum(seg.tab$sd.ratio * seg.tab$N.ratio, na.rm = TRUE)/sum(seg.tab$N.ratio, na.rm = TRUE)
+   avg.sd.Bf     <- sum(seg.tab$sd.BAF * seg.tab$N.BAF, na.rm = TRUE)/sum(seg.tab$N.BAF, na.rm = TRUE)
    cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
                             depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
-                            avg.depth.ratio = avg.depth.ratio, sd.Bf = avg.sd.Bf ,
-                            sd.ratio = avg.sd.ratio , N.Bf = seg.tab$N.BAF,
+                            avg.depth.ratio = avg.depth.ratio, sd.Bf = avg.sd.Bf//sqrt(seg.tab$N.BAF) ,
+                            sd.ratio = avg.sd.ratio/sqrt(seg.tab$N.ratio) , N.Bf = seg.tab$N.BAF,
                             N.ratio = seg.tab$N.ratio, ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (!female){
