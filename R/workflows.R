@@ -161,10 +161,15 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
          segs.all      <- do.call(rbind, sequenza.extract$segments[chromosome.list])      
       }
       segs.len      <- segs.all$end.pos - segs.all$start.pos
-      segs.filt     <- segs.len >= segment.filter
+      #segs.filt     <- segs.len >= segment.filter
+      #segs.filt     <- segs.all$sd.ratio <= quantile(segs.all$sd.ratio, 0.75)
+      #segs.filt     <- !segs.all$sd.ratio%in%boxplot(segs.all$sd.ratio, plot = FALSE)$out
       avg.depth.ratio <- mean(sequenza.extract$gc$adj[,2])
       avg.sd.ratio  <- sum(segs.all$sd.ratio * segs.all$N.ratio)/sum(segs.all$N.ratio)
       avg.sd.Bf     <- sum(segs.all$sd.BAF * segs.all$N.BAF)/sum(segs.all$N.BAF)
+      sd.mean.ratio <- segs.all$sd.ratio/sqrt(segs.all$N.ratio)
+      #segs.filt     <- sd.mean.ratio <= avg.sd.ratio/sqrt(quantile(x = segs.all$N.ratio, probs = 0.25, na.rm = TRUE))
+      segs.filt     <- rep(TRUE, length(segs.all$N.ratio))     
       if (female){
          segs.is.xy <- segs.all$chromosome == XY["Y"]
       } else{
@@ -174,7 +179,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
       seg.test   <- segs.all[filt.test, ]
       #weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 150
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
-                    sd.ratio = avg.sd.ratio, sd.Bf = avg.sd.Bf,
+                    sd.ratio = seg.test$sd.ratio, sd.Bf = seg.test$sd.BAF,
                     N.ratio = seg.test$N.ratio, N.Bf = seg.test$N.BAF,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                     ploidy = ploidy, priors.table = priors.table,
