@@ -1,23 +1,23 @@
-mufreq.dbinom <- function(mufreq, mufreq.model, depth.t, seq.errors = 0.01) {
+mufreq.dbinom <- function(mufreq, mufreq.model, depth.t, seq.errors = 0.01, ...) {
    mufreq.model[mufreq.model == 0] <- seq.errors
    n.success       <- round(mufreq * depth.t, 0)
-   dbinom( x = n.success, size = depth.t, prob = mufreq.model)
+   dbinom( x = n.success, size = depth.t, prob = mufreq.model, ...)
 }
 
-mufreq.dpois <- function(mufreq, mufreq.model, depth.t, seq.errors = 0.01) {
+mufreq.dpois <- function(mufreq, mufreq.model, depth.t, seq.errors = 0.01, ...) {
    mufreq.model[mufreq.model == 0] <- seq.errors
    n.success       <- round(mufreq * depth.t, 0)
-   dpois( x = n.success, lambda = mufreq.model * depth.t)
+   dpois( x = n.success, lambda = mufreq.model * depth.t, ...)
 }
 
-baf.dbinom <- function(baf, baf.model, depth.t) {
+baf.dbinom <- function(baf, baf.model, depth.t, ...) {
    n.success       <- round(baf * depth.t, 0)
-   dbinom( x = n.success, size = depth.t, prob = baf.model)
+   dbinom( x = n.success, size = depth.t, prob = baf.model, ...)
 }
 
-baf.dpois <- function(baf, baf.model, depth.t) {
+baf.dpois <- function(baf, baf.model, depth.t, ...) {
    n.success       <- round(baf * depth.t, 0)
-   dpois( x = n.success, lambda = baf.model * depth.t)
+   dpois( x = n.success, lambda = baf.model * depth.t, ...)
 }
 
 depth.ratio.dbinom <- function(size, depth.ratio, depth.ratio.model) {
@@ -27,11 +27,11 @@ depth.ratio.dbinom <- function(size, depth.ratio, depth.ratio.model) {
    dbinom( x = n.success, size = size, prob = prob)
 }
 
-depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model) {
+depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model, ...) {
    #n.success        <- round(depth.n * depth.ratio, 0)
    n.success        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
    prob             <- depth.ratio.model / (1 + depth.ratio.model)
-   dpois( x = n.success, lambda = prob * size)
+   dpois( x = n.success, lambda = prob * size, ...)
 }
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
@@ -94,13 +94,13 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
                       CNt.max = 7, CNn = 2, priors.table = data.frame(CN = CNt.min:CNt.max,
                       value = 1), ratio.priority = FALSE) {
 
-   mufreq.tab <- data.frame(Bf = Bf, ratio = depth.ratio,
+   mufreq.tab <- data.frame(Bf = Bf, ratio = log(depth.ratio),
                             sd.Bf = sd.Bf, sd.ratio = sd.ratio,
                             N.Bf = N.Bf, N.ratio = N.ratio)
    mufreq.depth.ratio <- model.points(cellularity = cellularity, ploidy = ploidy,
                                       types = cbind(CNn = CNn, CNt = CNt.min:CNt.max, Mt = 0),
                                       avg.depth.ratio = avg.depth.ratio)
-   model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = mufreq.depth.ratio[, 2])
+   model.d.ratio      <- cbind(CNt = CNt.min:CNt.max, depth.ratio = log(mufreq.depth.ratio[, 2]))
    model.baf          <- theoretical.baf(CNn = CNn, CNt = CNt.max, cellularity = cellularity)
    # B-allele freq are never 0.5, always smaller. just a work around on this.. to be better fixed!
    model.baf$BAF[model.baf$A==model.baf$B] <- quantile(rep(mufreq.tab$Bf, times = mufreq.tab$N.Bf),
@@ -125,23 +125,24 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
       test.baf   <- model.pts$BAF
       min.offset <- 1e-323
       #score.r    <- depth.ratio.dbinom(size = mat[x,]$sd.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
-      score.r    <- dnorm(sd = mat[x,]$sd.ratio/sqrt(mat[x,]$N.ratio), mean = mat[x,]$ratio, x = test.ratio)
-      score.r    <- score.r * priors
+      score.r    <- dt2(sd = mat[x,]$sd.ratio, mean = mat[x,]$ratio, x = test.ratio, df = length(unique(test.ratio)), log = TRUE)
+      score.r    <- score.r + log(priors)
       if (!is.na(mat[x,]$Bf)) {
-         score.b    <- dnorm(mean = mat[x,]$Bf, sd = mat[x,]$sd.Bf/sqrt(mat[x,]$N.Bf), x = test.baf)
-         post.model <- score.r * score.b
+         #score.b    <- baf.dpois(baf = mat[x,]$Bf, depth.t = mat[x,]$N.Bf, test.baf, log = TRUE)
+         score.b    <- dt2(mean = mat[x,]$Bf, sd = mat[x,]$sd.Bf, x = test.baf, df = length(unique(test.baf)), log = TRUE)
+         post.model <- score.r + score.b
       } else {
          post.model <- score.r         
       }
 
-      post.model[post.model == 0] <- min.offset
+      #post.model[post.model == 0] <- min.offset
       if (ratio.priority == FALSE) {
          max.lik <-  which.max(post.model)
-         max.post <- c(as.numeric(model.pts[max.lik,1:3]), log(post.model[max.lik]))
+         max.post <- c(as.numeric(model.pts[max.lik,1:3]), post.model[max.lik])
       } else {
          res.cn     <- model.pts$CNt[which.max(score.r)]
          idx.pts    <- model.pts$CNt == res.cn
-         model.lik  <- cbind(model.pts[idx.pts, 1:3], log(post.model[idx.pts]))
+         model.lik  <- cbind(model.pts[idx.pts, 1:3], post.model[idx.pts])
          if (is.null(dim(model.lik))) {
             max.post <- model.lik
          } else {
