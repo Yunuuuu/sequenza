@@ -150,7 +150,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                avg.depth = round(coverage,0)))
 }
 
-sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, mufreq.treshold = 0.10, 
+sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 3e6, mufreq.treshold = 0.10, 
                          XY = c(X = "X", Y = "Y"), cellularity = seq(0.1, 1, 0.01), ploidy = seq(1, 7, 0.1),
                          ratio.priority = FALSE, method = "baf", priors.table = data.frame(CN = 2, value = 2),
                          chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L)){
@@ -170,7 +170,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 1e7, 
       }
       filt.test  <- segs.filt & !segs.is.xy
       seg.test   <- segs.all[filt.test, ]
-      weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 150
+      weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 10
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
                     weight.ratio = 2 * weights.seg, weight.Bf = weights.seg,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
