@@ -1,37 +1,38 @@
-mufreq.dbinom <- function(mufreq, mufreq.model, depth.t, seq.errors = 0.01) {
+mufreq.dbinom <- function(mufreq, mufreq.model, depth.t, seq.errors = 0.01, ...) {
    mufreq.model[mufreq.model == 0] <- seq.errors
    n.success       <- round(mufreq * depth.t, 0)
-   dbinom( x = n.success, size = depth.t, prob = mufreq.model)
+   dbinom( x = n.success, size = depth.t, prob = mufreq.model, ...)
 }
 
-mufreq.dpois <- function(mufreq, mufreq.model, depth.t, seq.errors = 0.01) {
+mufreq.dpois <- function(mufreq, mufreq.model, depth.t, seq.errors = 0.01, ...) {
    mufreq.model[mufreq.model == 0] <- seq.errors
    n.success       <- round(mufreq * depth.t, 0)
-   dpois( x = n.success, lambda = mufreq.model * depth.t)
+   dpois( x = n.success, lambda = mufreq.model * depth.t, ...)
 }
 
-baf.dbinom <- function(baf, baf.model, depth.t) {
+baf.dbinom <- function(baf, baf.model, depth.t, ...) {
    n.success       <- round(baf * depth.t, 0)
-   dbinom( x = n.success, size = depth.t, prob = baf.model)
+   dbinom( x = n.success, size = depth.t, prob = baf.model, ...)
 }
 
-baf.dpois <- function(baf, baf.model, depth.t) {
+baf.dpois <- function(baf, baf.model, depth.t, ...) {
    n.success       <- round(baf * depth.t, 0)
-   dpois( x = n.success, lambda = baf.model * depth.t)
+   dpois( x = n.success, lambda = baf.model * depth.t, ...)
 }
 
-depth.ratio.dbinom <- function(size, depth.ratio, depth.ratio.model) {
+depth.ratio.dbinom <- function(size, depth.ratio, depth.ratio.model, ...) {
    #n.success        <- round(depth.n * depth.ratio, 0)
    n.success        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
    prob             <- depth.ratio.model / (1 + depth.ratio.model)
-   dbinom( x = n.success, size = size, prob = prob)
+   dbinom( x = n.success, size = size, prob = prob, ...)
 }
 
-depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model) {
-   #n.success        <- round(depth.n * depth.ratio, 0)
-   n.success        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
+depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model, ...) {
+   n.success        <- round(size * depth.ratio, 0)
+   #n.success        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
    prob             <- depth.ratio.model / (1 + depth.ratio.model)
-   dpois( x = n.success, lambda = prob * size)
+   #dpois( x = n.success, lambda = prob * size, ...)
+   dpois( x = n.success, lambda =  depth.ratio.model * size, ...)
 }
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
@@ -123,10 +124,10 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
       test.ratio <- model.pts$depth.ratio
       test.baf   <- model.pts$BAF
       min.offset <- 1e-323
-      score.r    <- depth.ratio.dbinom(size = mat[x,]$weight.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
+      score.r    <- depth.ratio.dpois(size = mat[x,]$weight.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
       score.r    <- score.r * priors
       if (!is.na(mat[x,]$Bf)) {
-         score.b    <- baf.dbinom(baf = mat[x,]$Bf, depth.t = mat[x,]$weight.Bf, test.baf)
+         score.b    <- baf.dpois(baf = mat[x,]$Bf, depth.t = mat[x,]$weight.Bf, test.baf)
          post.model <- score.r * score.b
       } else {
          post.model <- score.r         
