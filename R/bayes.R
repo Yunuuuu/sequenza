@@ -28,10 +28,10 @@ depth.ratio.dbinom <- function(size, depth.ratio, depth.ratio.model) {
 }
 
 depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model, ...) {
-   #n.success        <- round(depth.n * depth.ratio, 0)
-   n.success        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
-   prob             <- depth.ratio.model / (1 + depth.ratio.model)
-   dpois( x = n.success, lambda = prob * size, ...)
+   x        <- round(depth.n * depth.ratio, 0)
+   #x        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
+   #prob             <- depth.ratio.model / (1 + depth.ratio.model)
+   dpois( x = x, lambda = depth.ratio.model * size, ...)
 }
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
