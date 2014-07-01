@@ -171,8 +171,8 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       segs.all$sd.ratio[segs.all$sd.ratio == 0] <- max(segs.all$sd.ratio, na.rm = TRUE)
       #sd.mean.ratio <- segs.all$sd.ratio/sqrt(segs.all$N.ratio)
       #segs.filt     <- sd.mean.ratio <= avg.sd.ratio/sqrt(quantile(x = segs.all$N.ratio, probs = 0.25, na.rm = TRUE))
-      segs.filt     <- rep(TRUE, length(segs.all$N.ratio))
-      #segs.filt     <- segs.all$N.ratio > N.ratio.filter & segs.all$N.BAF > N.BAF.filter
+      #segs.filt     <- rep(TRUE, length(segs.all$N.ratio))
+      segs.filt     <- segs.all$N.ratio > N.ratio.filter & segs.all$N.BAF > N.BAF.filter
       
       if (female){
          segs.is.xy <- segs.all$chromosome == XY["Y"]
