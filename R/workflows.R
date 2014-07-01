@@ -167,11 +167,13 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       avg.depth.ratio <- mean(sequenza.extract$gc$adj[,2])
       avg.sd.ratio  <- sum(segs.all$sd.ratio * segs.all$N.ratio, na.rm = TRUE)/sum(segs.all$N.ratio, na.rm = TRUE)
       avg.sd.Bf     <- sum(segs.all$sd.BAF * segs.all$N.BAF, na.rm = TRUE)/sum(segs.all$N.BAF, na.rm = TRUE)
-      segs.all$sd.BAF[segs.all$sd.BAF < avg.sd.Bf] <- avg.sd.Bf
-      segs.all$sd.ratio[segs.all$sd.ratio < avg.sd.ratio] <- avg.sd.ratio
+      segs.all$sd.BAF[segs.all$sd.BAF == 0] <- max(segs.all$sd.BAF, na.rm = TRUE)
+      segs.all$sd.ratio[segs.all$sd.ratio == 0] <- max(segs.all$sd.ratio, na.rm = TRUE)
       #sd.mean.ratio <- segs.all$sd.ratio/sqrt(segs.all$N.ratio)
       #segs.filt     <- sd.mean.ratio <= avg.sd.ratio/sqrt(quantile(x = segs.all$N.ratio, probs = 0.25, na.rm = TRUE))
-      segs.filt     <- segs.all$N.ratio > N.ratio.filter & segs.all$N.BAF > N.BAF.filter
+      segs.filt     <- rep(TRUE, length(segs.all$N.ratio))
+      #segs.filt     <- segs.all$N.ratio > N.ratio.filter & segs.all$N.BAF > N.BAF.filter
+      
       if (female){
          segs.is.xy <- segs.all$chromosome == XY["Y"]
       } else{
