@@ -170,9 +170,9 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, segment.filter = 3e6, 
       }
       filt.test  <- segs.filt & !segs.is.xy
       seg.test   <- segs.all[filt.test, ]
-      weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 10
+      weights.seg <- round(segs.len[filt.test] / 1e6, 0) + 1
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
-                    weight.ratio = 2 * weights.seg, weight.Bf = weights.seg,
+                    weight.ratio = seg.test$N.ratio, weight.Bf = seg.test$N.BAF,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                     ploidy = ploidy, priors.table = priors.table,
                     mc.cores = mc.cores, ratio.priority = ratio.priority)
