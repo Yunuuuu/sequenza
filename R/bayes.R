@@ -15,9 +15,8 @@ baf.dbinom <- function(baf, baf.model, depth.t, ...) {
    dbinom( x = n.success, size = depth.t, prob = baf.model, ...)
 }
 
-baf.dpois <- function(baf, baf.model, depth.t, ...) {
-   n.success       <- round(baf * depth.t, 0)
-   dpois( x = n.success, lambda = baf.model * depth.t, ...)
+baf.dpois <- function(baf, baf.model, depth.t, ...) { 
+   dgamma( x = baf * depth.t, shape = baf.model * depth.t, scale = 1, ...)
 }
 
 depth.ratio.dbinom <- function(size, depth.ratio, depth.ratio.model, ...) {
@@ -32,8 +31,7 @@ depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model, ...) {
    #n.success        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
    prob             <- depth.ratio.model / (1 + depth.ratio.model)
    #dpois( x = n.success, lambda = prob * size, ...)
-   #dpois( x = n.success, lambda =  depth.ratio.model * size, ...)
-   dgamma(x = n.success, shape = depth.ratio.model * size, shape = 0.5, ...)
+   dpois( x = n.success, lambda =  depth.ratio.model * size, ...)
 }
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
