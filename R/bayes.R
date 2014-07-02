@@ -32,7 +32,8 @@ depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model, ...) {
    #n.success        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
    prob             <- depth.ratio.model / (1 + depth.ratio.model)
    #dpois( x = n.success, lambda = prob * size, ...)
-   dpois( x = n.success, lambda =  depth.ratio.model * size, ...)
+   #dpois( x = n.success, lambda =  depth.ratio.model * size, ...)
+   dgamma(x = n.success, shape = depth.ratio.model * size, shape = 0.5, ...)
 }
 
 mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.ratio,
