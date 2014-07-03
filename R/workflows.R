@@ -162,15 +162,11 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       }
       segs.len      <- segs.all$end.pos - segs.all$start.pos
       #segs.filt     <- segs.len >= segment.filter
-      #segs.filt     <- segs.all$sd.ratio <= quantile(segs.all$sd.ratio, 0.75)
-      #segs.filt     <- !segs.all$sd.ratio%in%boxplot(segs.all$sd.ratio, plot = FALSE)$out
       avg.depth.ratio <- mean(sequenza.extract$gc$adj[,2])
       avg.sd.ratio  <- sum(segs.all$sd.ratio * segs.all$N.ratio, na.rm = TRUE)/sum(segs.all$N.ratio, na.rm = TRUE)
       avg.sd.Bf     <- sum(segs.all$sd.BAF * segs.all$N.BAF, na.rm = TRUE)/sum(segs.all$N.BAF, na.rm = TRUE)
-      test.sd.ratio <- avg.sd.ratio * sqrt(median(segs.all$N.ratio,na.rm = TRUE))
-      test.sd.Bf    <- avg.sd.Bf * sqrt(median(segs.all$N.BAF,na.rm = TRUE))
-      #segs.all$sd.BAF[segs.all$sd.BAF == 0] <- max(segs.all$sd.BAF, na.rm = TRUE)
-      #segs.all$sd.ratio[segs.all$sd.ratio == 0] <- max(segs.all$sd.ratio, na.rm = TRUE)
+      segs.all$sd.BAF[segs.all$sd.BAF == 0]     <- max(segs.all$sd.BAF, na.rm = TRUE)
+      segs.all$sd.ratio[segs.all$sd.ratio == 0] <- max(segs.all$sd.ratio, na.rm = TRUE)
       #sd.mean.ratio <- segs.all$sd.ratio/sqrt(segs.all$N.ratio)
       #segs.filt     <- sd.mean.ratio <= avg.sd.ratio/sqrt(quantile(x = segs.all$N.ratio, probs = 0.25, na.rm = TRUE))
       #segs.filt     <- rep(TRUE, length(segs.all$N.ratio))
@@ -182,8 +178,9 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       }
       filt.test  <- segs.filt & !segs.is.xy
       seg.test   <- segs.all[filt.test, ]
+      seg.len.mb <- round(segs.len[filt.test] / 1e6, 0) + 1
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
-                    sd.ratio = test.sd.ratio, sd.Bf = test.sd.Bf,
+                    sd.ratio = seg.test$sd.ratio, sd.Bf = seg.test$sd.BAF,
                     N.ratio = seg.test$N.ratio, N.Bf = seg.test$N.BAF,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                     ploidy = ploidy, priors.table = priors.table,
