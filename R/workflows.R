@@ -150,7 +150,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                avg.depth = round(coverage,0)))
 }
 
-sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N.BAF.filter = 1, mufreq.treshold = 0.10, 
+sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N.BAF.filter = 1, segment.filter = 3e6, mufreq.treshold = 0.10, 
                          XY = c(X = "X", Y = "Y"), cellularity = seq(0.1, 1, 0.01), ploidy = seq(1, 7, 0.1),
                          ratio.priority = FALSE, method = "baf", priors.table = data.frame(CN = 2, value = 2),
                          chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L)){
@@ -171,6 +171,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       #segs.filt     <- sd.mean.ratio <= avg.sd.ratio/sqrt(quantile(x = segs.all$N.ratio, probs = 0.25, na.rm = TRUE))
       #segs.filt     <- rep(TRUE, length(segs.all$N.ratio))
       segs.filt     <- segs.all$N.ratio > N.ratio.filter & segs.all$N.BAF > N.BAF.filter
+      segs.filt     <- segs.len >= segment.filter & segs.filt
       if (female){
          segs.is.xy <- segs.all$chromosome == XY["Y"]
       } else{
