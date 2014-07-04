@@ -180,7 +180,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       seg.test   <- segs.all[filt.test, ]
       seg.len.mb <- round(segs.len[filt.test] / 1e6, 0) + 1
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
-                    sd.ratio = seg.test$sd.ratio, sd.Bf = seg.test$sd.BAF,
+                    sd.ratio = seg.test$sd.ratio/sqrt(seg.len.mb), sd.Bf = seg.test$sd.BAF/sqrt(seg.len.mb),
                     N.ratio = seg.test$N.ratio, N.Bf = seg.test$N.BAF,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                     ploidy = ploidy, priors.table = priors.table,
