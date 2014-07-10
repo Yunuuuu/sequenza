@@ -227,6 +227,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    chrw.file <- makeFilename("chromosome_view.pdf")
    geno.file <- makeFilename("genome_view.pdf")
    cn.file   <- makeFilename("CN_bars.pdf")
+   gap.file  <- makeFilename("GAP_print_model.pdf")
    muts.file <- makeFilename("mutations.txt")
    segs.file <- makeFilename("segments.txt")
    robj.extr <- makeFilename("sequenza_extract.RData")
@@ -271,9 +272,9 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
                             depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
-                            avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.test$sd.ratio,
-                            weight.ratio = seg.test$N.ratio, sd.Bf = seg.test$sd.BAF,
-                            weight.Bf = seg.test$N.BAF, ratio.priority = ratio.priority, CNn = 2)
+                            avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio,
+                            weight.ratio = seg.tab$N.ratio, sd.Bf = seg.tab$sd.BAF,
+                            weight.Bf = seg.tab$N.BAF, ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (!female){
       if (sum(segs.is.xy) >= 1) {
@@ -346,4 +347,38 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
       write.table(res.tab, cint.file, col.names = TRUE,
                   row.names = FALSE, sep = "\t")
    }
+   ## Make a GAP-print like plot, with model points and likelihood space with the chosen solution
+   baf <- seq(0.001, 0.45, 0.005)
+   d.r <- seq(0.01, 2.5, 0.05)
+   s.b <- mean(seg.res$sd.BAF, na.rm = TRUE)
+   s.r <- mean(seg.res$sd.ratio, na.rm = TRUE)
+   test.values <- expand.grid(Bf = baf, ratio = d.r,
+                              KEEP.OUT.ATTRS = FALSE)
+   gap.space  <- baf.bayes(Bf = test.values$Bf, CNt.max = CNt.max, CNt.min = 0,
+                            depth.ratio = test.values$ratio,
+                            cellularity = cellularity, ploidy = ploidy,
+                            avg.depth.ratio = avg.depth.ratio, sd.Bf = s.b, weight.Bf = 10,
+                            sd.ratio = s.r, weight.ratio = 10, ratio.priority = F,
+                            CNn = 2) 
+   gap.space <- as.data.frame(gap.space)
+   z <- tapply(gap.space$L, list(test.values$Bf, test.values$ratio), mean)
+   x <- as.numeric(rownames(z))
+   y <- as.numeric(colnames(z))
+   t <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
+   mpts <- cbind(t,
+                 model.points(cellularity = cellularity,
+                              ploidy = ploidy, types = t,
+                              avg.depth.ratio=1)
+                 )
+   mpts <- unique(mpts[, c("CNt", "depth.ratio")])
+   pdf(gap.file, width = 6, height = 6)
+      par(mar = c(5.1, 4.1, 4.1, 4.1))
+      colorgram(x,y,z, key = NA, n = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
+                main = paste("cellularity:", cellularity, "ploidy:", ploidy, "sd.BAF:", round(s.b,2), "depth:",
+                             paste0(round(sequenza.extract$avg.depth,0), "X"), sep = " "),
+                las = 1)
+      axis(side = 4, at = mpts$depth.ratio, label = mpts$CNt, las = 1)
+      mtext(text = "Copy number", side = 4, line = 2)
+   points(x = seg.res$Bf[!segs.is.xy], y = seg.res$depth.ratio[!segs.is.xy], pch = 19, cex = 0.5)
+   dev.off()
 }
