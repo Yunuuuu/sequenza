@@ -227,7 +227,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    chrw.file <- makeFilename("chromosome_view.pdf")
    geno.file <- makeFilename("genome_view.pdf")
    cn.file   <- makeFilename("CN_bars.pdf")
-   gap.file  <- makeFilename("GAP_print_model.pdf")
+   gap.file  <- makeFilename("model_fit.pdf")
    muts.file <- makeFilename("mutations.txt")
    segs.file <- makeFilename("segments.txt")
    robj.extr <- makeFilename("sequenza_extract.RData")
