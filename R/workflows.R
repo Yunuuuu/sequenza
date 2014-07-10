@@ -348,7 +348,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
                   row.names = FALSE, sep = "\t")
    }
    ## Make a GAP-print like plot, with model points and likelihood space with the chosen solution
-   baf <- seq(0.001, 0.45, 0.005)
+   baf <- seq(0.001, 0.5, 0.005)
    d.r <- seq(0.01, 2.5, 0.05)
    s.b <- mean(seg.res$sd.BAF, na.rm = TRUE)
    s.r <- mean(seg.res$sd.ratio, na.rm = TRUE)
@@ -376,7 +376,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
       colorgram(x,y,z, key = NA, n = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
                 main = paste("cellularity:", cellularity, "ploidy:", ploidy, "sd.BAF:", round(s.b,2), "depth:",
                              paste0(round(sequenza.extract$avg.depth,0), "X"), sep = " "),
-                las = 1)
+                las = 1, xlim = c(0, 0.5))
       axis(side = 4, at = mpts$depth.ratio, label = mpts$CNt, las = 1)
       mtext(text = "Copy number", side = 4, line = 2)
    points(x = seg.res$Bf[!segs.is.xy], y = seg.res$depth.ratio[!segs.is.xy], pch = 19, cex = 0.5)
