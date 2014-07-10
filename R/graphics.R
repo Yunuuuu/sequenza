@@ -92,7 +92,7 @@ plotWindows <- function(seqz.window, m.lty = 1, m.lwd = 3,
 }
 
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,  min.N.baf = 1, min.N.ratio = 1e4,
-                            main = "", vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0), BAF.style = "none",
+                            main = "", vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0), BAF.style = "lines",
                             CNn = 2, cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL, model.lwd = 1,
                             model.lty = "24", model.col = 1, x.chr.space = 10) {
    make.polygons <- function(segments, model.baf) {
