@@ -90,13 +90,14 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.rat
 }
 
 baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
-                      sd.Bf = 0.1, sd.ratio = 0.1, N.Bf = 100, N.ratio = 100, CNt.min = 0,
+                      sd.Bf = 0.1, sd.ratio = 0.1, weight.Bf = 1, weight.ratio = 1, CNt.min = 0,
                       CNt.max = 7, CNn = 2, priors.table = data.frame(CN = CNt.min:CNt.max,
                       value = 1), ratio.priority = FALSE) {
 
    mufreq.tab <- data.frame(Bf = Bf, ratio = log(depth.ratio),
                             sd.Bf = sd.Bf, sd.ratio = sd.ratio,
-                            N.Bf = N.Bf, N.ratio = N.ratio)
+                            weight.Bf = weight.Bf,
+                            weight.ratio = weight.ratio)
    mufreq.depth.ratio <- model.points(cellularity = cellularity, ploidy = ploidy,
                                       types = cbind(CNn = CNn, CNt = CNt.min:CNt.max, Mt = 0),
                                       avg.depth.ratio = avg.depth.ratio)
@@ -125,11 +126,11 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
       test.baf   <- model.pts$BAF
       min.offset <- 1e-323
       #score.r    <- depth.ratio.dbinom(size = mat[x,]$sd.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
-      score.r    <- dt2(sd = mat[x,]$sd.ratio, mean = mat[x,]$ratio, x = test.ratio, df = 5, log = TRUE)
+      score.r    <- dt2(sd = mat[x,]$sd.ratio/sqrt(mat[x,]$weight.ratio), mean = mat[x,]$ratio, x = test.ratio, df = 5, log = TRUE)
       score.r    <- score.r + log(priors)
       if (!is.na(mat[x,]$Bf)) {
          #score.b    <- baf.dpois(baf = mat[x,]$Bf, depth.t = mat[x,]$N.Bf, test.baf, log = TRUE)
-         score.b    <- dt2(mean = mat[x,]$Bf, sd = mat[x,]$sd.Bf, x = test.baf, df = 5, log = TRUE)
+         score.b    <- dt2(mean = mat[x,]$Bf, sd = mat[x,]$sd.Bf/sqrt(mat[x,]$weight.Bf), x = test.baf, df = 5, log = TRUE)
          post.model <- score.r + score.b
       } else {
          post.model <- score.r         
