@@ -179,7 +179,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       }
       filt.test  <- segs.filt & !segs.is.xy
       seg.test   <- segs.all[filt.test, ]
-      seg.len.mb <- round(segs.len[filt.test] / 1e6, 0)
+      seg.len.mb <- segs.len[filt.test] / 1e6
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
                     sd.ratio = seg.test$sd.ratio, weight.ratio = seg.len.mb,
                     sd.Bf = seg.test$sd.BAF, weight.Bf = seg.len.mb,
@@ -260,6 +260,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    }
    seg.tab     <- do.call(rbind, sequenza.extract$segments[chromosome.list])
    mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
+   seg.len     <- (seg.tab$end.pos - seg.tab$start.pos)/1e6
    if (female){
       segs.is.xy <- seg.tab$chromosome == XY["Y"]
       mut.is.xy  <- mut.tab$chromosome == XY["Y"]
@@ -273,8 +274,8 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
                             depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio,
-                            weight.ratio = seg.tab$N.ratio, sd.Bf = seg.tab$sd.BAF,
-                            weight.Bf = seg.tab$N.BAF, ratio.priority = ratio.priority, CNn = 2)
+                            weight.ratio = 1+seg.len, sd.Bf = seg.tab$sd.BAF,
+                            weight.Bf = 1+seg.len, ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (!female){
       if (sum(segs.is.xy) >= 1) {
