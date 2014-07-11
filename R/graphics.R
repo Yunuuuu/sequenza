@@ -328,3 +328,37 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
         at = seq(abs.list[[1]]$abs.start[1], abs.list[[1]]$abs.end[nrow(abs.list[[1]])], by = 5e7), outer = FALSE, cex = par("cex.axis")*par("cex"),
         side = 1 , line = 1)
 }
+
+baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001, 0.5, 0.005), ratio.space = seq(0.01, 2.5, 0.05), CNt.max = 7) {
+   s.b   <- mean(segs$sd.BAF, na.rm = TRUE)
+   s.r   <- mean(segs$sd.ratio, na.rm = TRUE)
+   avg.r <- mean(segs$depth.ratio, na.rm = TRUE)
+   test.values <- expand.grid(Bf = BAF.space, ratio = ratio.space,
+                              KEEP.OUT.ATTRS = FALSE)
+   both.space  <- baf.bayes(Bf = test.values$Bf, CNt.max = CNt.max, CNt.min = 0,
+                           depth.ratio = test.values$ratio,
+                           cellularity = cellularity, ploidy = ploidy,
+                           avg.depth.ratio = avg.r,
+                           sd.Bf = s.b, weight.Bf = 10,
+                           sd.ratio = s.r, weight.ratio = 10, ratio.priority = F,
+                           CNn = 2) 
+   both.space <- as.data.frame(both.space)
+   z <- tapply(both.space$L, list(test.values$Bf, test.values$ratio), mean)
+   x <- as.numeric(rownames(z))
+   y <- as.numeric(colnames(z))
+   t <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
+   mpts <- cbind(t,
+                 model.points(cellularity = cellularity,
+                              ploidy = ploidy, types = t,
+                              avg.depth.ratio = avg.r)
+   )
+   mpts <- unique(mpts[, c("CNt", "depth.ratio")])
+   par(mar = c(5.1, 4.1, 4.1, 4.1))
+   colorgram(x,y,z, key = NA, n = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
+             main = paste("cellularity:", cellularity, "ploidy:", ploidy, "sd.BAF:", round(s.b,2), sep = " "),
+             las = 1, xlim = c(0, 0.5))
+   axis(side = 4, at = mpts$depth.ratio, label = mpts$CNt, las = 1)
+   mtext(text = "Copy number", side = 4, line = 2)
+   points(x = segs$Bf, y = segs$depth.ratio, pch = 19, cex = 0.5)
+}
+
