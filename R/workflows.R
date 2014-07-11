@@ -233,7 +233,8 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    muts.file <- makeFilename("mutations.txt")
    segs.file <- makeFilename("segments.txt")
    robj.extr <- makeFilename("sequenza_extract.RData")
-   robj.fit  <- makeFilename("sequenza_cp_table.RData")  
+   robj.fit  <- makeFilename("sequenza_cp_table.RData")
+   log.file  <- makeFilename("sequenza_log.txt")
    avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
    assign(x = paste0(sample.id,"_sequenza_extract"), value = sequenza.extract)
    save(list = paste0(sample.id,"_sequenza_extract"), file = robj.extr) 
@@ -364,4 +365,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
       }
    dev.off()
    }
+   fileConn<-file(log.file)
+      writeLines(c(date(),paste("Sequenza version:", packageVersion("sequenza"), sep = " ")), fileConn)
+   close(fileConn)
 }
