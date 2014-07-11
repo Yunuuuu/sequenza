@@ -304,6 +304,7 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
       segments(x0 = abs.segments$abs.start, x1 = abs.segments$abs.end,
                y0 = (abs.segments$A+0.1), y1 = (abs.segments$A+0.1), col="red", lwd = 5, lend = 1)
    } else {
+      abs.segments <- abs.segments[!is.na(abs.segments$CNt), ]
       plot(x = c(min(abs.segments$abs.start), max(abs.segments$abs.end)),
            y = c(min(abs.segments$CNt), max(abs.segments$CNt)), type = "n",
            ylab = "Copy number", xlab = "Position (Mb)",
