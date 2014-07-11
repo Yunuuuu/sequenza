@@ -333,7 +333,8 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
 baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001, 0.5, 0.005), ratio.space = seq(0.01, 2.5, 0.05), CNt.max = 7) {
    s.b   <- mean(segs$sd.BAF, na.rm = TRUE)
    s.r   <- mean(segs$sd.ratio, na.rm = TRUE)
-   avg.r <- mean(segs$depth.ratio, na.rm = TRUE)
+   l.s   <- segs$end.pos - segs$start.pos
+   avg.r <- weighted.mean(x = segs$depth.ratio, w = l.s, na.rm = TRUE)
    test.values <- expand.grid(Bf = BAF.space, ratio = ratio.space,
                               KEEP.OUT.ATTRS = FALSE)
    both.space  <- baf.bayes(Bf = test.values$Bf, CNt.max = CNt.max, CNt.min = 0,
