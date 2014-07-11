@@ -297,3 +297,17 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
    len.seg <- (segments$end.pos - segments$start.pos)/1e6
    segments[(segments$N.ratio/len.seg) >= 2, ]
 }
+
+alternative.cp.solutions <- function(CP) {
+   ci <- get.ci(CP)
+   p.alt <- which(diff(sign(diff(ci$values.ploidy$y)))==-2)+1
+   get.alt <- function(idx.p, CP) {
+      idx.c <- which.max(CP.example$loglik[idx.p,])
+      c(cellularity = CP.example$cellularity[idx.c],
+        ploidy = CP.example$ploidy[idx.p],
+        L = CP.example$loglik[idx.p, idx.c])
+   }
+   res <- lapply(p.alt, FUN = function (x) get.alt(x, CP))
+   res <- as.data.frame(do.call(rbind, res))
+   res[order(res$L, decreasing = TRUE), ]
+}
