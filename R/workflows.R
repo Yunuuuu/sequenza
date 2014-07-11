@@ -182,7 +182,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       seg.len.mb <- segs.len[filt.test] / 1e6
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
                     sd.ratio = seg.test$sd.ratio, weight.ratio = seg.len.mb,
-                    sd.Bf = seg.test$sd.BAF, weight.Bf = 1,
+                    sd.Bf = seg.test$sd.BAF, weight.Bf = seg.len.mb,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                     ploidy = ploidy, priors.table = priors.table,
                     mc.cores = mc.cores, ratio.priority = ratio.priority)
