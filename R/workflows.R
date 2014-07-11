@@ -182,7 +182,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       seg.len.mb <- segs.len[filt.test] / 1e6
       baf.model.fit(Bf = seg.test$Bf, depth.ratio = seg.test$depth.ratio,
                     sd.ratio = seg.test$sd.ratio, weight.ratio = seg.len.mb,
-                    sd.Bf = seg.test$sd.BAF, weight.Bf = 100*seg.test$N.BAF/seg.test$N.ratio,
+                    sd.Bf = seg.test$sd.BAF, weight.Bf = 1,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                     ploidy = ploidy, priors.table = priors.table,
                     mc.cores = mc.cores, ratio.priority = ratio.priority)
@@ -275,7 +275,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
                             cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio,
                             weight.ratio = seg.len, sd.Bf = seg.tab$sd.BAF,
-                            weight.Bf = 100*seg.tab$N.BAF/seg.tab$N.ratio, ratio.priority = ratio.priority, CNn = 2)
+                            weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (!female){
       if (sum(segs.is.xy) >= 1) {
