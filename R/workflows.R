@@ -350,38 +350,18 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
       write.table(res.tab, cint.file, col.names = TRUE,
                   row.names = FALSE, sep = "\t")
    }
-   ## Make a GAP-print like plot, with model points and likelihood space with the chosen solution
-   baf <- seq(0.001, 0.5, 0.005)
-   d.r <- seq(0.01, 2.5, 0.05)
-   s.b <- mean(seg.res$sd.BAF, na.rm = TRUE)
-   s.r <- mean(seg.res$sd.ratio, na.rm = TRUE)
-   test.values <- expand.grid(Bf = baf, ratio = d.r,
-                              KEEP.OUT.ATTRS = FALSE)
-   gap.space  <- baf.bayes(Bf = test.values$Bf, CNt.max = CNt.max, CNt.min = 0,
-                            depth.ratio = test.values$ratio,
-                            cellularity = cellularity, ploidy = ploidy,
-                            avg.depth.ratio = avg.depth.ratio, sd.Bf = s.b, weight.Bf = 10,
-                            sd.ratio = s.r, weight.ratio = 10, ratio.priority = F,
-                            CNn = 2) 
-   gap.space <- as.data.frame(gap.space)
-   z <- tapply(gap.space$L, list(test.values$Bf, test.values$ratio), mean)
-   x <- as.numeric(rownames(z))
-   y <- as.numeric(colnames(z))
-   t <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
-   mpts <- cbind(t,
-                 model.points(cellularity = cellularity,
-                              ploidy = ploidy, types = t,
-                              avg.depth.ratio=1)
-                 )
-   mpts <- unique(mpts[, c("CNt", "depth.ratio")])
-   pdf(gap.file, width = 6, height = 6)
-      par(mar = c(5.1, 4.1, 4.1, 4.1))
-      colorgram(x,y,z, key = NA, n = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
-                main = paste("cellularity:", cellularity, "ploidy:", ploidy, "sd.BAF:", round(s.b,2), "depth:",
-                             paste0(round(sequenza.extract$avg.depth,0), "X"), sep = " "),
-                las = 1, xlim = c(0, 0.5))
-      axis(side = 4, at = mpts$depth.ratio, label = mpts$CNt, las = 1)
-      mtext(text = "Copy number", side = 4, line = 2)
-   points(x = seg.res$Bf[!segs.is.xy], y = seg.res$depth.ratio[!segs.is.xy], pch = 19, cex = 0.5)
+   pdf(fit.file, width = 6, height = 6)
+      baf.ratio.model.fit(cellularity = cellularity, ploidy = ploidy, segs = seg.res[!segs.is.xy, ])
    dev.off()
+   if (!is.null(cp.table)){
+      alt.sol <- alternative.cp.solutions(cp.table)
+      write.table(alt.sol, file = alt.file,
+                  col.names = TRUE, row.names = FALSE, sep = "\t")
+      pdf(afit.file)
+      for (sol in 1:nrow( alt.sol)){
+         baf.ratio.model.fit(cellularity = alt.sol$cellularity[sol],
+                             ploidy = alt.sol$ploidy[sol], segs = seg.res[!segs.is.xy, ])
+      }
+   dev.off()
+   }
 }
