@@ -152,7 +152,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
 
 sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N.BAF.filter = 1, segment.filter = 3e6, mufreq.treshold = 0.10, 
                          XY = c(X = "X", Y = "Y"), cellularity = seq(0.1, 1, 0.01), ploidy = seq(1, 7, 0.1),
-                         ratio.priority = FALSE, method = "baf", priors.table = data.frame(CN = 2, value = 2),
+                         ratio.priority = FALSE, method = "baf", priors.table = data.frame(CN = c(0,2), value = c(0.1,2),
                          chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L)){
    if (method == "baf") {
       if (is.null(chromosome.list)) {
