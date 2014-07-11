@@ -275,7 +275,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
                             cellularity = cellularity, ploidy = ploidy,
                             avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio,
                             weight.ratio = seg.len, sd.Bf = seg.tab$sd.BAF,
-                            weight.Bf = 100*seg.test$N.BAF/seg.test$N.ratio, ratio.priority = ratio.priority, CNn = 2)
+                            weight.Bf = 100*seg.tab$N.BAF/seg.tab$N.ratio, ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (!female){
       if (sum(segs.is.xy) >= 1) {
