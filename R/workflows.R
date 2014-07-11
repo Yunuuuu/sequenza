@@ -276,17 +276,19 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
                             depth.ratio = seg.tab$depth.ratio[!segs.is.xy],
                             cellularity = cellularity, ploidy = ploidy,
-                            avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio,
-                            weight.ratio = seg.len, sd.Bf = seg.tab$sd.BAF,
+                            avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio[!segs.is.xy],
+                            weight.ratio = seg.len[!segs.is.xy], sd.Bf = seg.tab$sd.BAF[!segs.is.xy],
                             weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
    seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    if (!female){
       if (sum(segs.is.xy) >= 1) {
          cn.alleles  <- baf.bayes(Bf = NA, CNt.max = CNt.max,
-                               depth.ratio = seg.tab$depth.ratio[segs.is.xy],
-                               cellularity = cellularity, ploidy = ploidy,
-                               avg.depth.ratio = avg.depth.ratio,
-                               ratio.priority = TRUE, CNn = 1)
+                                  depth.ratio = seg.tab$depth.ratio[segs.is.xy],
+                                  cellularity = cellularity, ploidy = ploidy,
+                                  avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio[segs.is.xy],
+                                  weight.ratio = seg.len[segs.is.xy], sd.Bf = NA,
+                                  weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)   
+               
          seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
          seg.res    <- rbind(seg.res, seg.xy)
       }
