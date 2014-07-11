@@ -129,7 +129,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
       #score.r    <- depth.ratio.dbinom(size = mat[x,]$sd.ratio, depth.ratio = mat[x,]$ratio, test.ratio)
       score.r    <- dt2(sd = mat[x,]$sd.ratio/sqrt(mat[x,]$weight.ratio), mean = mat[x,]$ratio, x = test.ratio, df = 5, log = TRUE)
       score.r    <- score.r + log(priors)
-      if (!is.na(mat[x,]$Bf) | !is.na(mat[x,]$weight.Bf)) {
+      if (!is.na(mat[x,]$Bf) | !is.na(mat[x,]$sd.Bf/sqrt(mat[x,]$weight.Bf))) {
          #score.b    <- baf.dpois(baf = mat[x,]$Bf, depth.t = mat[x,]$N.Bf, test.baf, log = TRUE)
          score.b    <- dt2(mean = mat[x,]$Bf, sd = mat[x,]$sd.Bf/sqrt(mat[x,]$weight.Bf), x = test.baf, df = 5, log = TRUE)
          post.model <- score.r + score.b
