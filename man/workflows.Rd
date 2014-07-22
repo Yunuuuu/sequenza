@@ -14,9 +14,10 @@
                    min.reads = 40, min.reads.normal = 10, min.reads.baf = 1,
                    max.mut.types = 1, min.type.freq = 0.9, min.fw.freq = 0,
                    verbose = TRUE, chromosome.list = NULL, breaks = NULL,
-                   breaks.method = "het",weighted.mean = TRUE)
+                   breaks.method = "het", assembly = "hg19", weighted.mean = TRUE)
 
-  sequenza.fit(sequenza.extract, female = TRUE, segment.filter = 1e7,
+  sequenza.fit(sequenza.extract, female = TRUE, N.ratio.filter = 10,
+               N.BAF.filter = 1, segment.filter = 3e6,
                mufreq.treshold = 0.10, XY = c(X = "X", Y = "Y"),
                cellularity = seq(0.1,1,0.01), ploidy = seq(1, 7, 0.1),
                ratio.priority = FALSE, method = "baf",
@@ -49,7 +50,9 @@
   \item{sequenza.extract}{a list of objects as output from the \code{sequenza.extract} function.}
   \item{cp.table}{a list of objects as output from the \code{sequenza.fit} function.}
   \item{female}{logical, indicating whether the sample is male or female, to properly handle the X and Y chromosomes. Implementation only works for the human normal karyotype.}
-  \item{CNt.max}{maximum copy number to consider in the model.}  
+  \item{CNt.max}{maximum copy number to consider in the model.}
+  \item{N.ratio.filter}{threshold of minimum number of observation of depth ratio in a segment.}
+  \item{N.BAF.filter}{threshold of minimum number of observation of B-allele frequency in a segment.}
   \item{segment.filter}{threshold segment length (in base pairs) to filter out short segments, that can cause noise when fitting the cellularity and ploidy parameters. The threshold will not affect the allele-specific segmentation.}
   \item{XY}{character vector of length 2 specifying the labels used for the X and Y chromosomes.}
   \item{cellularity}{vector of candidate cellularity parameters.}
@@ -62,6 +65,8 @@
   \item{sample.id}{identifier of the sample, to be used as a prefix for saved objects.}
   \item{out.dir}{output directory where the files and objects will be saved.}
   \item{mc.cores}{number of cores to use; see \code{\link{mclapply}}.}
+  \item{assembly}{assembly version of the genome, see \code{\link{aspcf}} or \code{\link{pcf}}.}
+
 }
 
 \details{
