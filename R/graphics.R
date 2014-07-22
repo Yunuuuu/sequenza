@@ -356,10 +356,10 @@ baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001
    )
    mpts <- unique(mpts[, c("CNt", "depth.ratio")])
    par(mar = c(5.1, 4.1, 4.1, 4.1))
-   colorgram(x,y,z, key = NA, n = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
+   colorgram(x, y, z, key = NA, nz = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
              main = paste("cellularity:", cellularity, "ploidy:", ploidy, "sd.BAF:", round(s.b,2), sep = " "),
              las = 1, xlim = c(0, 0.5))
-   axis(side = 4, at = mpts$depth.ratio, label = mpts$CNt, las = 1)
+   axis(side = 4, at = mpts$depth.ratio, labels = mpts$CNt, las = 1)
    mtext(text = "Copy number", side = 4, line = 2)
    points(x = segs$Bf, y = segs$depth.ratio, pch = 19, cex = 0.5)
 }
