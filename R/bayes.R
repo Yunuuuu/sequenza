@@ -28,9 +28,7 @@ depth.ratio.dbinom <- function(size, depth.ratio, depth.ratio.model) {
 }
 
 depth.ratio.dpois <- function(size, depth.ratio, depth.ratio.model, ...) {
-   x        <- round(depth.n * depth.ratio, 0)
-   #x        <- round(size * (depth.ratio/(1 + depth.ratio)), 0)
-   #prob             <- depth.ratio.model / (1 + depth.ratio.model)
+   x        <- round(size * depth.ratio, 0)
    dpois( x = x, lambda = depth.ratio.model * size, ...)
 }
 
