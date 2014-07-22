@@ -88,7 +88,7 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.rat
 }
 
 baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
-                      sd.Bf = 0.1, sd.ratio = 0.1, weight.Bf = 1, weight.ratio = 1, CNt.min = 0,
+                      sd.Bf = 0.1, sd.ratio = 0.5, weight.Bf = 1, weight.ratio = 1, CNt.min = 0,
                       CNt.max = 7, CNn = 2, priors.table = data.frame(CN = CNt.min:CNt.max,
                       value = 1), ratio.priority = FALSE) {
 
