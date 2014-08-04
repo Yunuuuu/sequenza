@@ -7,7 +7,8 @@
 %\VignettePackage{SNP}
 
 \documentclass[10pt,a4paper]{article}
-\usepackage{a4wide}
+%\usepackage{a4wide}
+\usepackage{geometry}
 \usepackage{hyperref}
 \usepackage{subfigure}
 \usepackage{listings}
