@@ -335,6 +335,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
          genome.view(seg.res)
       }
       genome.view(seg.res, "CN")
+      plotRawGenome(sequenza.extract, cellularity = cellularity, ploidy = ploidy)
    dev.off()
    barscn <- data.frame(size = seg.res$end.pos - seg.res$start.pos,
                      CNt = seg.res$CNt)
