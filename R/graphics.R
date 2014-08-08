@@ -8,24 +8,36 @@ cp.plot <- function (cp.table,
             xlab = xlab, ylab = ylab, zlab = zlab, ...)
 }
 
-cp.plot.contours <- function(cp.table, likThresh = c(0.95),
-                             col = palette(), legend.pos = 'bottomright', pch = 18, ...) {
+cp.plot.contours <- function(cp.table, likThresh = c(0.95), alternative = TRUE,
+                             col = palette(), legend.pos = 'bottomright', pch = 18, alt.pch = 3, ...) {
    znormsort <- sort(cp.table$loglik, decreasing = TRUE)
    znormcumLik <- cumsum(znormsort)
    n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
    LikThresh <- znormsort[n]
    names(LikThresh) <- paste0(likThresh * 100, '%')
-
    contour(x = cp.table$ploidy, y = cp.table$cellularity, z = cp.table$loglik,
            levels = znormsort[n], col = col, drawlabels = FALSE,
            xlab = "Ploidy", ylab = "Cellularity", ...)
    max.xy <- which(cp.table$loglik == max(cp.table$loglik), arr.ind = TRUE)
    points(x = cp.table$ploidy[max.xy[, "row"]],
           y = cp.table$cellularity[max.xy[, "col"]], pch = pch)
+   if (alternative == TRUE){
+      alt.sol <- alternative.cp.solutions(cp.table)
+      alt.sol <- alt.sol[-1, ]
+      points(x = alt.sol$ploidy,
+             y = alt.sol$cellularity, pch = alt.pch)
+   }
    if(!is.na(legend.pos)) {
-      legend(legend.pos, legend = c(paste("C.R.", names(LikThresh), sep = " "), "Point estimate"),
-             col = c(col[1:length(LikThresh)], "black"), lty = c(rep(1, length(LikThresh)), NA),
-             pch = c(rep(NA, length(LikThresh)), pch), border = NA, bty = "n")
+      if (alternative == FALSE) {
+         legend(legend.pos, legend = c(paste("C.R.", names(LikThresh), sep = " "), "Point estimate"),
+                col = c(col[1:length(LikThresh)], "black"), lty = c(rep(1, length(LikThresh)), NA),
+                pch = c(rep(NA, length(LikThresh)), pch), border = NA, bty = "n")
+      } else {
+         legend(legend.pos, legend = c(paste("C.R.", names(LikThresh), sep = " "),
+                                       "Point estimate", "Alternative solutions"),
+                col = c(col[1:length(LikThresh)], "black", "black"), lty = c(rep(1, length(LikThresh)), NA, NA),
+                pch = c(rep(NA, length(LikThresh)), pch, alt.pch), border = NA, bty = "n")         
+      }
    }
    invisible(LikThresh)
 }
