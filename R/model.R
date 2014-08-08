@@ -65,7 +65,7 @@ theoretical.baf <- function(CNt, CNn = 2, cellularity) {
 
 expected.baf <- function(sd, ...) {
    baf      <- theoretical.baf(...)
-   baf.binom <- function(BAF, sd, by = 0.001){
+   baf.t2 <- function(BAF, sd, by = 0.001){
       bafs   <- seq(0,1,0.001)
       b.b    <- dt2(x = bafs, mean = BAF, sd = sd, df = 5)
       b.a    <- dt2(x = bafs, mean = 1-BAF, sd = sd, df = 5)
@@ -73,7 +73,7 @@ expected.baf <- function(sd, ...) {
       b <- (b.b+b.a)[bafs <= 0.5]
       weighted.mean(half.b,b)
    }
-   BAF <- mapply(FUN = baf.binom, baf$BAF,
+   BAF <- mapply(FUN = baf.t2, baf$BAF,
                  MoreArgs = list(sd = sd))
    wgh <- dt2(x = baf$BAF, mean = 0.5, sd = sd, df = 5)
    wgh <- wgh/max(wgh)
