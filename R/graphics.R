@@ -377,3 +377,51 @@ baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001
    points(x = segs$Bf, y = segs$depth.ratio, pch = 19, cex = 0.5)
 }
 
+plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7){
+   max.end <- sapply(sequenza.extract$ratio, FUN = function(x) max(x$end, na.rm = T))
+   max.end <- c(0, cumsum(as.numeric(max.end)))
+   chrs <- names(sequenza.extract$ratio)
+   coords.names <- (max.end + c(diff(max.end)/2,0))[1:length(chrs)]
+   new.coords <- function(win.list, max.end){
+      lapply(1:length(win.list), FUN = function(x) {
+         y <- win.list[[x]]
+         y$start <- y$start + max.end[x]
+         y$end <- y$end + max.end[x]
+         y
+      })}
+   new.coords.segs <- function(segs, max.end){
+      lapply(1:length(segs), FUN = function(x) {
+         y <- segs[[x]]
+         y$start.pos <- y$start.pos + max.end[x]
+         y$end.pos <- y$end.pos + max.end[x]
+         y
+      })}
+   ratio.new <- new.coords(sequenza.extract$ratio,max.end)
+   BAF.new   <- new.coords(sequenza.extract$BAF,max.end)
+   segs.new  <- do.call(rbind, new.coords.segs(sequenza.extract$segments,max.end))
+   par(mar = c(1, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(2,1))
+   plot(x = c(min(max.end), max(max.end)), y = c(0,0.5), main = "", xlab = NA,
+        ylab = "B allele frequency", type = "n", las = 1, xaxs = "i", yaxs = "i", xaxt = "n" )
+   plotWindows(seqz.window = do.call(rbind, BAF.new), q.bg = "lightblue", m.col = "black", add = T)
+   segments(x0 = segs.new$start.pos, x1 = segs.new$end.pos,
+            y0 = (segs.new$Bf), y1 = (segs.new$Bf), col = "red", lwd = 2, lend = 1)
+   abline(v = max.end, lty = 1)
+   plot(x=c(min(max.end), max(max.end)), y = c(0,2.5), main = "", xlab = NA,
+        ylab = "Depth ratio", type = "n", las = 1, xaxs = "i", yaxs = "i", xaxt = "n")
+   plotWindows(seqz.window = do.call(rbind, ratio.new), q.bg = "lightblue", m.col = "black", add = T)
+   segments(x0 = segs.new$start.pos, x1 = segs.new$end.pos,
+            y0 = (segs.new$depth.ratio), y1 = (segs.new$depth.ratio), col = "red", lwd = 2, lend = 1)
+   if (!missing(ploidy) & !missing(cellularity)){
+      types        <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
+      depth.ratios <- model.points(cellularity = cellularity, ploidy = ploidy,
+                                   avg.depth.ratio = mean(sequenza.extract$gc$adj[,2]),
+                                   types = types)[, "depth.ratio"]
+      depth.ratios <- unique(data.frame(CNt = types$CNt, ratio = depth.ratios))
+      abline(h = depth.ratios$ratio, lty = 2)
+      axis(labels = as.character(depth.ratios$CNt), side = 4, line = 0, las = 1,
+           at = depth.ratios$ratio)
+      mtext(text = "Copy number", side = 4, line = 2, cex = par("cex.lab")*par("cex"))
+   }
+   abline(v = max.end, lty = 1)
+   axis(label = chrs, at = coords.names, side = 1, cex.axis = 1)
+}
