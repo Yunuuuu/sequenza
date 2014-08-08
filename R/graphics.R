@@ -185,8 +185,8 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
       labels <- sapply(unique.colors, function(a) paste(names(mutation.colors)[mutation.colors == a], collapse = ", "))
       #legend("topleft", legend = labels, fill = unique.colors, border = NA, bty = "n")
       legend(y = "center", x  = "right", legend = labels,
-             inset = legend.inset,
-             fill = unique.colors, border = NA, bty = "n")
+             inset = legend.inset, pch = 19, col = unique.colors,
+             pt.bg = unique.colors, border = NA, bty = "n")
       if (!is.null(segments)){
          if (vlines) {
             abline(v = segments$end.pos, lwd = 1, lty = 2)
