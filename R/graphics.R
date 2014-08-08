@@ -342,17 +342,17 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
         side = 1 , line = 1)
 }
 
-baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001, 0.5, 0.005), ratio.space = seq(0.01, 2.5, 0.05), CNt.max = 7) {
+baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001, 0.5, 0.005),
+                                ratio.space = seq(0.01, 2.5, 0.05), avg.depth.ratio = 1, CNt.max = 7) {
    s.b   <- mean(segs$sd.BAF, na.rm = TRUE)
    s.r   <- mean(segs$sd.ratio, na.rm = TRUE)
    l.s   <- segs$end.pos - segs$start.pos
-   avg.r <- weighted.mean(x = segs$depth.ratio, w = l.s, na.rm = TRUE)
    test.values <- expand.grid(Bf = BAF.space, ratio = ratio.space,
                               KEEP.OUT.ATTRS = FALSE)
    both.space  <- baf.bayes(Bf = test.values$Bf, CNt.max = CNt.max, CNt.min = 0,
                            depth.ratio = test.values$ratio,
                            cellularity = cellularity, ploidy = ploidy,
-                           avg.depth.ratio = avg.r,
+                           avg.depth.ratio = avg.depth.ratio,
                            sd.Bf = s.b, weight.Bf = 10,
                            sd.ratio = s.r, weight.ratio = 10, ratio.priority = F,
                            CNn = 2) 
@@ -364,13 +364,14 @@ baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001
    mpts <- cbind(t,
                  model.points(cellularity = cellularity,
                               ploidy = ploidy, types = t,
-                              avg.depth.ratio = avg.r)
+                              avg.depth.ratio = avg.depth.ratio)
    )
    mpts <- unique(mpts[, c("CNt", "depth.ratio")])
    par(mar = c(5.1, 4.1, 4.1, 4.1))
-   colorgram(x, y, z, key = NA, nz = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
+   suppressWarnings(colorgram(x, y, z, key = NA, nz = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
              main = paste("cellularity:", cellularity, "ploidy:", ploidy, "sd.BAF:", round(s.b,2), sep = " "),
-             las = 1, xlim = c(0, 0.5))
+             map = makecmap(z, breaks = unique(quantile(z, seq(.25,1,0.0001))), right = TRUE, n = 1000), outlier = "white",
+             las = 1, xlim = c(0, 0.5)))
    axis(side = 4, at = mpts$depth.ratio, labels = mpts$CNt, las = 1)
    mtext(text = "Copy number", side = 4, line = 2)
    points(x = segs$Bf, y = segs$depth.ratio, pch = 19, cex = 0.5)
