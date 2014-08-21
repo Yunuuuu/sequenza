@@ -1,5 +1,4 @@
-cp.plot <- function (cp.table,  
-                     xlab = "Ploidy", ylab = "Cellularity", zlab = "Scaled rank likelihood", 
+cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity", zlab = "Scaled rank likelihood", 
                      colFn = colorRampPalette(c('white', 'lightblue')), ...) {
   z <- matrix(rank(cp.table$loglik), nrow = nrow(cp.table$loglik)) / length(cp.table$loglik)
   map <- makecmap(c(0, 1), colFn = colFn, include.lowest = TRUE)
@@ -343,10 +342,12 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
 }
 
 baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001, 0.5, 0.005),
-                                ratio.space = seq(0.01, 2.5, 0.05), avg.depth.ratio = 1, CNt.max = 7) {
+                                ratio.space = seq(0.01, 2.5, 0.05), avg.depth.ratio = 1, CNt.max = 7,
+                                segment.filter = 3e6) {
    s.b   <- mean(segs$sd.BAF, na.rm = TRUE)
    s.r   <- mean(segs$sd.ratio, na.rm = TRUE)
    l.s   <- segs$end.pos - segs$start.pos
+   s.big <- l.s >= segment.filter
    test.values <- expand.grid(Bf = BAF.space, ratio = ratio.space,
                               KEEP.OUT.ATTRS = FALSE)
    both.space  <- baf.bayes(Bf = test.values$Bf, CNt.max = CNt.max, CNt.min = 0,
@@ -368,16 +369,18 @@ baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001
    )
    mpts <- unique(mpts[, c("CNt", "depth.ratio")])
    par(mar = c(5.1, 4.1, 4.1, 4.1))
+   rev.heat <- function(...){rev(heat.colors(...))}
    suppressWarnings(colorgram(x, y, z, key = NA, nz = 1000, xlab = "B allele frequency", ylab = "Depth ratio",
              main = paste("cellularity:", cellularity, "ploidy:", ploidy, "sd.BAF:", round(s.b,2), sep = " "),
-             map = makecmap(z, breaks = unique(quantile(z, seq(.25,1,0.0001))), right = TRUE, n = 1000), outlier = "white",
-             las = 1, xlim = c(0, 0.5)))
+             map = makecmap(z, breaks = unique(quantile(z, seq(.25,1,0.0001))), right = TRUE, n = 1000, colFn = rev.heat),
+             outlier = "white", las = 1, xlim = c(0, 0.5)))
    axis(side = 4, at = mpts$depth.ratio, labels = mpts$CNt, las = 1)
    mtext(text = "Copy number", side = 4, line = 2)
-   points(x = segs$Bf, y = segs$depth.ratio, pch = 19, cex = 0.5)
+   points(x = segs$Bf[s.big], y = segs$depth.ratio[s.big], pch = 1, cex = 1)
+   points(x = segs$Bf[!s.big], y = segs$depth.ratio[!s.big], pch = ".", cex = 1)
 }
 
-plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7){
+plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7, main = "", ...){
    max.end <- sapply(sequenza.extract$ratio, FUN = function(x) max(x$end, na.rm = T))
    max.end <- c(0, cumsum(as.numeric(max.end)))
    chrs <- names(sequenza.extract$ratio)
@@ -399,8 +402,8 @@ plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7){
    ratio.new <- new.coords(sequenza.extract$ratio,max.end)
    BAF.new   <- new.coords(sequenza.extract$BAF,max.end)
    segs.new  <- do.call(rbind, new.coords.segs(sequenza.extract$segments,max.end))
-   par(mar = c(1, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(2,1))
-   plot(x = c(min(max.end), max(max.end)), y = c(0,0.5), main = "", xlab = NA,
+   par(mar = c(1, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(2,1), ...)
+   plot(x = c(min(max.end), max(max.end)), y = c(0,0.5), main = main, xlab = NA,
         ylab = "B allele frequency", type = "n", las = 1, xaxs = "i", yaxs = "i", xaxt = "n" )
    plotWindows(seqz.window = do.call(rbind, BAF.new), q.bg = "lightblue", m.col = "black", add = T)
    segments(x0 = segs.new$start.pos, x1 = segs.new$end.pos,
