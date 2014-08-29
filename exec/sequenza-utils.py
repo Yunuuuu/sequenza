@@ -765,7 +765,7 @@ def main():
                   pup = multiPileups(normal,tumor)
                   pup = GCmultiPileups(pup, gc_file)
                   fileout.write("\t".join(out_header) + '\n')
-                  if args.chunk > 1 or args.nproc > 0:
+                  if args.nproc > 0:
                      #p = ThreadPool(processes=args.nproc)
                      p = multiprocessing.Pool(processes=args.nproc)
                      for res in p.imap(line_worker_partial, pup,chunksize=args.chunk):
@@ -784,7 +784,7 @@ def main():
                   pup = GCmultiPileups(pup, gc_file)
                   pup = GCmultiPileupsAltDepth(pup, alt_normal)
                   fileout.write("\t".join(out_header) + '\n')
-                  if args.chunk > 1 or args.nproc > 0:
+                  if args.nproc > 0:
                      #p = ThreadPool(processes=args.nproc)
                      p = multiprocessing.Pool(processes=args.nproc)
                      for res in p.imap(line_worker_partial, pup,chunksize=args.chunk):
