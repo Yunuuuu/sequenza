@@ -851,7 +851,10 @@ def main():
             cmd_tum2 = [args.samtools, "mpileup", "-f", args.fasta, "-q " + str(args.qlimit), "-"]
             cmd_nor2 = [args.samtools, "mpileup", "-f", args.fasta, "-q " + str(args.qlimit), "-"]
             if args.normal2:
-               cmd_nor3 = [args.samtools, "view", "-u", args.normal2]
+               if args.chr:
+                  cmd_nor3 = [args.samtools, "view", "-u", args.normal2, args.chr]
+               else:
+                  cmd_nor3 = [args.samtools, "view", "-u", args.normal2]
                cmd_nor4 = [args.samtools, "mpileup", "-f", args.fasta, "-q " + str(args.qlimit), "-"]
                tum1 = Popen(cmd_tum1, stdout = PIPE)
                nor1 = Popen(cmd_nor1, stdout = PIPE)
@@ -861,10 +864,10 @@ def main():
                   res.start()
                   with open(nfifo, 'wb', 0) as normal, open(tfifo, 'wb', 0) as tumor, open(n2fifo, 'wb', 0) as normal2:
                      fifos = [Popen(cmd_tum2, stdin=tum1.stdout, stdout=tumor, stderr=PIPE), Popen(cmd_nor2, stdin=nor1.stdout, stdout=normal, stderr=PIPE), Popen(cmd_nor4, stdin=nor2.stdout, stdout=normal2, stderr=PIPE)]
-                     res.join()
-                     tum1.terminate()
-                     nor1.terminate()
-                     nor3.terminate()
+                     tum1.stdout.close()
+                     nor1.stdout.close()
+                     nor2.stdout.close()
+                  res.join()
                   for fifo in fifos:
                      fifo.terminate()
             else:
@@ -875,9 +878,9 @@ def main():
                   res.start()
                   with open(nfifo, 'wb', 0) as normal, open(tfifo, 'wb', 0) as tumor:
                      fifos = [Popen(cmd_tum2, stdin=tum1.stdout, stdout=tumor, stderr=PIPE), Popen(cmd_nor2, stdin=nor1.stdout, stdout=normal, stderr=PIPE)]
-                     res.join()
-                     tum1.terminate()
-                     nor1.terminate()
+                     tum1.stdout.close()
+                     nor1.stdout.close()
+                  res.join()
                   for fifo in fifos:
                      fifo.terminate()
 
@@ -887,7 +890,7 @@ def main():
             out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal", "GC.percent", "good.reads", "AB.normal", "AB.tumor", "tumor.strand"]
             res = multiprocessing.Process(target = DOpup2seqz, args = (args.normal, args.tumor, args.gc, args.normal2, args.n,  args.qlimit, args.qformat, args.hom, args.het, args.nproc, args.chunk, fileout, out_header))
             res.start()
-            res.join()
+         res.join()
 
 
       elif used_module == "GC-windows":
