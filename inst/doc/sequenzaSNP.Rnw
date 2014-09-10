@@ -7,7 +7,8 @@
 %\VignettePackage{SNP}
 
 \documentclass[10pt,a4paper]{article}
-\usepackage{a4wide}
+%\usepackage{a4wide}
+\usepackage{geometry}
 \usepackage{hyperref}
 \usepackage{subfigure}
 \usepackage{listings}
@@ -98,16 +99,20 @@ seg.i  <- segment.breaks(sample.i, breaks = breaks)
 \subsection{Using the Bayesian inference on segmented SNP arrays}
 <<label=adjustSegs, eval=TRUE>>=
 
-weights.snp   <- 150 + round((seg.i$end.pos - seg.i$start.pos)/1e6 , 0)
+weights.snp   <- (seg.i$end.pos - seg.i$start.pos)/1e6
 filter.size   <- (seg.i$end.pos - seg.i$start.pos) >= 10e6
-avg.unlogR <- mean(sample.i$adjusted.ratio, na.rm = TRUE)
+avg.unlogR    <- mean(sample.i$adjusted.ratio, na.rm = TRUE)
+avg.sd.ratio  <- sum(seg.i$sd.ratio * seg.i$N.ratio)/sum(seg.i$N.ratio)
+avg.sd.Bf     <- sum(seg.i$sd.BAF * seg.i$N.BAF)/sum(seg.i$N.BAF)
 @
 
 <<label=CPforSNP, eval = FALSE, results=hide>>=
 CPsnp.example <- baf.model.fit(Bf = seg.i$Bf[filter.size],
                         depth.ratio = seg.i$depth.ratio[filter.size], 
-                        weight.ratio = weights.snp[filter.size],
-                        weight.Bf = weights.snp[filter.size],
+                        sd.ratio = seg.i$sd.ratio[filter.size],
+                        sd.Bf = seg.i$sd.BAF[filter.size],
+                        weight.ratio = 10,
+                        weight.Bf = 1,
                         avg.depth.ratio = avg.unlogR,
                         cellularity = seq(0.1,1,0.01), 
                         ploidy = seq(1,7,0.1),
@@ -143,8 +148,11 @@ snp.seg.cn <- baf.bayes(Bf = seg.i$Bf,
                         depth.ratio = seg.i$depth.ratio, 
                         avg.depth.ratio = avg.unlogR,
                         cellularity = cellularity,
-                        weight.ratio = 2 * 300,
-                        weight.Bf = 300, ratio.priority = FALSE,
+                        sd.ratio = seg.i$sd.ratio,
+                        sd.Bf = seg.i$sd.BAF,
+                        weight.ratio = weights.snp,
+                        weight.Bf = 1,                        
+                        ratio.priority = FALSE,
                         ploidy = ploidy, CNt.max = 10)
 
 segmented.snp <- cbind(seg.i, snp.seg.cn)
@@ -171,11 +179,11 @@ chromosome.view(baf.windows = snp.b.win[[1]],
 \begin{figure}[H]
       \centering
 <<label=chrViewNoMutCP16, fig=TRUE, width=6, height=6>>=
-chromosome.view(baf.windows = snp.b.win[[16]], 
-                ratio.windows = snp.r.win[[16]],  min.N.ratio = 1,
-                segments = segmented.snp[segmented.snp$chromosome == "16", ],
-                cellularity = cellularity, ploidy = ploidy,
-                avg.depth.ratio = avg.unlogR, main = "16")
+chromosome.view(baf.windows = snp.b.win[[2]],
+                ratio.windows = snp.r.win[[2]],  min.N.ratio = 2,
+                segments = segmented.snp[segmented.snp$chromosome == "2", ],
+                cellularity = cellularity, ploidy = ploidy, BAF.style = "lines",
+                avg.depth.ratio = avg.unlogR, main = "2")
 @
       \caption{Plots B-allele frequencies (top) and un-logged-logR (bottom) with SNP array data. Chromosome 16. Horizontal dotted line indicate different copy number/ allele state. }
       \label{fig:crhomViewNoMutCP16}
@@ -204,6 +212,7 @@ legend("bottomright", bty = "n", c("A-allele","B-allele"), col= c("red", "blue")
       \label{fig:genomeViewABSNP}
 \end{figure}
 %\newpage
+
 
 \end{document}
 

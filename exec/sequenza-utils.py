@@ -10,11 +10,28 @@ from itertools import izip_longest
 from multiprocessing.pool import ThreadPool
 from functools import partial
 from multiprocessing.queues import SimpleQueue
+from contextlib import contextmanager
+from shutil     import rmtree
+from subprocess import Popen, check_call, PIPE
+from tempfile   import mkdtemp
 
-VERSION = "1.2.0"
-DATE    = "08 May 2014"
+VERSION = "2.1.0"
+DATE    = "05 September 2014"
 AUTHOR  = "Favero Francesco"
 MAIL    = "favero@cbs.dtu.dk"
+
+@contextmanager
+def named_pipe():
+   '''
+   Thanks to google for this nice solution :)
+   '''
+   dirname = mkdtemp()
+   try:
+      path = os.path.join(dirname, "temp.fifo")
+      os.mkfifo(path)
+      yield path
+   finally:
+      rmtree(dirname)
 
 def check_dir(directory):
    '''
@@ -618,6 +635,44 @@ class DefaultHelpParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
+
+def DOpup2seqz(p1, p2, gc, n2, n, qlimit, qformat, hom, het, nproc, chunk, fileout, out_header):
+   stream_mpileup = IterableQueue()
+   if not n2:
+      line_worker_partial = partial(line_worker, depth_sum=n, qlimit=qlimit, qformat=qformat, hom_t=hom, het_t=het)
+      with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file:
+         pup = multiPileups(normal,tumor)
+         pup = GCmultiPileups(pup, gc_file)
+         fileout.write("\t".join(out_header) + '\n')
+         if nproc > 0:
+            p = multiprocessing.Pool(processes=nproc)
+            for res in p.imap(line_worker_partial, pup,chunksize=chunk):
+               if res:
+                  fileout.write('\t'.join(map(str,res))+'\n')
+         else:
+            for line in pup:
+               res = line_worker_partial(line)
+               if res:
+                  fileout.write('\t'.join(map(str,res))+'\n')
+   else:
+      line_worker_partial = partial(line_worker, depth_sum=n, qlimit=qlimit, qformat=qformat, hom_t=hom, het_t=het, alt_pileup=True) 
+      with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file, xopen(n2, 'rb') as alt_normal:
+         pup = multiPileups(normal,tumor)
+         pup = GCmultiPileups(pup, gc_file)
+         pup = GCmultiPileupsAltDepth(pup, alt_normal)
+         fileout.write("\t".join(out_header) + '\n')
+         if nproc > 0:
+            p = multiprocessing.Pool(processes=nproc)
+            for res in p.imap(line_worker_partial, pup,chunksize=chunk):
+               if res:
+                  fileout.write('\t'.join(map(str,res))+'\n')
+         else:
+            for line in pup:
+               res = line_worker_partial(line)
+               if res:
+                  fileout.write('\t'.join(map(str,res))+'\n')
+
+
 def pileup2acgt(parser, subparser):
    subparser.add_argument('pileup', metavar='pileup',
                    help='Name of the input pileup (SAMtools) file. If the filename ends in .gz it will be opened in gzip mode. If the file name is - it will be read from STDIN.')
@@ -672,6 +727,37 @@ def pileup2seqz(parser, subparser):
                    help='Set the number of input lines to assign to each process, if NPROC > 0. (Default = 1000)')
    return parser.parse_args()
 
+def bam2seqz(parser, subparser):
+   parser_ABinput       = subparser.add_argument_group(title='Input Files',description='Required input files.')
+   parser_ABgenotype    = subparser.add_argument_group(title='Genotyper',description='Options regarding the genotyping.')
+   parser_ABsamtools = subparser.add_argument_group(title='Samtools', description='Options regarding samtools.')
+   parser_ABqualitysets = subparser.add_argument_group(title='Quality and Format', description='Options that change the quality threshold and format.')
+   parser_ABinput.add_argument('-n', '--normal', dest = 'normal', required = True,
+                   help='Name of the BAM file from the reference/normal sample')
+   parser_ABinput.add_argument('-t', '--tumor', dest = 'tumor', required = True,
+                   help='Name of the BAM file from the tumor sample')
+   parser_ABinput.add_argument('-gc', dest = 'gc', metavar = 'gc', required = True,
+                   help='The GC-content file coming from UCSC genome browser, or generated in the same UCSC format')
+   parser_ABinput.add_argument('-F', "--fasta", dest = 'fasta', metavar = 'fasta', required = True,
+                   help='The reference FASTA file used to generate the pileup')
+   parser_ABinput.add_argument('-n2', '--normal2', dest = 'normal2', type = str, default = None,
+                   help='EXPERIMENTAL: Optional BAM used only to compute the depth.normal and depth-ratio, instead of \"normal\"')
+   parser_ABqualitysets.add_argument('-q', '--qlimit', dest = 'qlimit', default = 20, type = int,
+                   help='Minimum nucleotide quality score for inclusion in the counts. Default 20.')
+   parser_ABqualitysets.add_argument('-f', '--qformat', dest = 'qformat', default = "sanger",
+                   help='Quality format, options are "sanger" or "illumina". This will add an offset of 33 or 64 respectively to the qlimit value. Default "sanger".')
+   parser_ABqualitysets.add_argument('-N', dest = 'n', type = int, default = 20,
+                   help='Threshold to filter positions by the sum of read depth of the two samples. Default 20.')
+   parser_ABgenotype.add_argument('--hom', dest = 'hom', type = float, default = 0.9,
+                   help='Threshold to select homozygous positions. Default 0.9.')
+   parser_ABgenotype.add_argument('--het', dest = 'het', type = float, default = 0.25,
+                   help='Threshold to select heterozygous positions. Default 0.25.')
+   parser_ABsamtools.add_argument("-S", '--samtools', dest = 'samtools', type = str, default = "samtools",
+                   help='Path of samtools to use for the pileup generation.')
+   parser_ABsamtools.add_argument("-C", '--chromosome', dest = 'chr', type = str, default = None,
+                   help='Argument to restrict the input/output to a chromosome or a chromosome region. Coordinate format is Name:pos.start-pos.end, eg: chr17:7565097-7590856, for a particular region; eg: chr17, for the entire chromosome. Chromosome name are depending of the BAM file and FASTA reference used for alignment. Default behaviour is not selecting any cromosome.')
+   return parser.parse_args()
+
 def GC_windows(parser, subparser):
    subparser.add_argument('fasta', metavar = 'fasta',
                    help='the fasta file. It can be a file name or \"-\" to take the input from STDIN')
@@ -702,6 +788,7 @@ def main():
                               usage= 'sequenza-utils.py command [options]', epilog = 'This is version {0} - Francesco Favero - {1}'.format(VERSION, DATE))
    subparsers = parser.add_subparsers(dest='module')
    subparsers.metavar = None
+   parser_bam2seqz  = subparsers.add_parser('bam2seqz', help = 'Process a paired set of BAM files (tumor and matching normal), and GC-content genome-wide information, to extract the common positions with A and B alleles frequencies',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=39, width=90))
    parser_pileup2seqz  = subparsers.add_parser('pileup2seqz', help = 'Process a paired set of pileup files (tumor and matching normal), and GC-content genome-wide information, to extract the common positions with A and B alleles frequencies',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=39, width=90))
    parser_reduce_seqz = subparsers.add_parser('seqz-binning', help = 'Perform binning of the seqz file to reduce file size and memory requirement for the analysis.')
    parser_pup2mu = subparsers.add_parser('pileup2acgt', help = 'Convert pileup format to ACGT format',formatter_class=lambda prog: SubcommandHelpFormatter(prog,max_help_position=30, width=90))
@@ -750,52 +837,60 @@ def main():
                seconds =  end-start
                logging.warning("Pileup to ACGT: processed " + str(counter) + " lines in " + str(seconds) + " seconds")
 
+      elif used_module == "bam2seqz":
+         args = bam2seqz(parser, parser_bam2seqz)
+         with xopen('-', "wb") as fileout:
+            out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal", "GC.percent", "good.reads", "AB.normal", "AB.tumor", "tumor.strand"]
+            if args.chr:
+               cmd_tum1 = [args.samtools, "view", "-u", args.tumor, args.chr]
+               cmd_nor1 = [args.samtools, "view", "-u", args.normal, args.chr]
+            else:
+               cmd_tum1 = [args.samtools, "view", "-u", args.tumor]
+               cmd_nor1 = [args.samtools, "view", "-u", args.normal]
+
+            cmd_tum2 = [args.samtools, "mpileup", "-f", args.fasta, "-q " + str(args.qlimit), "-"]
+            cmd_nor2 = [args.samtools, "mpileup", "-f", args.fasta, "-q " + str(args.qlimit), "-"]
+            if args.normal2:
+               if args.chr:
+                  cmd_nor3 = [args.samtools, "view", "-u", args.normal2, args.chr]
+               else:
+                  cmd_nor3 = [args.samtools, "view", "-u", args.normal2]
+               cmd_nor4 = [args.samtools, "mpileup", "-f", args.fasta, "-q " + str(args.qlimit), "-"]
+               tum1 = Popen(cmd_tum1, stdout = PIPE)
+               nor1 = Popen(cmd_nor1, stdout = PIPE)
+               nor2 = Popen(cmd_nor3, stdout = PIPE)
+               with named_pipe() as tfifo, named_pipe() as nfifo, named_pipe() as n2fifo:
+                  res = multiprocessing.Process(target = DOpup2seqz, args = (nfifo, tfifo, args.gc, n2fifo, args.n,  args.qlimit, args.qformat, args.hom, args.het, 0, 1, fileout, out_header))
+                  res.start()
+                  with open(nfifo, 'wb', 0) as normal, open(tfifo, 'wb', 0) as tumor, open(n2fifo, 'wb', 0) as normal2:
+                     fifos = [Popen(cmd_tum2, stdin=tum1.stdout, stdout=tumor, stderr=PIPE), Popen(cmd_nor2, stdin=nor1.stdout, stdout=normal, stderr=PIPE), Popen(cmd_nor4, stdin=nor2.stdout, stdout=normal2, stderr=PIPE)]
+                     tum1.stdout.close()
+                     nor1.stdout.close()
+                     nor2.stdout.close()
+                  res.join()
+                  for fifo in fifos:
+                     fifo.terminate()
+            else:
+               tum1 = Popen(cmd_tum1, stdout = PIPE)
+               nor1 = Popen(cmd_nor1, stdout = PIPE)
+               with named_pipe() as tfifo, named_pipe() as nfifo:
+                  res = multiprocessing.Process(target = DOpup2seqz, args = (nfifo, tfifo, args.gc, args.normal2, args.n,  args.qlimit, args.qformat, args.hom, args.het, 0, 1, fileout, out_header))
+                  res.start()
+                  with open(nfifo, 'wb', 0) as normal, open(tfifo, 'wb', 0) as tumor:
+                     fifos = [Popen(cmd_tum2, stdin=tum1.stdout, stdout=tumor, stderr=PIPE), Popen(cmd_nor2, stdin=nor1.stdout, stdout=normal, stderr=PIPE)]
+                     tum1.stdout.close()
+                     nor1.stdout.close()
+                  res.join()
+                  for fifo in fifos:
+                     fifo.terminate()
+
       elif used_module == "pileup2seqz":
          args = pileup2seqz(parser, parser_pileup2seqz)
          with xopen('-', "wb") as fileout:
             out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal", "GC.percent", "good.reads", "AB.normal", "AB.tumor", "tumor.strand"]
-            p1 = args.normal
-            p2 = args.tumor
-            gc = args.gc
-            n2 = args.normal2
-            stream_mpileup = IterableQueue()
-            if not n2:
-               line_worker_partial = partial(line_worker, depth_sum=args.n, qlimit=args.qlimit, qformat=args.qformat, hom_t=args.hom, het_t=args.het)
-               with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file:
-                  pup = multiPileups(normal,tumor)
-                  pup = GCmultiPileups(pup, gc_file)
-                  fileout.write("\t".join(out_header) + '\n')
-                  if args.chunk > 1 or args.nproc > 0:
-                     #p = ThreadPool(processes=args.nproc)
-                     p = multiprocessing.Pool(processes=args.nproc)
-                     for res in p.imap(line_worker_partial, pup,chunksize=args.chunk):
-                        #for res in results.get(99):
-                        if res:
-                           fileout.write('\t'.join(map(str,res))+'\n')
-                  else:
-                     for line in pup:
-                        res = line_worker_partial(line)
-                        if res:
-                           fileout.write('\t'.join(map(str,res))+'\n')
-            else:
-               line_worker_partial = partial(line_worker, depth_sum=args.n, qlimit=args.qlimit, qformat=args.qformat, hom_t=args.hom, het_t=args.het, alt_pileup=True) 
-               with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file, xopen(n2, 'rb') as alt_normal:
-                  pup = multiPileups(normal,tumor)
-                  pup = GCmultiPileups(pup, gc_file)
-                  pup = GCmultiPileupsAltDepth(pup, alt_normal)
-                  fileout.write("\t".join(out_header) + '\n')
-                  if args.chunk > 1 or args.nproc > 0:
-                     #p = ThreadPool(processes=args.nproc)
-                     p = multiprocessing.Pool(processes=args.nproc)
-                     for res in p.imap(line_worker_partial, pup,chunksize=args.chunk):
-                        #for res in results.get(99):
-                        if res:
-                           fileout.write('\t'.join(map(str,res))+'\n')
-                  else:
-                     for line in pup:
-                        res = line_worker_partial(line)
-                        if res:
-                           fileout.write('\t'.join(map(str,res))+'\n')
+            res = multiprocessing.Process(target = DOpup2seqz, args = (args.normal, args.tumor, args.gc, args.normal2, args.n,  args.qlimit, args.qformat, args.hom, args.het, args.nproc, args.chunk, fileout, out_header))
+            res.start()
+         res.join()
 
 
       elif used_module == "GC-windows":
