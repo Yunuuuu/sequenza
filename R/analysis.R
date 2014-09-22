@@ -266,6 +266,13 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
       breaks.i    <- breaks[breaks$chrom == names(seqz.tab)[i], ]
       nb          <- nrow(breaks.i)
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))
+      unique.breaks <- function(b, offset = 1) {
+         while(sum(diff(b) == 0) > 0) {
+            b[which(diff(b) == 0) + 1] <- b[diff(b) == 0] + offset
+         }
+         b
+      }
+      breaks.vect <- unique.breaks(b = as.numeric(breaks.vect), offset = 1)
       fact.r.i    <- cut(seqz.tab[[i]]$position, breaks.vect)
       fact.b.i    <- cut(seqz.b.i$position, breaks.vect)
       seg.i.s.r   <- sapply(X = split(seqz.tab[[i]]$chromosome, f = fact.r.i), FUN = length)
