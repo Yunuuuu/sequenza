@@ -11,8 +11,9 @@
    cp.plot(cp.table, xlab = "Ploidy", ylab = "Cellularity",
            zlab = "Scaled rank likelihood", 
            colFn = colorRampPalette(c('white', 'lightblue')), ...)
-   cp.plot.contours(cp.table, likThresh = c(0.95),
-                    col = palette(), legend.pos = "bottomright", pch = 18, ...)
+   cp.plot.contours(cp.table, likThresh = c(0.95), alternative = TRUE,
+                    col = palette(), legend.pos = "bottomright", pch = 18,
+                    alt.pch = 3, ...)
 }
 
 \arguments{
@@ -22,9 +23,11 @@
   \item{zlab}{zlab parameter as in the function \code{\link{colorgram}}.}
   \item{colFn}{colFn parameter as in the function \code{\link{colorgram}}.}  
   \item{likThresh}{vector of selected likelihood tresholds.}
-  \item{col}{vector of colours.}
+  \item{alternative}{boolean parameter, if \code{TRUE} the alternative solutions are computed and plotted.}
+  \item{col}{vector of colors.}
   \item{legend.pos}{position for placing the legend.}
   \item{pch}{character used to indicate the point estimate.}
+  \item{alt.pch}{if \code{alternative} is set to \code{TRUE} defines the character to indicate alternative solutions.}
   \item{...}{additional arguments accepted by the function \code{\link{colorgram}} for \code{cp.plot}, or \code{\link{contour}} for \code{cp.plot.contours}.}
 }
 
