@@ -316,5 +316,12 @@ alternative.cp.solutions <- function(cp.table) {
    }
    res <- lapply(p.alt, FUN = function (x) get.alt(x, cp.table))
    res <- as.data.frame(do.call(rbind, res))
-   res[order(res$L, decreasing = TRUE), ]
+   if (nrow(res) > 0 ){
+      res[order(res$L, decreasing = TRUE), ]
+   } else {
+      data.frame(cellularity = ci$max.cellularity, 
+                 ploidy = ci$max.ploidy,
+                 L =  cp.table$loglik[which(cp.table$ploidy == ci$max.ploidy),
+                                      which(cp.table$cellularity == ci$max.cellularity)])
+   }
 }
