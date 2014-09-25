@@ -249,7 +249,7 @@ find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5),
 
 segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
                            weighted.mean = TRUE) {
-   if (weighted.mean == TRUE){
+   if (weighted.mean){
       w.r     <- sqrt(seqz.tab$depth.tumor)
       rw      <- seqz.tab$adjusted.ratio * w.r
       w.b     <- sqrt(seqz.tab$good.reads)
@@ -267,7 +267,7 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
       nb          <- nrow(breaks.i)
       breaks.vect <- do.call(cbind, split.data.frame(breaks.i[,c("start.pos", "end.pos")], f = 1:nb))
       unique.breaks <- function(b, offset = 1) {
-         while(sum(diff(b) == 0) > 0) {
+         while(any(diff(b) == 0)) {
             b[which(diff(b) == 0) + 1] <- b[diff(b) == 0] + offset
          }
          b
@@ -278,7 +278,7 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
       seg.i.s.r   <- sapply(X = split(seqz.tab[[i]]$chromosome, f = fact.r.i), FUN = length)
       seg.i.s.b   <- sapply(X = split(seqz.b.i$chromosome, f = fact.b.i), FUN = length)
      
-      if (weighted.mean == TRUE){
+      if (weighted.mean){
          seg.i.rw    <- sapply(X = split(seqz.tab[[i]]$rw, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
          seg.i.w.r   <- sapply(X = split(seqz.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
          seg.i.r.sd  <- sapply(X = split(seqz.tab[[i]]$rw/seqz.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sd(log(a), na.rm = TRUE))
@@ -301,13 +301,13 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
    }
    segments <- do.call(rbind, segments[as.factor(chr.order)])
    row.names(segments) <- 1:nrow(segments)
-   len.seg <- (segments$end.pos - segments$start.pos)/1e6
+   len.seg <- (segments$end.pos - segments$start.pos) / 1e6
    segments[(segments$N.ratio/len.seg) >= 2, ]
 }
 
 alternative.cp.solutions <- function(cp.table) {
    ci <- get.ci(cp.table)
-   p.alt <- which(diff(sign(diff(ci$values.ploidy$y)))==-2)+1
+   p.alt <- which(diff(sign(diff(ci$values.ploidy$y))) == -2) + 1
    get.alt <- function(idx.p, cp.table) {
       idx.c <- which.max(cp.table$loglik[idx.p,])
       c(cellularity = cp.table$cellularity[idx.c],
