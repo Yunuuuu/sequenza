@@ -163,7 +163,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       segs.len      <- segs.all$end.pos - segs.all$start.pos
       #segs.filt     <- segs.len >= segment.filter
       #avg.depth.ratio <- mean(sequenza.extract$gc$adj[,2])
-      avg.depth.ratio <- weighted.mean(x = segs.all$depth.ratio, w = seg.len)
+      avg.depth.ratio <- weighted.mean(x = segs.all$depth.ratio, w = segs.len)
       avg.sd.ratio  <- sum(segs.all$sd.ratio * segs.all$N.ratio, na.rm = TRUE)/sum(segs.all$N.ratio, na.rm = TRUE)
       avg.sd.Bf     <- sum(segs.all$sd.BAF * segs.all$N.BAF, na.rm = TRUE)/sum(segs.all$N.BAF, na.rm = TRUE)
       segs.all$sd.BAF[segs.all$sd.BAF == 0]     <- max(segs.all$sd.BAF, na.rm = TRUE)
@@ -199,7 +199,8 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       }
       mut.filt     <- mut.all$F >= mufreq.treshold
       #avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
-      avg.depth.ratio <- weighted.mean(x = segs.all$depth.ratio, w = seg.len)
+      segs.len      <- segs.all$end.pos - segs.all$start.pos
+      avg.depth.ratio <- weighted.mean(x = segs.all$depth.ratio, w = segs.len)
       if (female){
          mut.is.xy  <- mut.all$chromosome == XY["Y"]
       } else{
