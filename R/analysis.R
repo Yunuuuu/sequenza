@@ -68,25 +68,26 @@ read.acgt <- function (file, colClasses = c('character', 'integer', 'character',
    read.seqz(file = file , colClasses = colClasses, ...)
 }
 
-gc.norm <- function (x, gc) {
+gc.norm <- function (x, gc, w) {
    dr.by.gc <- split(x, gc)
+   w.by.gc  <- split(w, gc)
    raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
-   dr.by.gc.median <- sapply(dr.by.gc, median, na.rm = TRUE)
-   dr.by.gc.mean <- sapply(dr.by.gc, mean, na.rm = TRUE)
-   adj <- sweep(raw, 1, dr.by.gc.median, '/')
+   dr.by.gc.mean <- mapply(dr.by.gc, FUN = weighted.mean, w.by.gc, na.rm = TRUE)
+   adj <- sweep(raw, 1, dr.by.gc.mean, '/')
    list(raw = raw, adj = adj, gc.values = as.numeric(names(dr.by.gc)),
-        raw.mean = dr.by.gc.mean, raw.median = dr.by.gc.median)
+        raw.mean = dr.by.gc.mean)
 }
 
 gc.sample.stats <- function (file, gz = TRUE) {
-   colClasses = c('character', 'numeric', 'numeric')
+   colClasses = c('character', 'numeric', 'numeric', 'numeric')
    if (gz) {
-      seqz.data <- read.delim(pipe(paste('gzip -d -c', file, '| cut -f 1,6,10')), colClasses = colClasses)
+      seqz.data <- read.delim(pipe(paste('gzip -d -c', file, '| cut -f 1,5,6,10')), colClasses = colClasses)
    } else {
-      seqz.data <- read.delim(pipe(paste('cut -f 1,6,10', file)), colClasses = colClasses)
+      seqz.data <- read.delim(pipe(paste('cut -f 1,5,6,10', file)), colClasses = colClasses)
    }
-   gc.stats <- gc.norm(x = seqz.data$depth.ratio,
-                       gc = seqz.data$GC.percent)
+   gc.stats <- gc.norm(x  = seqz.data$depth.ratio,
+                       gc = seqz.data$GC.percent,
+                       w  = seqz.data$depth.tumor)
    chr.ord  <- unique(seqz.data$chromosome)
    chr.dim  <- lapply(X = split(seqz.data$chromosome, seqz.data$chromosome), FUN = length)
    chr.dim  <- data.frame(chr = chr.ord, n.lines = do.call(rbind,chr.dim[chr.ord]))
