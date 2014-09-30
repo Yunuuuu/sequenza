@@ -196,7 +196,8 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
          mut.all       <- na.exclude(mut.all)
       }
       mut.filt     <- mut.all$F >= mufreq.treshold
-      avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
+      #avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
+      avg.depth.ratio <- 1
       if (female){
          mut.is.xy  <- mut.all$chromosome == XY["Y"]
       } else{
