@@ -275,7 +275,7 @@ def parse_pileup_str(line, min_depth, qlimit=20, qformat='sanger'):
    '''
    Parse the pileup format
    '''
-   if line.strip():
+   if line:
       line   = line.strip()
       try:
          chromosome, n_base, ref_base, depth, mut_list, mut_qual = line.split()
@@ -684,9 +684,9 @@ def pileup2acgt(parser, subparser):
    parser_pup2muoutput.add_argument('--quiet', dest='quiet', action="store_true",
                        help='Do not output additional debugging information.')
    parser_pup2muperformance = subparser.add_argument_group(title='Performance', description='Arguments that can effect the performance.')
-   parser_pup2muperformance.add_argument('-p', '--processes', dest='nproc', default="0", type=int,
+   parser_pup2muperformance.add_argument('-p', '--processes', dest='nproc', default=0, type=int,
                    help='Set the number of processes to split the parsing job. If set to 0 (default), the job will occur with no forking to other processes.')
-   parser_pup2muperformance.add_argument('-c', '--chunk', dest='chunk', default="1000", type=int,
+   parser_pup2muperformance.add_argument('-c', '--chunk', dest='chunk', default=1000, type=int,
                    help='Set the number of input lines to assign to each process, if NPROC > 0. (Default = 1000)')
    parser_pup2muqualitysets = subparser.add_argument_group(title='Quality and Format', description='Argument that change the quality threshold or the quality format.')
    parser_pup2muqualitysets.add_argument('-q', '--qlimit', dest='qlimit', default=20,type=int,
@@ -721,9 +721,9 @@ def pileup2seqz(parser, subparser):
                    help='Threshold to select homozygous positions. Default 0.9.')
    parser_ABgenotype.add_argument('--het', dest = 'het', type = float, default = 0.25,
                    help='Threshold to select heterozygous positions. Default 0.25.')
-   parser_ABperformance.add_argument('-p', '--processes', dest='nproc', default="0", type=int,
+   parser_ABperformance.add_argument('-p', '--processes', dest='nproc', default=0, type=int,
                    help='Set the number of processes to split the parsing job. If set to 0 (default), the job will occur with no forking to other processes.')
-   parser_ABperformance.add_argument('-c', '--chunk', dest='chunk', default="1000", type=int,
+   parser_ABperformance.add_argument('-c', '--chunk', dest='chunk', default=1000, type=int,
                    help='Set the number of input lines to assign to each process, if NPROC > 0. (Default = 1000)')
    return parser.parse_args()
 
