@@ -162,7 +162,8 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       }
       segs.len      <- segs.all$end.pos - segs.all$start.pos
       #segs.filt     <- segs.len >= segment.filter
-      avg.depth.ratio <- mean(sequenza.extract$gc$adj[,2])
+      #avg.depth.ratio <- mean(sequenza.extract$gc$adj[,2])
+      avg.depth.ratio <- 1
       avg.sd.ratio  <- sum(segs.all$sd.ratio * segs.all$N.ratio, na.rm = TRUE)/sum(segs.all$N.ratio, na.rm = TRUE)
       avg.sd.Bf     <- sum(segs.all$sd.BAF * segs.all$N.BAF, na.rm = TRUE)/sum(segs.all$N.BAF, na.rm = TRUE)
       segs.all$sd.BAF[segs.all$sd.BAF == 0]     <- max(segs.all$sd.BAF, na.rm = TRUE)
@@ -235,7 +236,8 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    robj.extr <- makeFilename("sequenza_extract.RData")
    robj.fit  <- makeFilename("sequenza_cp_table.RData")
    log.file  <- makeFilename("sequenza_log.txt")
-   avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
+   #avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
+   avg.depth.ratio <- 1
    assign(x = paste0(sample.id,"_sequenza_extract"), value = sequenza.extract)
    save(list = paste0(sample.id,"_sequenza_extract"), file = robj.extr) 
    if (is.null(cp.table) && (is.null(cellularity) || is.null(ploidy))){
