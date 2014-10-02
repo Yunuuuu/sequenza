@@ -69,8 +69,8 @@ read.acgt <- function (file, colClasses = c('character', 'integer', 'character',
 }
 
 gc.norm <- function (x, gc, w) {
-   dr.by.gc <- split(x, gc)
-   w.by.gc  <- split(w, gc)
+   dr.by.gc <- split(x = x, f = gc)
+   w.by.gc  <- split(x = w, f = gc)
    raw <- t(sapply(dr.by.gc, quantile, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
    dr.by.gc.mean <- mapply(dr.by.gc, FUN = weighted.mean, w.by.gc, na.rm = TRUE)
    adj <- sweep(raw, 1, dr.by.gc.mean, '/')
