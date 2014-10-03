@@ -429,5 +429,5 @@ plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7, ma
       mtext(text = "Copy number", side = 4, line = 2, cex = par("cex.lab")*par("cex"))
    }
    abline(v = max.end, lty = 1)
-   axis(label = chrs, at = coords.names, side = 1, cex.axis = 1)
+   axis(labels = chrs, at = coords.names, side = 1, cex.axis = 1)
 }
