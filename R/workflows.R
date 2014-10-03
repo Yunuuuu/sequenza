@@ -2,10 +2,16 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                              gamma.pcf = 140, kmin.pcf = 40, mufreq.treshold = 0.10, min.reads = 40,
                              min.reads.normal = 10, min.reads.baf = 1, max.mut.types = 1,
                              min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
-                             breaks = NULL, breaks.method = "het", assembly = "hg19", weighted.mean = TRUE){
+                             breaks = NULL, breaks.method = "het", assembly = "hg19", weighted.mean = TRUE,
+                             normalization.method = "mean"){
+
    gc.stats <- gc.sample.stats(file, gz = gz)
    chr.vect <- as.character(gc.stats$file.metrics$chr)
-   gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
+   if (normalization.method != "mean") {
+      gc.vect  <- setNames(gc.stats$raw.median, gc.stats$gc.values)
+   } else {
+      gc.vect  <- setNames(gc.stats$raw.mean, gc.stats$gc.values)
+   }
    windows.baf   <- list()
    windows.ratio <- list()
    mutation.list <- list()
