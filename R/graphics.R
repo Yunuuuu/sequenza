@@ -402,6 +402,9 @@ plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7, ma
    ratio.new <- new.coords(sequenza.extract$ratio,max.end)
    BAF.new   <- new.coords(sequenza.extract$BAF,max.end)
    segs.new  <- do.call(rbind, new.coords.segs(sequenza.extract$segments,max.end))
+   #avg.depth.ratio <- 1
+   #avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
+   avg.depth.ratio <- center.ratio(segs.new)
    par(mar = c(1, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(2,1), ...)
    plot(x = c(min(max.end), max(max.end)), y = c(0,0.5), main = main, xlab = NA,
         ylab = "B allele frequency", type = "n", las = 1, xaxs = "i", yaxs = "i", xaxt = "n" )
@@ -417,7 +420,7 @@ plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7, ma
    if (!missing(ploidy) & !missing(cellularity)){
       types        <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
       depth.ratios <- model.points(cellularity = cellularity, ploidy = ploidy,
-                                   avg.depth.ratio = mean(sequenza.extract$gc$adj[,2]),
+                                   avg.depth.ratio = avg.depth.ratio,
                                    types = types)[, "depth.ratio"]
       depth.ratios <- unique(data.frame(CNt = types$CNt, ratio = depth.ratios))
       abline(h = depth.ratios$ratio, lty = 2)
