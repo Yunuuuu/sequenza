@@ -72,7 +72,9 @@
 }
 
 \details{
-   The first function, \code{sequenza.extract}, utilizes a range of functions from the sequenza package to read the raw data, normalize the depth.ratio for GC-content bias, perform allele-specific segmentation, filter for noisy mutations and bin the raw data for plotting. The computed objects are returned as a single list object. 
+   The first function, \code{sequenza.extract}, utilizes a range of functions from the sequenza package to read the raw data, normalize the depth.ratio for GC-content bias, perform allele-specific segmentation, filter for noisy mutations and bin the raw data for plotting. The computed objects are returned as a single list object.
+   
+   The segmentation by default is performed using only the heterozygous position and the \code{\link{aspcf}} function from \pkg{copynumber} package. The \code{full} option in the \code{breaks.method} argument allow to combine results of the segmentation of all the data available, using the \code{\link{pcf}} function, and the default \code{\link{aspcf}} using only the heterozygous positions.
    
    The second function, \code{sequenza.fit}, accepts the output from \code{sequenza.extract} and calls \code{\link{baf.model.fit}} to calculate the log-likelihood for all pairs of the candidate ploidy and cellularity parameters.
    
