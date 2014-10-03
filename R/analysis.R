@@ -79,7 +79,7 @@ gc.norm <- function (x, gc) {
 }
 
 gc.sample.stats <- function (file, gz = TRUE) {
-   colClasses = c('character', 'numeric', 'numeric', 'numeric')
+   colClasses = c('character', 'numeric', 'numeric')
    if (gz) {
       seqz.data <- read.delim(pipe(paste('gzip -d -c', file, '| cut -f 1,6,10')), colClasses = colClasses)
    } else {
