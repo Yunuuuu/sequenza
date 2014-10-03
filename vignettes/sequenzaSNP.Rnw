@@ -7,7 +7,8 @@
 %\VignettePackage{SNP}
 
 \documentclass[10pt,a4paper]{article}
-\usepackage{a4wide}
+%\usepackage{a4wide}
+\usepackage{geometry}
 \usepackage{hyperref}
 \usepackage{subfigure}
 \usepackage{listings}
@@ -41,7 +42,7 @@ data(logR)
 <<label=SNPdataPrep, eval=TRUE>>=
 sample.i <- data.frame(chromosome = BAF$chrs, position = BAF$pos, 
                       Bf = BAF$S1, adjusted.ratio = logR$S1,
-                      depth.tumor = 1, good.reads = 1,
+                      depth.tumor = 1, depth.normal = 1, good.reads = 1,
                       zygosity.normal = 'hom', stringsAsFactors = FALSE)
 @
 \subsubsection{Correcting logR with a normal sample, or with the mean logR value}

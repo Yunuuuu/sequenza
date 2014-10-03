@@ -6,7 +6,8 @@
 %\VignettePackage{sequenza}
 
 \documentclass[10pt,a4paper]{article}
-\usepackage{a4wide}
+%\usepackage{a4wide}
+\usepackage{geometry}
 \usepackage{hyperref}
 \usepackage{subfigure}
 \usepackage{listings}
@@ -135,15 +136,12 @@ The seqz file is generated like this:
                                    -t tumor.pileup.gz | gzip > out.seqz.gz
 \end{lstlisting}
 
-Alternatively, if you haven't already generated the pileup files, and you are not interested in storing the pileup for further use, you may want to create two named pipes (\textit{FIFOs}) directing \texttt{samtools} output directly into \texttt{sequenza-utils.py}:
+Alternatively, if you haven't already generated the pileup files, and you are not interested in storing the pileup for further use, you can use the function \texttt{bam2seqz} which generates two temporary named pipes (\textit{FIFOs}) converting on the fly to pileup using \texttt{samtools} without storing the pileup file:
 \begin{lstlisting}[style=BashInputStyle]
-   mkfifo normal.fifo tumor.fifo
-   samtools mpileup -f hg19.fasta -Q 20 normal.bam > normal.fifo &
-   samtools mpileup -f hg19.fasta -Q 20 tumor.bam > tumor.fifo &
-   sequenza-utils.py pileup2seqz -gc hg19.gc50Base.txt.gz \
-                                   -n normal.fifo \
-                                   -t tumor.fifo | gzip > out.seqz.gz
-   rm normal.fifo tumor.fifo
+   sequenza-utils.py bam2seqz -gc hg19.gc50Base.txt.gz 
+                              --fasta hg19.fasta \
+                              -n normal.fifo \
+                              -t tumor.fifo | gzip > out.seqz.gz
 \end{lstlisting}
 
 To further compress the seqz file, it is possible to use a binning function provided in \texttt{sequenza-utils.py}.
