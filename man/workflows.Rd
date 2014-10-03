@@ -14,7 +14,8 @@
                    min.reads = 40, min.reads.normal = 10, min.reads.baf = 1,
                    max.mut.types = 1, min.type.freq = 0.9, min.fw.freq = 0,
                    verbose = TRUE, chromosome.list = NULL, breaks = NULL,
-                   breaks.method = "het", assembly = "hg19", weighted.mean = TRUE)
+                   breaks.method = "het", assembly = "hg19", weighted.mean = TRUE,
+                   normalization.method = "mean")
 
   sequenza.fit(sequenza.extract, female = TRUE, N.ratio.filter = 10,
                N.BAF.filter = 1, segment.filter = 3e6,
@@ -59,8 +60,9 @@
   \item{ploidy}{vector candidate ploidy parameters.}
   \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
   \item{ratio.priority}{logical, if TRUE only the depth ratio will be used to determine the copy number state, while the Bf value will be used to determine the number of B-alleles.}
-  \item{chromosome.list}{Vector containing the index or the names of the chromosome to include in the model fitting.}
+  \item{chromosome.list}{vector containing the index or the names of the chromosome to include in the model fitting.}
   \item{weighted.mean}{boolean to select if the segments should be calculated using the read depth as weights to calculate depth ratio and B-allele frequency means.}
+  \item{normalization.method}{string defining the operation to perform during the GC-normalization process. Possible values are \code{mean} (default) and \code{median}. A \code{median} normalization is preferable with noisy data.}
   \item{verbose}{logical, indicating whether to print information about the chromosome being processed.}
   \item{sample.id}{identifier of the sample, to be used as a prefix for saved objects.}
   \item{out.dir}{output directory where the files and objects will be saved.}
