@@ -325,3 +325,9 @@ alternative.cp.solutions <- function(cp.table) {
                                       which(cp.table$cellularity == ci$max.cellularity)])
    }
 }
+
+center.ratio <- function(segments, filter = 3) {
+   w <- round((segments$end.pos - segments$start.pos)/1e6, 0)
+   xx <- rep(x = segments$depth.ratio[w >= filter], times = w[w >= filter])
+   median(xx)
+}
