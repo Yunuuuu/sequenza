@@ -9,7 +9,7 @@
 
 \usage{
    cp.plot(cp.table, xlab = "Ploidy", ylab = "Cellularity",
-           zlab = "Scaled rank posterior probability", 
+           zlab = "Scaled rank LPP", 
            colFn = colorRampPalette(c('white', 'lightblue')), ...)
    cp.plot.contours(cp.table, likThresh = c(0.95), alternative = TRUE,
                     col = palette(), legend.pos = "bottomright", pch = 18,
