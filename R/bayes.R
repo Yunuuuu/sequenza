@@ -83,7 +83,7 @@ mufreq.bayes <- function(mufreq, depth.ratio, cellularity, ploidy, avg.depth.rat
                                          priors = priors),
                                          SIMPLIFY = FALSE)
    types.L           <- do.call(rbind, types.L)
-   colnames(types.L) <- c("CNn","CNt","Mt", "L")
+   colnames(types.L) <- c("CNn","CNt","Mt", "LPP")
    types.L
 }
 
@@ -161,7 +161,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
                                          ratio.priority = ratio.priority),
                                          SIMPLIFY = FALSE)
    bafs.L           <- do.call(rbind, bafs.L)
-   colnames(bafs.L) <- c("CNt", "A", "B", "L")
+   colnames(bafs.L) <- c("CNt", "A", "B", "LPP")
    bafs.L
 }
 
@@ -178,14 +178,14 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
       sum(L.model[,4])
    }
    bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
-   result$L <- unlist(bayes.res)
-   z <- tapply(result$L, list(result$ploidy, result$cellularity), mean)
+   result$LPP <- unlist(bayes.res)
+   z <- tapply(result$LPP, list(result$ploidy, result$cellularity), mean)
    x <- as.numeric(rownames(z))
    y <- as.numeric(colnames(z))
-   max.lik <- max(result$L, na.rm = TRUE)
-   LogSumLik <- log(sum(exp(result$L - max.lik))) + max.lik
+   max.lik <- max(result$LPP, na.rm = TRUE)
+   LogSumLik <- log(sum(exp(result$LPP - max.lik))) + max.lik
    znorm <- exp(z - LogSumLik)
-   list(ploidy = x, cellularity = y, loglik = znorm)
+   list(ploidy = x, cellularity = y, lpp = znorm)
 }
 
 baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
@@ -201,12 +201,12 @@ baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
       sum(L.model[,4])
    }
    bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp, mc.cores = mc.cores)
-   result$L <- unlist(bayes.res)
-   z <- tapply(result$L, list(result$ploidy, result$cellularity), mean)
+   result$LPP <- unlist(bayes.res)
+   z <- tapply(result$LPP, list(result$ploidy, result$cellularity), mean)
    x <- as.numeric(rownames(z))
    y <- as.numeric(colnames(z))
-   max.lik <- max(result$L, na.rm = TRUE)
-   LogSumLik <- log(sum(exp(result$L - max.lik))) + max.lik
+   max.lik <- max(result$LPP, na.rm = TRUE)
+   LogSumLik <- log(sum(exp(result$LPP - max.lik))) + max.lik
    znorm <- exp(z - LogSumLik)
-   list(ploidy = x, cellularity = y, loglik = znorm)
+   list(ploidy = x, cellularity = y, lpp = znorm)
 }

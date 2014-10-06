@@ -1,15 +1,15 @@
 \name{cp.plot}
 \alias{cp.plot}
 \alias{cp.plot.contours}
-\title{Plot log-likelihood for the tested values of cellularity and ploidy}
+\title{Plot log-posterior probability for the tested values of cellularity and ploidy}
 
 \description{
-  This function uses the \code{\link{colorgram}} function from the package \pkg{squash} to plot log-likelihood for the tested combinations of cellularity and ploidy
+  This function uses the \code{\link{colorgram}} function from the package \pkg{squash} to plot log-posterior probability for the tested combinations of cellularity and ploidy
 }
 
 \usage{
    cp.plot(cp.table, xlab = "Ploidy", ylab = "Cellularity",
-           zlab = "Scaled rank likelihood", 
+           zlab = "Scaled rank posterior probability", 
            colFn = colorRampPalette(c('white', 'lightblue')), ...)
    cp.plot.contours(cp.table, likThresh = c(0.95), alternative = TRUE,
                     col = palette(), legend.pos = "bottomright", pch = 18,
@@ -22,7 +22,7 @@
   \item{ylab}{ylab parameter as in the function \code{\link{colorgram}}.}
   \item{zlab}{zlab parameter as in the function \code{\link{colorgram}}.}
   \item{colFn}{colFn parameter as in the function \code{\link{colorgram}}.}  
-  \item{likThresh}{vector of selected likelihood tresholds.}
+  \item{likThresh}{vector of quantiles to define tresholds for the confindent regions.}
   \item{alternative}{boolean parameter, if \code{TRUE} the alternative solutions are computed and plotted.}
   \item{col}{vector of colors.}
   \item{legend.pos}{position for placing the legend.}

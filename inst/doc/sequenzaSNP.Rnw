@@ -137,7 +137,7 @@ ploidy   <- cint$max.ploidy
 cp.plot(CPsnp.example)
 cp.plot.contours(CPsnp.example, add = TRUE)
 @ 
-      \caption{Result from the Bayesian inference over the defined range of cellularity and ploidy from artificial SNP array data. The color indicate the log-likelihood of the corresponding cellularity/ploidy combinations.}
+      \caption{Result from the Bayesian inference over the defined range of cellularity and ploidy from artificial SNP array data. The color indicate the log-posterior probability of the corresponding cellularity/ploidy combinations.}
       \label{fig:cpPlotSNP}
 \end{figure}
 

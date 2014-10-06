@@ -4,7 +4,7 @@
 \title{Model allele-specific copy numbers with specified cellularity and ploidy parameters}
 
 \description{
-  Given a pair of cellularity and ploidy parameters, the function returns the most likely allele-specific copy numbers with the corresponding log-likelihood of the fit, for given values of B-allele frequency and depth ratio.
+  Given a pair of cellularity and ploidy parameters, the function returns the most likely allele-specific copy numbers with the corresponding log-posterior probability of the fit, for given values of B-allele frequency and depth ratio.
 }
 
 \usage{
@@ -43,10 +43,10 @@
   \item{B}{number of B-alleles at the tested point.}
   \item{CNn}{copy number of the normal cell at the tested point (equal to CNn given as argument).}
   \item{Mt}{number of mutated alleles at the tested point.}
-  \item{L}{log-likelihood of model fitting at the given point.}
+  \item{LPP}{log-posterior probability of model fitting at the given point/segment.}
 }
 \details{
-  \code{baf.bayes} and \code{mufreq.bayes} use a naive Bayesian approach to calculate the likelihood of fitness of the data point with the model point resulting from the given values of cellularity and DNA-content.
+  \code{baf.bayes} and \code{mufreq.bayes} use a naive Bayesian approach to calculate the posterior probability of fitness of the data point with the model point resulting from the given values of cellularity and DNA-content.
 }
 
 \seealso{

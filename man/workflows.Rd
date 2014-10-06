@@ -76,7 +76,7 @@
    
    The segmentation by default is performed using only the heterozygous position and the \code{\link{aspcf}} function from \pkg{copynumber} package. The \code{full} option in the \code{breaks.method} argument allow to combine results of the segmentation of all the data available, using the \code{\link{pcf}} function, and the default \code{\link{aspcf}} using only the heterozygous positions.
    
-   The second function, \code{sequenza.fit}, accepts the output from \code{sequenza.extract} and calls \code{\link{baf.model.fit}} to calculate the log-likelihood for all pairs of the candidate ploidy and cellularity parameters.
+   The second function, \code{sequenza.fit}, accepts the output from \code{sequenza.extract} and calls \code{\link{baf.model.fit}} to calculate the log-posterior probability for all pairs of the candidate ploidy and cellularity parameters.
    
    The third function, \code{sequenza.results}, saves a number of objects in a specified directory (default is the working directory). The objects are:
 \itemize{

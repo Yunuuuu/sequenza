@@ -19,7 +19,7 @@
  \describe{ 
    \item{ploidy}{numeric vector of tested ploidy values.}
    \item{cellularity}{numeric vector of tested cellularity values.}
-   \item{loglik}{numeric matrix of log-likelihoods for each \var{(ploidy, cellularity)} pair.}
+   \item{lpp}{numeric matrix of log-posterior probability for each \var{(ploidy, cellularity)} pair.}
   }
 }
 
@@ -33,7 +33,7 @@
   ## Visualization of the object
   image(x = CP.example$ploidy,
         y = CP.example$cellularity,
-        z = CP.example$loglik)
+        z = CP.example$lpp)
 
   ## A better plot
   cp.plot(CP.example)

@@ -1,6 +1,6 @@
-cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity", zlab = "Scaled rank likelihood", 
+cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity", zlab = "Scaled rank LPP", 
                      colFn = colorRampPalette(c('white', 'lightblue')), ...) {
-  z <- matrix(rank(cp.table$loglik), nrow = nrow(cp.table$loglik)) / length(cp.table$loglik)
+  z <- matrix(rank(cp.table$lpp), nrow = nrow(cp.table$lpp)) / length(cp.table$lpp)
   map <- makecmap(c(0, 1), colFn = colFn, include.lowest = TRUE)
   colorgram(x = cp.table$ploidy, y = cp.table$cellularity, z = z, 
             map = map, las = 1, 
@@ -9,15 +9,15 @@ cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity", zlab = "Sc
 
 cp.plot.contours <- function(cp.table, likThresh = c(0.95), alternative = TRUE,
                              col = palette(), legend.pos = 'bottomright', pch = 18, alt.pch = 3, ...) {
-   znormsort <- sort(cp.table$loglik, decreasing = TRUE)
+   znormsort <- sort(cp.table$lpp, decreasing = TRUE)
    znormcumLik <- cumsum(znormsort)
    n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
    LikThresh <- znormsort[n]
    names(LikThresh) <- paste0(likThresh * 100, '%')
-   contour(x = cp.table$ploidy, y = cp.table$cellularity, z = cp.table$loglik,
+   contour(x = cp.table$ploidy, y = cp.table$cellularity, z = cp.table$lpp,
            levels = znormsort[n], col = col, drawlabels = FALSE,
            xlab = "Ploidy", ylab = "Cellularity", ...)
-   max.xy <- which(cp.table$loglik == max(cp.table$loglik), arr.ind = TRUE)
+   max.xy <- which(cp.table$lpp == max(cp.table$lpp), arr.ind = TRUE)
    points(x = cp.table$ploidy[max.xy[, "row"]],
           y = cp.table$cellularity[max.xy[, "col"]], pch = pch)
    if (alternative == TRUE){
@@ -358,7 +358,7 @@ baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001
                            sd.ratio = s.r, weight.ratio = 10, ratio.priority = F,
                            CNn = 2) 
    both.space <- as.data.frame(both.space)
-   z <- tapply(both.space$L, list(test.values$Bf, test.values$ratio), mean)
+   z <- tapply(both.space$LPP, list(test.values$Bf, test.values$ratio), mean)
    x <- as.numeric(rownames(z))
    y <- as.numeric(colnames(z))
    t <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
