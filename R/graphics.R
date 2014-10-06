@@ -402,9 +402,9 @@ plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7, ma
    ratio.new <- new.coords(sequenza.extract$ratio,max.end)
    BAF.new   <- new.coords(sequenza.extract$BAF,max.end)
    segs.new  <- do.call(rbind, new.coords.segs(sequenza.extract$segments,max.end))
-   #avg.depth.ratio <- 1
+   avg.depth.ratio <- 1
    #avg.depth.ratio = mean(sequenza.extract$gc$adj[,2])
-   avg.depth.ratio <- center.ratio(segs.new)
+   #avg.depth.ratio <- center.ratio(segs.new)
    par(mar = c(1, 4, 0, 3), oma = c(5, 0, 4, 0), mfcol = c(2,1), ...)
    plot(x = c(min(max.end), max(max.end)), y = c(0,0.5), main = main, xlab = NA,
         ylab = "B allele frequency", type = "n", las = 1, xaxs = "i", yaxs = "i", xaxt = "n" )
