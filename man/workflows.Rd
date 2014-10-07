@@ -15,7 +15,7 @@
                    max.mut.types = 1, min.type.freq = 0.9, min.fw.freq = 0,
                    verbose = TRUE, chromosome.list = NULL, breaks = NULL,
                    breaks.method = "het", assembly = "hg19", weighted.mean = TRUE,
-                   normalization.method = "mean")
+                   normalization.method = "mean", gc.stats = NULL)
 
   sequenza.fit(sequenza.extract, female = TRUE, N.ratio.filter = 10,
                N.BAF.filter = 1, segment.filter = 3e6,
@@ -63,6 +63,7 @@
   \item{chromosome.list}{vector containing the index or the names of the chromosome to include in the model fitting.}
   \item{weighted.mean}{boolean to select if the segments should be calculated using the read depth as weights to calculate depth ratio and B-allele frequency means.}
   \item{normalization.method}{string defining the operation to perform during the GC-normalization process. Possible values are \code{mean} (default) and \code{median}. A \code{median} normalization is preferable with noisy data.}
+  \item{gc.stats}{object returned from the function \code{\link{gc.sample.stats}}. If \code{NULL} the object will be computed from the input file.} 
   \item{verbose}{logical, indicating whether to print information about the chromosome being processed.}
   \item{sample.id}{identifier of the sample, to be used as a prefix for saved objects.}
   \item{out.dir}{output directory where the files and objects will be saved.}
