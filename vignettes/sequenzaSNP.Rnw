@@ -23,7 +23,7 @@
 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
-\title{sequenza possible SNP-array usage example}
+\title{Experimental: Sequenza applied to SNP array data}
 \maketitle
 
 \tableofcontents
@@ -52,9 +52,10 @@ Without a reference sample (normal germline sample) we can try to divide for the
 sample.i$adjusted.ratio <- 2^(sample.i$adjusted.ratio/0.55)
 
 @
-\subsubsection{Retrieve the homozygous position}
-It should be available a germline sample to get the heterozygours SNP, doing in the same sample it's a risk if the sample is pure. A threshold around 0.25 or 0.35 can be picked to subset the heterozygous position on the germline.
-In the example we are lowering the threshold while taking the SNP from the same aberrant sample.
+\subsubsection{Identify the heterozygous positions}
+Ideally, a germline sample should be used to identify the heterozygous positions, using a threshold around 0.25 or 0.35.
+In the example below we set a lower threshold of 0.2 to identify the heterozygous positions from the same aberrant sample.  However, doing this in the same sample is a risk if the sample is pure. 
+
 <<label=hetFind, eval=TRUE>>=
 het.lim <- 0.2
 is.het <- sample.i$Bf >= het.lim & sample.i$Bf <= 1 - het.lim
