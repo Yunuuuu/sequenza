@@ -37,8 +37,6 @@ data(CP.example)
 cp.plot(CP.example)
 cp.plot.contours(CP.example, add = TRUE)
 
-data(CPsnp.example)
-cp.plot(CPsnp.example)
-cp.plot.contours(CPsnp.example, likThresh = c(0.95, 0.9999), add = TRUE)
-
+cp.plot(CP.example)
+cp.plot.contours(CP.example, likThresh = c(0.95, 0.9999), add = TRUE)
 }

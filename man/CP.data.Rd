@@ -1,6 +1,5 @@
 \name{CP.example}
 \docType{data}
-\alias{CPsnp.example}
 \alias{CP.example}
 
 \title{Example of cellularity and ploidy results}
@@ -11,7 +10,6 @@
 
 \usage{
   data(CP.example)
-  data(CPsnp.example)
 }
 
 \format{
@@ -26,9 +24,6 @@
 \examples{
   data(CP.example)
   str(CP.example)
-
-  data(CPsnp.example)
-  str(CPsnp.example)
 
   ## Visualization of the object
   image(x = CP.example$ploidy,
