@@ -1,4 +1,4 @@
-Changes in version 2.1.0 (2014-09-10)
+Changes in version 2.1.0 (2014-10-08)
  - Add sequenza-utils.py function bam2seqz
  - Add raw data depth-ratio/Bf in the genome view plots
  - Results model fitting plot using the B-allele/depth-ratio plot.
