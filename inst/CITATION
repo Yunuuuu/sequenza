@@ -10,6 +10,9 @@ bibentry(bibtype = 'Article',
                             as.person("Qiyuan Li"),
                             as.person("Zoltan Szallasi"),
                             as.person("Aron C Eklund")),
-        journal = "submitted for publication",
+        journal = "Annals of Oncology",
+        url = "http://annonc.oxfordjournals.org/content/early/2014/10/15/annonc.mdu479.abstract",
+        volume = 25,
+        doi = "10.1093/annonc/mdu479",
         year = 2014
 )
