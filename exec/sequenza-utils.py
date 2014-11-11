@@ -16,7 +16,7 @@ from subprocess import Popen, check_call, PIPE
 from tempfile   import mkdtemp
 
 VERSION = "2.1.0"
-DATE    = "05 September 2014"
+DATE    = "07 October 2014"
 AUTHOR  = "Favero Francesco"
 MAIL    = "favero@cbs.dtu.dk"
 
@@ -733,7 +733,7 @@ def bam2seqz(parser, subparser):
    parser_ABsamtools.add_argument("-S", '--samtools', dest = 'samtools', type = str, default = "samtools",
                    help='Path of samtools to use for the pileup generation.')
    parser_ABsamtools.add_argument("-C", '--chromosome', dest = 'chr', type = str, default = None,
-                   help='Argument to restrict the input/output to a chromosome or a chromosome region. Coordinate format is Name:pos.start-pos.end, eg: chr17:7565097-7590856, for a particular region; eg: chr17, for the entire chromosome. Chromosome name are depending of the BAM file and FASTA reference used for alignment. Default behaviour is not selecting any cromosome.')
+                   help='Argument to restrict the input/output to a chromosome or a chromosome region. Coordinate format is Name:pos.start-pos.end, eg: chr17:7565097-7590856, for a particular region; eg: chr17, for the entire chromosome. Chromosome names can checked in the BAM files and are depending on the FASTA reference used for alignment. Default behaviour is to not selecting any cromosome.')
    return parser.parse_args()
 
 def GC_windows(parser, subparser):
