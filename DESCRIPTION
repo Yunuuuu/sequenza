@@ -1,6 +1,6 @@
 Package: sequenza
-Title:   Copy number estimation from tumor genome sequencing data.
-Description: This package provides tools to analyze genomic sequencing data from
+Title:   Copy Number Estimation from Tumor Genome Sequencing Data
+Description: Tools to analyze genomic sequencing data from
  paired normal-tumor samples, including cellularity and ploidy estimation; mutation
  and copy number (allele-specific and total copy number) detection, quantification 
  and visualization.
