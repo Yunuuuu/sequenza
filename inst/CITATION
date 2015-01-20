@@ -14,7 +14,7 @@ bibentry(bibtype = 'Article',
         year = 2015,
         volume = 26,
         issue = 1,
-        pages = 64-70,
+        pages = "64-70",
         doi = "10.1093/annonc/mdu479",
-        url = "http://annonc.oxfordjournals.org/content/26/1/64",
+        url = "http://annonc.oxfordjournals.org/content/26/1/64"
 )
