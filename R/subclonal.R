@@ -30,6 +30,13 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
   }
   if (!is.null(cp.table)){      
     cint <- get.ci(cp.table)
+    if (!is.null(cellularity) || !is.null(ploidy)) {
+       if (is.null(cellularity)) cellularity <- cint$max.cellularity
+       if (is.null(ploidy)) ploidy <- cint$max.ploidy
+    } else {
+       cellularity <- cint$max.cellularity
+       ploidy <- cint$max.ploidy
+    }  
   }
   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
   types <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
@@ -60,7 +67,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
   model.vect <- CNt.to.ratio[as.character(seg.res$CNt)]
   float.vect <- (seg.res$depth.ratio - model.vect)/mean.ratio.step
   float.vect[float.vect < 0 && seg.res$CNt == 0] <- 0
-  seg.res    <- cbind(seg.res, CNt.float = seg.res$CNt + float.vect)
+  seg.res    <- cbind(seg.res, CNt.float = seg.res$CNt + round(float.vect, 3))
   if (!female){
     if (sum(segs.is.xy) >= 1) {
       cn.alleles  <- baf.bayes(Bf = NA, CNt.max = CNt.max,
@@ -74,7 +81,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
       model.vect <- CNt.to.ratio[as.character(seg.xy$CNt)]
       float.vect <- (seg.xy$depth.ratio - model.vect)/mean.ratio.step
       float.vect[float.vect < 0] <- 0
-      seg.xy    <- cbind(seg.xy, CNt.float = seg.xy$CNt + float.vect)      
+      seg.xy     <- cbind(seg.xy, CNt.float = seg.xy$CNt + round(float.vect,3))      
       seg.res    <- rbind(seg.res, seg.xy)
     }
   }
@@ -108,7 +115,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
     }
     
     ccfs <-  apply( mut.res, 1, function(x) get.ccf(x))
-    mut.res <- cbind(mut.res, CCF = ccfs)
+    mut.res <- cbind(mut.res, CCF = round(ccfs, 3))
     write.table(mut.res, file = muts.file,
                 col.names = TRUE, row.names = FALSE, sep = "\t")   
   }
