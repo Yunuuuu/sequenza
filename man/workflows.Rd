@@ -28,7 +28,7 @@
   sequenza.results(sequenza.extract, cp.table = NULL, sample.id, out.dir = getwd(),
                    cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
                    ratio.priority = FALSE, XY = c(X = "X", Y = "Y"),
-                   chromosome.list = 1:24)
+                   chromosome.list = 1:24, subclonal = TRUE)
 }
 
 \arguments{
@@ -61,6 +61,7 @@
   \item{priors.table}{data frame with the columns \code{CN} and \code{value}, containing the copy numbers and the corresponding weights. To every copy number is assigned the value 1 as default, so every values different then 1 will change the corresponding weight.}
   \item{ratio.priority}{logical, if TRUE only the depth ratio will be used to determine the copy number state, while the Bf value will be used to determine the number of B-alleles.}
   \item{chromosome.list}{vector containing the index or the names of the chromosome to include in the model fitting.}
+  \item{subclonal}{boolean argument that enable basic metrics for subclonal populaation inference.}
   \item{weighted.mean}{boolean to select if the segments should be calculated using the read depth as weights to calculate depth ratio and B-allele frequency means.}
   \item{normalization.method}{string defining the operation to perform during the GC-normalization process. Possible values are \code{mean} (default) and \code{median}. A \code{median} normalization is preferable with noisy data.}
   \item{gc.stats}{object returned from the function \code{\link{gc.sample.stats}}. If \code{NULL} the object will be computed from the input file.} 
