@@ -25,6 +25,7 @@ export(
    sequenza.fit,
    sequenza.extract,
    sequenza.results,
+   sequenza.subclonal,
    VarScan2seqz
 )
 
