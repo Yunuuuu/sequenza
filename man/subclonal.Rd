@@ -3,7 +3,7 @@
 \title{Sequenza basic functionalities to infer subclonal populations}
 
 \description{
-  These three functions are intended to be the main user interface of the package, to run several of the functions of \code{sequenza} in a standardized pipeline.
+  Function intended to be the main a wrapper for many subclonal population tests.
 }
 
 \usage{
@@ -28,14 +28,10 @@
 }
 
 \details{   
-   The third function, \code{sequenza.results}, saves a number of objects in a specified directory (default is the working directory). The objects are:
+   \code{sequenza.subclonal}, run basic functionalities to retrive information useful for subclonal populations inference. It return the following information:
 \itemize{
- \item The list of segments with resulting copy numbers and major and minor alleles. 
- \item The candidate mutation list with variant allele frequency, and copy number and number of mutated allele, in relation of the clonal population (for sub-clonal population it needs to be processed with further methods). 
- \item A plot of all the chromosomes in one image, representing the major and minor alleles and the absolute copy number changes (genome_view).
- \item Multiple plots with one chromosome per image, representing copy-number, B-allele frequency and mutation in parallel (chromosome_view).
- \item Results of the model fitting (CP_contours and confints_CP)
- \item A summary of the copy number state of the sample (CN_bars).
+ \item The list of segments with resulting copy numbers and major and minor alleles, and non integer copy number value. 
+ \item The candidate mutation list with variant allele frequency, and copy number and number of mutated allele, in relation of the clonal population and cancer cell fraction (ccf). 
 }
 }
 
@@ -50,7 +46,7 @@ data.file <-  system.file("data", "example.seqz.txt.gz",
               package = "sequenza")
 test <- sequenza.extract(data.file)
 test.CP   <- sequenza.fit(test)
-sequenza.results(test, test.CP, out.dir = "example",
+sequenza.subclonal(test, test.CP, out.dir = "example",
                  sample.id = "example")
 
    }
