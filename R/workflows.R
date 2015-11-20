@@ -233,7 +233,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
 
 sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.dir = getwd(),
                              cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
-                             ratio.priority = FALSE, XY = c(X = "X", Y = "Y"), chromosome.list = 1:24){
+                             ratio.priority = FALSE, XY = c(X = "X", Y = "Y"), chromosome.list = 1:24, subclonal = TRUE){
    if(!file.exists(out.dir)) {
      dir.ok <- dir.create(path = out.dir, recursive = TRUE)
      if(!dir.ok) stop('Directory does not exist and cannot be created: ', out.dir)
@@ -388,6 +388,14 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
       }
    dev.off()
    }
+   
+   if (subclonal) {
+     sequenza.subclonal(sequenza.extract, cp.table, sample.id, out.dir,
+                        cellularity, ploidy, female, CNt.max, ratio.priority,
+                        XY, chromosome.list)
+     
+   }
+   
    fileConn<-file(log.file)
       writeLines(c(date(),paste("Sequenza version:", packageVersion("sequenza"), sep = " ")), fileConn)
    close(fileConn)
