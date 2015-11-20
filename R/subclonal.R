@@ -32,12 +32,19 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
     cint <- get.ci(cp.table)
   }
   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
+  types <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
+  model <- model.points(cellularity = celluarity, ploidy = ploidy, types = types, avg.depth.ratio = avg.depth.ratio)
+  model <- cbind(types, model)
+  model.ratio     <- unique(model[, c("CNn","CNt","depth.ratio")])
+  mean.ratio.step <- mean(diff(model.ratio$depth.ratio))
+  
   if (female){
     segs.is.xy <- seg.tab$chromosome == XY["Y"]
     mut.is.xy  <- mut.tab$chromosome == XY["Y"]
   } else{
     segs.is.xy <- seg.tab$chromosome %in% XY
     mut.is.xy  <- mut.tab$chromosome %in% XY
+    types.xy = types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 1)
   }
   avg.sd.ratio  <- sum(seg.tab$sd.ratio * seg.tab$N.ratio, na.rm = TRUE)/sum(seg.tab$N.ratio, na.rm = TRUE)
   avg.sd.Bf     <- sum(seg.tab$sd.BAF * seg.tab$N.BAF, na.rm = TRUE)/sum(seg.tab$N.BAF, na.rm = TRUE)
@@ -47,6 +54,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                            avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio[!segs.is.xy],
                            weight.ratio = seg.len[!segs.is.xy], sd.Bf = seg.tab$sd.BAF[!segs.is.xy],
                            weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
+  
   seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
   if (!female){
     if (sum(segs.is.xy) >= 1) {
