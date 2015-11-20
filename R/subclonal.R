@@ -33,9 +33,10 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
   }
   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
   types <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
-  model <- model.points(cellularity = celluarity, ploidy = ploidy, types = types, avg.depth.ratio = avg.depth.ratio)
+  model <- model.points(cellularity = cellularity, ploidy = ploidy, types = types, avg.depth.ratio = avg.depth.ratio)
   model <- cbind(types, model)
   model.ratio     <- unique(model[, c("CNn","CNt","depth.ratio")])
+  CNt.to.ratio    <- setNames(model.ratio$depth.ratio, model.ratio$CNt)
   mean.ratio.step <- mean(diff(model.ratio$depth.ratio))
   
   if (female){
@@ -55,7 +56,11 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                            weight.ratio = seg.len[!segs.is.xy], sd.Bf = seg.tab$sd.BAF[!segs.is.xy],
                            weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
   
-  seg.res     <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
+  seg.res    <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
+  model.vect <- CNt.to.ratio[as.character(seg.res$CNt)]
+  float.vect <- (seg.res$depth.ratio - model.vect)/mean.ratio.step
+  float.vect[float.vect < 0 && seg.res$CNt == 0] <- 0
+  seg.res    <- cbind(seg.res, CNt.float = seg.res$CNt + float.vect)
   if (!female){
     if (sum(segs.is.xy) >= 1) {
       cn.alleles  <- baf.bayes(Bf = NA, CNt.max = CNt.max,
@@ -66,6 +71,10 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                                weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)   
       
       seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
+      model.vect <- CNt.to.ratio[as.character(seg.xy$CNt)]
+      float.vect <- (seg.xy$depth.ratio - model.vect)/mean.ratio.step
+      float.vect[float.vect < 0] <- 0
+      seg.xy    <- cbind(seg.xy, CNt.float = seg.xy$CNt + float.vect)      
       seg.res    <- rbind(seg.res, seg.xy)
     }
   }
