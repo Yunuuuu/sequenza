@@ -484,13 +484,13 @@ class abfreReduce:
             self._status = 0
             self.__do_dict__()
             #return [line_ls[1], self.w + self._last_edge, self._n]
-            return self.line_dict    
+            return self.line_dict
          if self.w + self._last_edge < int(line_ls[1]) or self._last_chromosome != line_ls[0]:
             self.__do_dict__()
             line_dict = self.line_dict
             self.__refresh__(line_ls, line)
             #return [line_ls[1], self.w + self._last_edge, self._n]
-            return line_dict 
+            return line_dict
          else:
             self.__addline__(line_ls, line)
       elif self._status == 0:
@@ -649,7 +649,7 @@ def DOpup2seqz(p1, p2, gc, n2, n, qlimit, qformat, hom, het, fileout, out_header
             if res:
                fileout.write('\t'.join(map(str,res))+'\n')
    else:
-      line_worker_partial = partial(line_worker, depth_sum=n, qlimit=qlimit, qformat=qformat, hom_t=hom, het_t=het, alt_pileup=True) 
+      line_worker_partial = partial(line_worker, depth_sum=n, qlimit=qlimit, qformat=qformat, hom_t=hom, het_t=het, alt_pileup=True)
       with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file, xopen(n2, 'rb') as alt_normal:
          pup = multiPileups(normal,tumor)
          pup = GCmultiPileups(pup, gc_file)
@@ -732,7 +732,7 @@ def bam2seqz(parser, subparser):
                    help='Threshold to select heterozygous positions. Default 0.25.')
    parser_ABsamtools.add_argument("-S", '--samtools', dest = 'samtools', type = str, default = "samtools",
                    help='Path of samtools to use for the pileup generation.')
-   parser_ABsamtools.add_argument("-C", '--chromosome', dest = 'chr', type = str, default = None,
+   parser_ABsamtools.add_argument("-C", '--chromosome', dest = 'chr', nargs = "+", default = None,
                    help='Argument to restrict the input/output to a chromosome or a chromosome region. Coordinate format is Name:pos.start-pos.end, eg: chr17:7565097-7590856, for a particular region; eg: chr17, for the entire chromosome. Chromosome names can checked in the BAM files and are depending on the FASTA reference used for alignment. Default behaviour is to not selecting any cromosome.')
    return parser.parse_args()
 
@@ -784,15 +784,15 @@ def main():
                try:
                   fileout.write(parse_pileup_partial(line) + '\n')
                except AttributeError:
-                  pass                        
+                  pass
 
       elif used_module == "bam2seqz":
          args = bam2seqz(parser, parser_bam2seqz)
          with xopen('-', "wb") as fileout:
             out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal", "GC.percent", "good.reads", "AB.normal", "AB.tumor", "tumor.strand"]
             if args.chr:
-               cmd_tum1 = [args.samtools, "view", "-u", args.tumor, args.chr]
-               cmd_nor1 = [args.samtools, "view", "-u", args.normal, args.chr]
+               cmd_tum1 = [args.samtools, "view", "-u", args.tumor] + args.chr
+               cmd_nor1 = [args.samtools, "view", "-u", args.normal] + args.chr
             else:
                cmd_tum1 = [args.samtools, "view", "-u", args.tumor]
                cmd_nor1 = [args.samtools, "view", "-u", args.normal]
