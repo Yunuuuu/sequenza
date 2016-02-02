@@ -78,17 +78,17 @@ gc.norm <- function (x, gc) {
         raw.mean = dr.by.gc.mean, raw.median = dr.by.gc.median)
 }
 
-gc.sample.stats <- function (file, gz = TRUE) {
+gc.sample.stats <- function (file, gz = TRUE, columns = '1,6,10') {
    colClasses = c('character', 'numeric', 'numeric')
    if (gz) {
-      seqz.data <- read.delim(pipe(paste('gzip -d -c', file, '| cut -f 1,6,10')), colClasses = colClasses)
+      seqz.data <- read.delim(pipe(paste('gzip -d -c', file, '| cut -f', columns)), colClasses = colClasses)
    } else {
-      seqz.data <- read.delim(pipe(paste('cut -f 1,6,10', file)), colClasses = colClasses)
+      seqz.data <- read.delim(pipe(paste('cut -f', columns, file)), colClasses = colClasses)
    }
-   gc.stats <- gc.norm(x  = seqz.data$depth.ratio,
-                       gc = seqz.data$GC.percent)
-   chr.ord  <- unique(seqz.data$chromosome)
-   chr.dim  <- lapply(X = split(seqz.data$chromosome, seqz.data$chromosome), FUN = length)
+   gc.stats <- gc.norm(x  = seqz.data[, 2],
+                       gc = seqz.data[, 3])
+   chr.ord  <- unique(seqz.data[, 1])
+   chr.dim  <- lapply(X = split(seqz.data[, 1], seqz.data[, 1]), FUN = length)
    chr.dim  <- data.frame(chr = chr.ord, n.lines = do.call(rbind,chr.dim[chr.ord]))
    chr.dim$start <- cumsum(c(1, chr.dim$n.lines[-length(chr.dim$n.lines)]))
    chr.dim$end   <- chr.dim$start + chr.dim$n.lines - 1

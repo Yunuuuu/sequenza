@@ -9,7 +9,7 @@
 }
 
 \usage{
-gc.sample.stats(file, gz = TRUE)
+gc.sample.stats(file, gz = TRUE, columns = '1,6,10')
 gc.norm(x, gc)
 }
 
@@ -17,6 +17,7 @@ gc.norm(x, gc)
   \item{file}{name of a file in the seqz format.}
   \item{x}{vector of values to be normalized by GC-content, typically depth ratio values.}
   \item{gc}{vector of relative GC-content values for x.}
+  \item{columns}{column index of the 3 columns of the seqz file used for the normalization.}
   \item{gz}{logical. If TRUE (the default) the function expects a gzipped file.}
 }
 
@@ -24,6 +25,9 @@ gc.norm(x, gc)
   \code{gc.norm} detects bias in \code{x} driven by \code{gc}. Specifically, for each value of \code{gc}, summary statistics are calculated for the corresponding values of \code{x}. These statistics can then be used to normalize \code{x} for \code{gc}.
 
   \code{gc.sample.stats} extracts depth ratio and GC-content from an seqz file, and then uses \code{gc.norm} on the results.
+
+
+  It is possible to change the column used for the normalization by using the \code{columns} string in the argument. By default the function will take the columns 1, 6, and 10, respectively 'chromosome', 'depth.ratio' and 'GC.percent'. The normalization step will use the first column to read chromosme information in the file and produce the \code{file.metrics} table, this is neccessary to efficently access a given chromosome in the file; the second column is used as data to be normalized, by default the depth ratio, the third column is used as factor to split the data to normilize, by default GC content.
 
 }
 
