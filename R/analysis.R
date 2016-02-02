@@ -102,7 +102,7 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
   overlap  <- as.integer(overlap)
   window.offset <- as.integer(window - round(window * (overlap / (overlap + 1))))
   chr.ordered <- unique(chromosomes)
-  data.splitByChr    <- split(data.frame(pos = positions, x = x, weight = weight), 
+  data.splitByChr    <- split(data.frame(pos = positions, x = x, weight = weight),
                               f = factor(chromosomes, levels = chr.ordered))
   lapply(data.splitByChr, function(data.oneChr) {
     range.pos <- range(data.oneChr$pos, na.rm = TRUE)
@@ -125,7 +125,7 @@ windowValues <- function(x, positions, chromosomes, window = 1e6, overlap = 0,
     window.means <- mapply(weighted.mean, x = x.window, w = weight.window)
     window.quantiles <- sapply(x.window, quantile, probs = c(0.25, 0.75), na.rm = TRUE, names = FALSE)
     window.counts <- sapply(x.window, length)
-    data.frame(start = window.starts, end = window.ends, mean = window.means, 
+    data.frame(start = window.starts, end = window.ends, mean = window.means,
                q0 = window.quantiles[1,], q1 = window.quantiles[2,], N = window.counts)
   })
 }
@@ -277,12 +277,12 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
       fact.b.i    <- cut(seqz.b.i$position, breaks.vect)
       seg.i.s.r   <- sapply(X = split(seqz.tab[[i]]$chromosome, f = fact.r.i), FUN = length)
       seg.i.s.b   <- sapply(X = split(seqz.b.i$chromosome, f = fact.b.i), FUN = length)
-     
+
       if (weighted.mean){
          seg.i.rw    <- sapply(X = split(seqz.tab[[i]]$rw, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
          seg.i.w.r   <- sapply(X = split(seqz.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sum(a, na.rm = TRUE))
          seg.i.r.sd  <- sapply(X = split(seqz.tab[[i]]$rw/seqz.tab[[i]]$w.r, f = fact.r.i), FUN = function(a) sd(a, na.rm = TRUE))
-         seg.i.b.sd  <- sapply(X = split(seqz.b.i$bw/seqz.b.i$w.b, f = fact.b.i), FUN = function(a) sd(a, na.rm = TRUE))         
+         seg.i.b.sd  <- sapply(X = split(seqz.b.i$bw/seqz.b.i$w.b, f = fact.b.i), FUN = function(a) sd(a, na.rm = TRUE))
          seg.i.bw    <- sapply(X = split(seqz.b.i$bw, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
          seg.i.w.b   <- sapply(X = split(seqz.b.i$w.b, f = fact.b.i), FUN = function(a) sum(a, na.rm = TRUE))
          segments.i <- data.frame(chromosome  = names(seqz.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
@@ -292,7 +292,7 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
         seg.i.r    <- sapply(X = split(seqz.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = function(a) mean(a, na.rm = TRUE))
         seg.i.b    <- sapply(X = split(seqz.b.i$Bf, f = fact.b.i), FUN = function(a) mean(a, na.rm = TRUE))
         seg.i.r.sd <- sapply(X = split(seqz.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = function(a) sd(a, na.rm = TRUE))
-        seg.i.b.sd <- sapply(X = split(seqz.b.i$Bf, f = fact.b.i), FUN = function(a) sd(a, na.rm = TRUE)) 
+        seg.i.b.sd <- sapply(X = split(seqz.b.i$Bf, f = fact.b.i), FUN = function(a) sd(a, na.rm = TRUE))
         segments.i <- data.frame(chromosome  = names(seqz.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
                                  end.pos = as.numeric(breaks.vect[-1]), Bf = seg.i.b, N.BAF = seg.i.s.b, sd.BAF = seg.i.b.sd,
                                  depth.ratio = seg.i.r, N.ratio = seg.i.s.r, sd.ratio = seg.i.r.sd, stringsAsFactors = FALSE)
@@ -319,7 +319,7 @@ alternative.cp.solutions <- function(cp.table) {
    if (nrow(res) > 0 ){
       res[order(res$SLPP, decreasing = TRUE), ]
    } else {
-      data.frame(cellularity = ci$max.cellularity, 
+      data.frame(cellularity = ci$max.cellularity,
                  ploidy = ci$max.ploidy,
                  SLPP =  cp.table$lpp[which(cp.table$ploidy == ci$max.ploidy),
                                       which(cp.table$cellularity == ci$max.cellularity)])

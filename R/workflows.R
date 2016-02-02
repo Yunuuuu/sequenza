@@ -84,7 +84,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
             } else if (breaks.method.i == "het"){
                breaks <- try(find.breaks(seqz.het, gamma = gamma, assembly = assembly,
                                          kmin = kmin, baf.thres = c(0, 0.5)),
-                             silent = FALSE)               
+                             silent = FALSE)
             } else if (breaks.method.i == "fast"){
                BAF <- data.frame(chrom = chr, pos = c(seqz.b.win[[1]]$start, tail(seqz.b.win[[1]]$end, n = 1)),
                                  s1 = c(seqz.b.win[[1]]$mean, tail(seqz.b.win[[1]]$mean, n = 1)))
@@ -111,7 +111,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
          }
          if (!is.null(breaks) & nrow(breaks) > 0){
             seg.s1    <- segment.breaks(seqz.tab = seqz.data, breaks = breaks,
-                                        min.reads.baf = min.reads.baf, weighted.mean = weighted.mean)            
+                                        min.reads.baf = min.reads.baf, weighted.mean = weighted.mean)
          } else {
             seg.s1 <- segment.breaks(seqz.data,
                                      breaks = data.frame(chrom = chr,
@@ -119,7 +119,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                                          end.pos = max(seqz.data$position, na.rm = TRUE)),
                                      weighted.mean = weighted.mean)
          }
-         
+
       } else {
          seqz.b.win <- list()
          seqz.b.win[[1]] <- data.frame(start = min(seqz.data$position, na.rm = TRUE),
@@ -149,10 +149,10 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                                                        na.rm = TRUE),
                                                                  N  = length(seqz.data$depth.tumor) )
       if (verbose){
-        
+
         message(nrow(mut.tab), ' variant calls; ',
                  nrow(seqz.het), ' heterozygous positions; ',
-                 sum(seqz.hom), ' homozygous positions.') 
+                 sum(seqz.hom), ' homozygous positions.')
       }
    }
    names(windows.baf)   <- chromosome.list
@@ -166,7 +166,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                avg.depth = round(coverage,0)))
 }
 
-sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N.BAF.filter = 1, segment.filter = 3e6, mufreq.treshold = 0.10, 
+sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N.BAF.filter = 1, segment.filter = 3e6, mufreq.treshold = 0.10,
                          XY = c(X = "X", Y = "Y"), cellularity = seq(0.1, 1, 0.01), ploidy = seq(1, 7, 0.1),
                          ratio.priority = FALSE, method = "baf", priors.table = data.frame(CN = 2, value = 2),
                          chromosome.list = 1:24, mc.cores = getOption("mc.cores", 2L)){
@@ -174,7 +174,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
       if (is.null(chromosome.list)) {
          segs.all      <- do.call(rbind, sequenza.extract$segments)
       } else {
-         segs.all      <- do.call(rbind, sequenza.extract$segments[chromosome.list])      
+         segs.all      <- do.call(rbind, sequenza.extract$segments[chromosome.list])
       }
       segs.len      <- segs.all$end.pos - segs.all$start.pos
       #segs.filt     <- segs.len >= segment.filter
@@ -233,7 +233,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE, N.ratio.filter = 10, N
                     weight.ratio = 2 * w.mufreq, weight.mufreq = w.mufreq,
                     avg.depth.ratio = avg.depth.ratio, cellularity = cellularity,
                     ploidy = ploidy, priors.table = priors.table,
-                    mc.cores = mc.cores)    
+                    mc.cores = mc.cores)
    } else {
       stop("The only available methods are \"baf\" and \"mufreq\"")
    }
@@ -267,13 +267,13 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    #avg.depth.ratio <- center.ratio(seg.tab)
    avg.depth.ratio <- 1
    assign(x = paste0(sample.id,"_sequenza_extract"), value = sequenza.extract)
-   save(list = paste0(sample.id,"_sequenza_extract"), file = robj.extr) 
+   save(list = paste0(sample.id,"_sequenza_extract"), file = robj.extr)
    if (is.null(cp.table) && (is.null(cellularity) || is.null(ploidy))){
       stop("Either the cp.table or both cellularity and ploidy argument are required.")
    }
    if (!is.null(cp.table)){
       assign(x = paste0(sample.id,"_sequenza_cp_table"), value = cp.table)
-      save(list = paste0(sample.id,"_sequenza_cp_table"), file = robj.fit)       
+      save(list = paste0(sample.id,"_sequenza_cp_table"), file = robj.fit)
       cint <- get.ci(cp.table)
       pdf(cp.file)
          cp.plot(cp.table)
@@ -282,7 +282,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
             if (is.null(cellularity)) cellularity <- cint$max.cellularity
             if (is.null(ploidy)) ploidy <- cint$max.ploidy
             points(x = ploidy, y = cellularity, pch = 5)
-            text(x = ploidy, y = cellularity, 
+            text(x = ploidy, y = cellularity,
                  labels = "User selection",
                  pos = 3, offset = 0.5)
          } else {
@@ -315,14 +315,14 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
                                   cellularity = cellularity, ploidy = ploidy,
                                   avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio[segs.is.xy],
                                   weight.ratio = seg.len[segs.is.xy], sd.Bf = NA,
-                                  weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)   
-               
+                                  weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)
+
          seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
          seg.res    <- rbind(seg.res, seg.xy)
       }
    }
    write.table(seg.res, file = segs.file,
-               col.names = TRUE, row.names = FALSE, sep = "\t")   
+               col.names = TRUE, row.names = FALSE, sep = "\t")
    if(nrow(mut.tab) > 0) {
       mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy], CNt.max = CNt.max,
                                depth.ratio = mut.tab$adjusted.ratio[!mut.is.xy],
@@ -340,11 +340,11 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
          }
       }
       write.table(mut.res, file = muts.file,
-                  col.names = TRUE, row.names = FALSE, sep = "\t")   
-   }   
+                  col.names = TRUE, row.names = FALSE, sep = "\t")
+   }
    pdf(chrw.file)
    for (i in unique(seg.res$chromosome)) {
-      
+
       if (!female && i %in% XY){
          CNn <- 1
       } else {
@@ -373,7 +373,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
    barplot(round(cn.sizes / sum(cn.sizes) * 100), names = names(cn.sizes), las = 1,
                       ylab = "Percentage (%)", xlab = "Copy number")
    dev.off()
-   
+
    ## Write down the results.... ploidy etc...
    if (!is.null(cp.table)){
       res.tab <- data.frame(cellularity     = c(cint$confint.cellularity[1], cint$max.cellularity[1], cint$confint.cellularity[2]),
@@ -396,14 +396,14 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL, sample.id, out.d
       }
    dev.off()
    }
-   
+
    if (subclonal) {
      sequenza.subclonal(sequenza.extract, cp.table, sample.id, out.dir,
                         cellularity, ploidy, female, CNt.max, ratio.priority,
                         XY, chromosome.list)
-     
+
    }
-   
+
    fileConn<-file(log.file)
       writeLines(c(date(),paste("Sequenza version:", packageVersion("sequenza"), sep = " ")), fileConn)
    close(fileConn)
