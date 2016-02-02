@@ -384,7 +384,7 @@ def parse_pileup_seq(seq, quality, depth, reference, qlimit=20, qformat='sanger'
       sys.exit('Something went wrong on the block counting!!')
 
 
-def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=0.35, alt_pileup=False):
+def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=0.35, alt_pileup=False, het_f=-0.1):
    '''
    After the 3 files are syncronized we need to transform the pileup in a
    readable format, find the alleles, and compute the allele frequency in tumor
@@ -437,25 +437,33 @@ def line_worker(line, depth_sum, qlimit=20, qformat='sanger', hom_t=0.85, het_t=
                      if p1_freq[b] >= het_t:
                         allele.append(bases_list[b])
                   if len(allele) == 2:
-                     p2_mu    = parse_pileup(ref, p2_list, qlimit, qformat)
-                     sum_p2   = float(sum(p2_mu[2:6]))
-                     if sum_p2 > 0:
-                        i        = bases_list.index(allele[0])
-                        ii       = bases_list.index(allele[1])
-                        het_a_p2 = p2_mu[2 + i]/sum_p2
-                        het_b_p2 = p2_mu[2 + ii]/sum_p2
-                        if  het_a_p2 >= het_b_p2:
-                           if alt_pileup:
-                              line_out = [chromosome, position, p1_mu[0], alt_depth, p2_mu[1], round(p2_mu[1]/float(alt_depth), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
-                           else:
-                              line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
-                           return line_out
-                        elif het_a_p2 < het_b_p2:
-                           if alt_pileup:
-                              line_out = [chromosome, position, p1_mu[0], alt_depth, p2_mu[1], round(p2_mu[1]/float(alt_depth), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[ii]+bases_list[i], ".", "0"]
-                           else:
-                              line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[ii]+bases_list[i], ".", "0"]
-                           return line_out
+                     het_f = [het_f, 1 - het_f]
+                     strands_bases = [round(p1_mu[6][ll]/float(p1_mu[2+ll]), 3) for ll in map(bases_list.index, allele)]
+                     if het_f[0] < strands_bases[0] < het_f[1] and het_f[0] < strands_bases[1] < het_f[1]:
+                     #   print "Heterozygous strands " + ':'.join(map(str, strands_bases)) + " " +':'.join(map(str, het_f))
+                     #else:
+                     #   print "Heterozygous no good " + ':'.join(map(str, strands_bases))  + " " +':'.join(map(str, het_f))
+                        p2_mu    = parse_pileup(ref, p2_list, qlimit, qformat)
+                        sum_p2   = float(sum(p2_mu[2:6]))
+                        if sum_p2 > 0:
+                           i        = bases_list.index(allele[0])
+                           ii       = bases_list.index(allele[1])
+                           het_a_p2 = p2_mu[2 + i]/sum_p2
+                           het_b_p2 = p2_mu[2 + ii]/sum_p2
+                           if  het_a_p2 >= het_b_p2:
+                              if alt_pileup:
+                                 line_out = [chromosome, position, p1_mu[0], alt_depth, p2_mu[1], round(p2_mu[1]/float(alt_depth), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
+                              else:
+                                 line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_a_p2 , 3), round(het_b_p2 , 3) , 'het', gc, int(sum_p2), bases_list[i]+bases_list[ii], ".", "0"]
+                              return line_out
+                           elif het_a_p2 < het_b_p2:
+                              if alt_pileup:
+                                 line_out = [chromosome, position, p1_mu[0], alt_depth, p2_mu[1], round(p2_mu[1]/float(alt_depth), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[ii]+bases_list[i], ".", "0"]
+                              else:
+                                 line_out = [chromosome, position, p1_mu[0], p1_mu[1], p2_mu[1], round(p2_mu[1]/float(p1_mu[1]), 3), round(het_b_p2 , 3), round(het_a_p2 , 3) , 'het', gc, int(sum_p2), bases_list[ii]+bases_list[i], ".", "0"]
+                              return line_out
+                     else:
+                        pass
                   else:
                      pass
          else:
@@ -636,10 +644,10 @@ class DefaultHelpParser(argparse.ArgumentParser):
         sys.exit(2)
 
 
-def DOpup2seqz(p1, p2, gc, n2, n, qlimit, qformat, hom, het, fileout, out_header):
+def DOpup2seqz(p1, p2, gc, n2, n, qlimit, qformat, hom, het, fileout, out_header, het_f):
    stream_mpileup = IterableQueue()
    if not n2:
-      line_worker_partial = partial(line_worker, depth_sum=n, qlimit=qlimit, qformat=qformat, hom_t=hom, het_t=het)
+      line_worker_partial = partial(line_worker, depth_sum=n, qlimit=qlimit, qformat=qformat, hom_t=hom, het_t=het, het_f=het_f)
       with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file:
          pup = multiPileups(normal,tumor)
          pup = GCmultiPileups(pup, gc_file)
@@ -649,7 +657,7 @@ def DOpup2seqz(p1, p2, gc, n2, n, qlimit, qformat, hom, het, fileout, out_header
             if res:
                fileout.write('\t'.join(map(str,res))+'\n')
    else:
-      line_worker_partial = partial(line_worker, depth_sum=n, qlimit=qlimit, qformat=qformat, hom_t=hom, het_t=het, alt_pileup=True) 
+      line_worker_partial = partial(line_worker, depth_sum=n, qlimit=qlimit, qformat=qformat, hom_t=hom, het_t=het, alt_pileup=True, het_f=het_f) 
       with xopen(p1, 'rb') as normal, xopen(p2, 'rb') as tumor, xopen(gc, 'rb') as gc_file, xopen(n2, 'rb') as alt_normal:
          pup = multiPileups(normal,tumor)
          pup = GCmultiPileups(pup, gc_file)
@@ -703,6 +711,8 @@ def pileup2seqz(parser, subparser):
                    help='Threshold to select homozygous positions. Default 0.9.')
    parser_ABgenotype.add_argument('--het', dest = 'het', type = float, default = 0.25,
                    help='Threshold to select heterozygous positions. Default 0.25.')
+   parser_ABgenotype.add_argument('--het_f', dest = 'het_f', type = float, default = -0.2,
+                   help='Threshold of frequency in the forward strand to trust heterozygous calls. Default -0.2 (Diabled, effective with values >= 0).')
    return parser.parse_args()
 
 def bam2seqz(parser, subparser):
@@ -730,6 +740,8 @@ def bam2seqz(parser, subparser):
                    help='Threshold to select homozygous positions. Default 0.9.')
    parser_ABgenotype.add_argument('--het', dest = 'het', type = float, default = 0.25,
                    help='Threshold to select heterozygous positions. Default 0.25.')
+   parser_ABgenotype.add_argument('--het_f', dest = 'het_f', type = float, default = -0.2,
+                   help='Threshold of frequency in the forward strand to trust heterozygous calls. Default -0.2 (Diabled, effective with values >= 0).')
    parser_ABsamtools.add_argument("-S", '--samtools', dest = 'samtools', type = str, default = "samtools",
                    help='Path of samtools to use for the pileup generation.')
    parser_ABsamtools.add_argument("-C", '--chromosome', dest = 'chr', type = str, default = None,
@@ -782,7 +794,9 @@ def main():
             parse_pileup_partial = partial(parse_pileup_str, min_depth=args.n, qlimit=args.qlimit, qformat=args.qformat)
             for line in f:
                try:
-                  fileout.write(parse_pileup_partial(line) + '\n')
+                  parsed_line = parse_pileup_partial(line)
+                  if parsed_line:
+                     fileout.write(parsed_line + '\n')
                except AttributeError:
                   pass                        
 
@@ -809,7 +823,7 @@ def main():
                nor1 = Popen(cmd_nor1, stdout = PIPE)
                nor2 = Popen(cmd_nor3, stdout = PIPE)
                with named_pipe() as tfifo, named_pipe() as nfifo, named_pipe() as n2fifo:
-                  res = multiprocessing.Process(target = DOpup2seqz, args = (nfifo, tfifo, args.gc, n2fifo, args.n,  args.qlimit, args.qformat, args.hom, args.het, fileout, out_header))
+                  res = multiprocessing.Process(target = DOpup2seqz, args = (nfifo, tfifo, args.gc, n2fifo, args.n,  args.qlimit, args.qformat, args.hom, args.het, fileout, out_header, args.het_f))
                   res.start()
                   with open(nfifo, 'wb', 0) as normal, open(tfifo, 'wb', 0) as tumor, open(n2fifo, 'wb', 0) as normal2:
                      fifos = [Popen(cmd_tum2, stdin=tum1.stdout, stdout=tumor, stderr=PIPE), Popen(cmd_nor2, stdin=nor1.stdout, stdout=normal, stderr=PIPE), Popen(cmd_nor4, stdin=nor2.stdout, stdout=normal2, stderr=PIPE)]
@@ -823,7 +837,7 @@ def main():
                tum1 = Popen(cmd_tum1, stdout = PIPE)
                nor1 = Popen(cmd_nor1, stdout = PIPE)
                with named_pipe() as tfifo, named_pipe() as nfifo:
-                  res = multiprocessing.Process(target = DOpup2seqz, args = (nfifo, tfifo, args.gc, args.normal2, args.n,  args.qlimit, args.qformat, args.hom, args.het, fileout, out_header))
+                  res = multiprocessing.Process(target = DOpup2seqz, args = (nfifo, tfifo, args.gc, args.normal2, args.n,  args.qlimit, args.qformat, args.hom, args.het, fileout, out_header, args.het_f))
                   res.start()
                   with open(nfifo, 'wb', 0) as normal, open(tfifo, 'wb', 0) as tumor:
                      fifos = [Popen(cmd_tum2, stdin=tum1.stdout, stdout=tumor, stderr=PIPE), Popen(cmd_nor2, stdin=nor1.stdout, stdout=normal, stderr=PIPE)]
@@ -837,7 +851,7 @@ def main():
          args = pileup2seqz(parser, parser_pileup2seqz)
          with xopen('-', "wb") as fileout:
             out_header = ["chromosome", "position", "base.ref", "depth.normal", "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal", "GC.percent", "good.reads", "AB.normal", "AB.tumor", "tumor.strand"]
-            res = multiprocessing.Process(target = DOpup2seqz, args = (args.normal, args.tumor, args.gc, args.normal2, args.n,  args.qlimit, args.qformat, args.hom, args.het, fileout, out_header))
+            res = multiprocessing.Process(target = DOpup2seqz, args = (args.normal, args.tumor, args.gc, args.normal2, args.n,  args.qlimit, args.qformat, args.hom, args.het, fileout, out_header, args.het_f))
             res.start()
          res.join()
 
