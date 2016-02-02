@@ -3,10 +3,14 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                              min.reads.normal = 10, min.reads.baf = 1, max.mut.types = 1,
                              min.type.freq = 0.9, min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
                              breaks = NULL, breaks.method = "het", assembly = "hg19", weighted.mean = TRUE,
-                             normalization.method = "mean", gc.stats = NULL){
+                             normalization.method = "mean", ignore.normal = FALSE, gc.stats = NULL){
 
    if (is.null(gc.stats)) {
-      gc.stats <- gc.sample.stats(file, gz = gz)
+      if (ignore.normal) {
+         gc.stats <- gc.sample.stats(file, gz = gz, columns = '1,5,10')
+      } else {
+         gc.stats <- gc.sample.stats(file, gz = gz)
+      }
    }
    chr.vect <- as.character(gc.stats$file.metrics$chr)
    if (normalization.method != "mean") {
@@ -31,11 +35,15 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
    }
    for (chr in chromosome.list){
       if (verbose){
-         message("Processing ", chr, ": ", appendLF = FALSE) 
+         message("Processing ", chr, ": ", appendLF = FALSE)
       }
       file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
       seqz.data   <- read.seqz(file, gz = gz, n.lines = c(file.lines$start, file.lines$end))
-      seqz.data$adjusted.ratio <- round(seqz.data$depth.ratio / gc.vect[as.character(seqz.data$GC.percent)], 3)
+      if (ignore.normal) {
+         seqz.data$adjusted.ratio <- round(seqz.data$depth.tumor / gc.vect[as.character(seqz.data$GC.percent)], 3)
+      } else {
+         seqz.data$adjusted.ratio <- round(seqz.data$depth.ratio / gc.vect[as.character(seqz.data$GC.percent)], 3)
+      }
       seqz.hom <- seqz.data$zygosity.normal == 'hom'
       seqz.het <- seqz.data[!seqz.hom, ]
       het.filt <- seqz.het$good.reads >= min.reads.baf
@@ -46,7 +54,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                 weight = seqz.data$depth.normal)
       if (nrow(seqz.het) > 0) {
          breaks.method.i <- breaks.method
-         
+
          seqz.b.win <- windowValues(x = seqz.het$Bf[het.filt],
                                    positions = seqz.het$position[het.filt],
                                    chromosomes = seqz.het$chromosome[het.filt],
@@ -54,7 +62,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
                                    weight = seqz.het$good.reads[het.filt])
          if (is.null(breaks.all)){
             if (breaks.method.i == "full") {
-               breaks <- find.breaks(seqz.data, gamma = gamma.pcf, assembly = assembly, 
+               breaks <- find.breaks(seqz.data, gamma = gamma.pcf, assembly = assembly,
                                      kmin = kmin.pcf, seg.algo = "pcf")
                breaks.het <- try(find.breaks(seqz.het, gamma = gamma, assembly = assembly,
                                          kmin = kmin, baf.thres = c(0, 0.5)),
