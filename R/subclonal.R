@@ -39,13 +39,13 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
     }  
   }
   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
-  types <- types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 2)
-  model <- model.points(cellularity = cellularity, ploidy = ploidy, types = types, avg.depth.ratio = avg.depth.ratio)
-  model <- cbind(types, model)
-  model.ratio     <- unique(model[, c("CNn","CNt","depth.ratio")])
-  CNt.to.ratio    <- setNames(model.ratio$depth.ratio, model.ratio$CNt)
-  mean.ratio.step <- mean(diff(model.ratio$depth.ratio))
-  
+  get.dr <- function(x, CNn) {
+     theoretical.CNt(cellularity = cellularity,
+                     ploidy = ploidy,
+                     avg.depth.ratio = avg.depth.ratio,
+                     depth.ratio = as.numeric(x['depth.ratio']),
+                     CNn = CNn)
+  }
   if (female){
     segs.is.xy <- seg.tab$chromosome == XY["Y"]
     mut.is.xy  <- mut.tab$chromosome == XY["Y"]
@@ -54,6 +54,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
     mut.is.xy  <- mut.tab$chromosome %in% XY
     types.xy = types.matrix(CNt.min = 0, CNt.max = CNt.max, CNn = 1)
   }
+
   avg.sd.ratio  <- sum(seg.tab$sd.ratio * seg.tab$N.ratio, na.rm = TRUE)/sum(seg.tab$N.ratio, na.rm = TRUE)
   avg.sd.Bf     <- sum(seg.tab$sd.BAF * seg.tab$N.BAF, na.rm = TRUE)/sum(seg.tab$N.BAF, na.rm = TRUE)
   cn.alleles  <- baf.bayes(Bf = seg.tab$Bf[!segs.is.xy], CNt.max = CNt.max,
@@ -62,12 +63,10 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                            avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio[!segs.is.xy],
                            weight.ratio = seg.len[!segs.is.xy], sd.Bf = seg.tab$sd.BAF[!segs.is.xy],
                            weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
-  
+
   seg.res    <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
-  model.vect <- CNt.to.ratio[as.character(seg.res$CNt)]
-  float.vect <- (seg.res$depth.ratio - model.vect)/mean.ratio.step
-  float.vect[float.vect < 0 && seg.res$CNt == 0] <- 0
-  seg.res    <- cbind(seg.res, CNt.float = seg.res$CNt + round(float.vect, 3))
+  CNt.float  <- apply(seg.res, 1, function(x) get.dr(x, CNn = 2))
+  seg.res    <- cbind(seg.res, CNt.float)
   if (!female){
     if (sum(segs.is.xy) >= 1) {
       cn.alleles  <- baf.bayes(Bf = NA, CNt.max = CNt.max,
@@ -75,18 +74,17 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                                cellularity = cellularity, ploidy = ploidy,
                                avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio[segs.is.xy],
                                weight.ratio = seg.len[segs.is.xy], sd.Bf = NA,
-                               weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)   
-      
+                               weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)
+
       seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
-      model.vect <- CNt.to.ratio[as.character(seg.xy$CNt)]
-      float.vect <- (seg.xy$depth.ratio - model.vect)/mean.ratio.step
-      float.vect[float.vect < 0] <- 0
-      seg.xy     <- cbind(seg.xy, CNt.float = seg.xy$CNt + round(float.vect,3))      
+      CNt.float  <- apply(seg.xy, 1, function(x) get.dr(x, CNn = 1))
+      seg.xy     <- cbind(seg.xy, CNt.float)
       seg.res    <- rbind(seg.res, seg.xy)
     }
   }
+
   write.table(seg.res, file = segs.file,
-              col.names = TRUE, row.names = FALSE, sep = "\t")   
+              col.names = TRUE, row.names = FALSE, sep = "\t")
   if(nrow(mut.tab) > 0) {
     mut.alleles  <- mufreq.bayes(mufreq = mut.tab$F[!mut.is.xy], CNt.max = CNt.max,
                                  depth.ratio = mut.tab$adjusted.ratio[!mut.is.xy],
@@ -103,21 +101,21 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
         mut.res    <- rbind(mut.res, mut.xy)
       }
     }
-    
-    get.ccf <- function(x) {
-      Mta <- as.numeric(x['Mt'])
-      if (Mta == 0) {Mta = 1}
-      mufreq.ccf(cellularity = cellularity,
-                 mufreq = as.numeric(x['F']),
-                 CNt = as.numeric(x['CNt']),
-                 Mt = Mta,
-                 CNn = as.numeric(x['CNn']))
+
+    get.ccf.mut <- function(x) {
+       Mta <- as.numeric(x['Mt'])
+       if (Mta == 0) {Mta = 1}
+       mufreq.ccf(cellularity = cellularity,
+                  mufreq = as.numeric(x['F']),
+                  CNt = as.numeric(x['CNt']),
+                  Mt = Mta,
+                  CNn = as.numeric(x['CNn']))
     }
-    
-    ccfs <-  apply( mut.res, 1, function(x) get.ccf(x))
+
+    ccfs <-  apply( mut.res, 1, function(x) get.ccf.mut(x))
     mut.res <- cbind(mut.res, CCF = round(ccfs, 3))
     write.table(mut.res, file = muts.file,
-                col.names = TRUE, row.names = FALSE, sep = "\t")   
+                col.names = TRUE, row.names = FALSE, sep = "\t")
   }
 }
 
