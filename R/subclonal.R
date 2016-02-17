@@ -1,9 +1,22 @@
-mufreq.ccf <- function(cellularity, mufreq, Mt, CNt, CNn = 2, normal.ploidy = 2) {
+mufreq.ccf <- function(cellularity, mufreq, Mt, CNt, CNn = 2) {
   rel.freq    <- mufreq/cellularity
   tumor.comp  <- cellularity * CNt
-  normal.comp <- normal.ploidy * (1 - cellularity)
+  normal.comp <- CNn * (1 - cellularity)
   mutation.multiplicity <- rel.freq * (tumor.comp + normal.comp)
   mutation.multiplicity/Mt
+}
+
+ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy, normal.ploidy = 2, avg.depth.ratio = 1) {
+   CNt.x <- theoretical.CNt(depth.ratio, CNn = 2, cellularity, ploidy, normal.ploidy = 2, avg.depth.ratio = 1)
+   CNt.x/CNt
+}
+
+baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2) {
+   rel.freq    <- (1 - Bf)/cellularity
+   tumor.comp  <- cellularity * CNt
+   normal.comp <- CNn * (1 - cellularity)
+   allele.multiplicity <- rel.freq * (tumor.comp + normal.comp)
+   allele.multiplicity/(CNt - B)
 }
 
 sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out.dir = getwd(),
@@ -14,7 +27,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
     if(!dir.ok) stop('Directory does not exist and cannot be created: ', out.dir)
   }
   makeFilename <- function(x) file.path(out.dir, paste(sample.id, x, sep = '_'))
-  
+
   muts.file <- makeFilename("mutations_ccf.txt")
   segs.file <- makeFilename("segments_floats.txt")
 
@@ -24,11 +37,11 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
   #avg.depth.ratio <- weighted.mean(x = seg.tab$depth.ratio, w = seg.len)
   #avg.depth.ratio <- center.ratio(seg.tab)
   avg.depth.ratio <- 1
- 
+
   if (is.null(cp.table) && (is.null(cellularity) || is.null(ploidy))){
     stop("Either the cp.table or both cellularity and ploidy argument are required.")
   }
-  if (!is.null(cp.table)){      
+  if (!is.null(cp.table)){
     cint <- get.ci(cp.table)
     if (!is.null(cellularity) || !is.null(ploidy)) {
        if (is.null(cellularity)) cellularity <- cint$max.cellularity
@@ -36,7 +49,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
     } else {
        cellularity <- cint$max.cellularity
        ploidy <- cint$max.ploidy
-    }  
+    }
   }
   mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
   get.dr <- function(x, CNn) {
