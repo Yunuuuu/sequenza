@@ -59,6 +59,13 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                       depth.ratio = as.numeric(x['depth.ratio']),
                       CNn = CNn)
    }
+   get.ccf.baf <- function(x, CNn) {
+      baf.ccf(cellularity = cellularity,
+              Bf = as.numeric(x['Bf']),
+              CNt = as.numeric(x['CNt']),
+              B = as.numeric(x['B']),
+              CNn = CNn)
+   }
    if (female){
       segs.is.xy <- seg.tab$chromosome == XY["Y"]
       mut.is.xy  <- mut.tab$chromosome == XY["Y"]
@@ -79,7 +86,8 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
 
    seg.res    <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
    CNt.float  <- apply(seg.res, 1, function(x) get.dr(x, CNn = 2))
-   seg.res    <- cbind(seg.res, CNt.float)
+   ccf.baf    <- apply(seg.res, 1, function(x) get.ccf.baf(x, CNn = 2))
+   seg.res    <- cbind(seg.res, CNt.float, CCF.baf = ccf.baf)
    if (!female){
       if (sum(segs.is.xy) >= 1) {
          cn.alleles  <- baf.bayes(Bf = NA, CNt.max = CNt.max,
@@ -91,7 +99,8 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
 
          seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
          CNt.float  <- apply(seg.xy, 1, function(x) get.dr(x, CNn = 1))
-         seg.xy     <- cbind(seg.xy, CNt.float)
+         ccf.baf    <- apply(seg.xy, 1, function(x) get.ccf.baf(x, CNn = 1))
+         seg.xy     <- cbind(seg.xy, CNt.float, CCF.baf = ccf.baf)
          seg.res    <- rbind(seg.res, seg.xy)
       }
    }
@@ -124,7 +133,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                     Mt = Mta,
                     CNn = as.numeric(x['CNn']))
       }
-
+      ccfs <-  apply( mut.res, 1, function(x) get.ccf.mut(x))
       mut.res <- cbind(mut.res, CCF = round(ccfs, 3))
       write.table(mut.res, file = muts.file,
                   col.names = TRUE, row.names = FALSE, sep = "\t")
