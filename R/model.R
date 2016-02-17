@@ -4,6 +4,17 @@ theoretical.depth.ratio <- function(CNt, CNn = 2, cellularity, ploidy, normal.pl
    avg.depth.ratio * cellu.copy.term / ploidy.cellu.term
 }
 
+theoretical.CNt <- function(depth.ratio, CNn = 2, cellularity, ploidy, normal.ploidy = 2, avg.depth.ratio = 1) {
+   # Opposite of the theoretical.depth.ratio function
+   # thank to http://www.wolframalpha.com/widgets/view.jsp?id=4be4308d0f9d17d1da68eea39de9b2ce
+   # for the math :)
+   normal.term <- (cellularity - 1) * avg.depth.ratio *  normal.ploidy
+   ploidy.term <- -(cellularity * normal.ploidy) + (cellularity * ploidy) + normal.ploidy
+   denom       <- cellularity * avg.depth.ratio * normal.ploidy
+   numr        <- normal.term + depth.ratio * ploidy.term
+   CNn * numr / denom
+}
+
 theoretical.mufreq <- function(Mt, CNt, CNn = 2, cellularity) {
    normal.alleles <- (CNt - Mt) * cellularity + CNn * (1 - cellularity)
    all.alleles    <- (CNt * cellularity) + CNn * (1 - cellularity)
