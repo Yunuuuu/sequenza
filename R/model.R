@@ -46,7 +46,11 @@ model.points <- function(cellularity, ploidy,
 # }
 
 theoretical.baf <- function(CNt, CNn = 2, cellularity) {
+   if (CNt > 0) {
    alleles       <- seq(from = 1, to = CNt, by = 1)
+   } else {
+      alleles = 0
+   }
    max.b <- function(CNt) {
       max.b.alleles <- CNt / 2
       if (CNt %% 2 != 0 ) {
