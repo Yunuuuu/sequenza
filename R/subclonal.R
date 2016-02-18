@@ -1,22 +1,49 @@
-mufreq.ccf <- function(cellularity, mufreq, Mt, CNt, CNn = 2) {
-   rel.freq    <- mufreq/cellularity
-   tumor.comp  <- cellularity * CNt
-   normal.comp <- CNn * (1 - cellularity)
-   mutation.multiplicity <- rel.freq * (tumor.comp + normal.comp)
-   mutation.multiplicity/Mt
+mufreq.ccf <- function(cellularity, mufreq, Mt, CNt, CNn = 2, N, ci = 0.95) {
+   calc.ccf <- function (x) {
+      rel.freq    <- x/cellularity
+      tumor.comp  <- cellularity * CNt
+      normal.comp <- CNn * (1 - cellularity)
+      mutation.multiplicity <- rel.freq * (tumor.comp + normal.comp)
+      mutation.multiplicity/Mt
+
+   }
+   mufreq <- binom.test(x = round(mufreq * N, 0), n = N, conf.level = 0.95)
+   ccf.left  <- calc.ccf(mufreq$conf.int[1])
+   ccf.right <- calc.ccf(mufreq$conf.int[2])
+   ccf       <- calc.ccf(mufreq$estimate)
+   cbind(CCF.left = ccf.left, CCF = ccf, CCF.right = ccf.right)
 }
 
-ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy, normal.ploidy = 2, avg.depth.ratio = 1) {
-   CNt.x <- theoretical.CNt(depth.ratio, CNn = 2, cellularity, ploidy, normal.ploidy = 2, avg.depth.ratio = 1)
-   CNt.x/CNt
+ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
+                      normal.ploidy = 2, avg.depth.ratio = 1, sd, N, ci = 0.95) {
+   calc.dr <- function(x) {
+      theoretical.CNt(x, CNn = 2, cellularity, ploidy, normal.ploidy = normal.ploidy,
+                      avg.depth.ratio = avg.depth.ratio)
+   }
+   ci <- qt(ci, df = N - 1) * sd / sqrt(N)
+   dr.left  <- calc.dr(depth.ratio - ci)
+   dr.right <- calc.dr(depth.ratio + ci)
+   dr       <- calc.dr(depth.ratio)
+   cbind(CNt.float = dr, CCF.ratio.left = dr.left/CNt, CCF.ratio = dr/CNt, CCF.ratio.right = dr.right/CNt)
 }
 
-baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2) {
-   rel.freq    <- (1 - Bf)/cellularity
-   tumor.comp  <- cellularity * CNt
-   normal.comp <- CNn * (1 - cellularity)
-   allele.multiplicity <- rel.freq * (tumor.comp + normal.comp)
-   allele.multiplicity/(CNt - B)
+baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95) {
+   eBf <- expected.baf(CNt = CNt, cellularity = cellularity, sd = sd)
+   eBf <- eBf$BAF[eBf$B == B & eBf$CNt == CNt]
+   calc.ccf <- function(x) {
+      rel.freq.ebf <- eBf / cellularity
+      rel.freq.bf  <- x / cellularity
+      tumor.comp  <- cellularity * B
+      normal.comp <- 1 - cellularity
+      eb.multiplicity <- rel.freq.ebf * (tumor.comp + normal.comp)
+      b.multiplicity  <- rel.freq.bf * (tumor.comp + normal.comp)
+      b.multiplicity / eb.multiplicity
+   }
+   ci <- qt(ci, df = N - 1) * sd / sqrt(N)
+   ccf.left  <- calc.ccf(Bf - ci)
+   ccf.right <- calc.ccf(Bf + ci)
+   ccf       <- calc.ccf(Bf)
+   cbind(CCF.baf.left = ccf.left, CCF.baf = ccf, CCF.baf.right = ccf.right)
 }
 
 sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out.dir = getwd(),
@@ -28,10 +55,12 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    }
    makeFilename <- function(x) file.path(out.dir, paste(sample.id, x, sep = '_'))
 
-   muts.file <- makeFilename("mutations_ccf.txt")
-   segs.file <- makeFilename("segments_floats.txt")
+   muts.file   <- makeFilename("mutations_ccf.txt")
+   segs.file   <- makeFilename("segments_floats.txt")
+   segs.d.plot <- makeFilename("dirichlet_segment.pdf")
 
    seg.tab     <- do.call(rbind, sequenza.extract$segments[chromosome.list])
+   seg.tab     <- na.exclude(seg.tab)
    seg.len     <- (seg.tab$end.pos - seg.tab$start.pos)/1e6
    #avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
    #avg.depth.ratio <- weighted.mean(x = seg.tab$depth.ratio, w = seg.len)
@@ -52,18 +81,23 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
       }
    }
    mut.tab     <- na.exclude(do.call(rbind, sequenza.extract$mutations[chromosome.list]))
-   get.dr <- function(x, CNn) {
-      theoretical.CNt(cellularity = cellularity,
-                      ploidy = ploidy,
-                      avg.depth.ratio = avg.depth.ratio,
-                      depth.ratio = as.numeric(x['depth.ratio']),
-                      CNn = CNn)
+   get.ccf.dr <- function(x, CNn) {
+      ratio.ccf(cellularity = cellularity,
+                ploidy = ploidy,
+                avg.depth.ratio = avg.depth.ratio,
+                depth.ratio = as.numeric(x['depth.ratio']),
+                CNt = as.numeric(x['CNt']),
+                sd = as.numeric(x['sd.ratio']),
+                N = as.numeric(x['N.ratio']),
+                CNn = CNn)
    }
    get.ccf.baf <- function(x, CNn) {
       baf.ccf(cellularity = cellularity,
               Bf = as.numeric(x['Bf']),
               CNt = as.numeric(x['CNt']),
               B = as.numeric(x['B']),
+              sd = as.numeric(x['sd.BAF']),
+              N = as.numeric(x['N.BAF']),
               CNn = CNn)
    }
    if (female){
@@ -85,9 +119,9 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                             weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
 
    seg.res    <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
-   CNt.float  <- apply(seg.res, 1, function(x) get.dr(x, CNn = 2))
-   ccf.baf    <- apply(seg.res, 1, function(x) get.ccf.baf(x, CNn = 2))
-   seg.res    <- cbind(seg.res, CNt.float, CCF.baf = ccf.baf)
+   ccf.dr     <- lapply(split(seg.res,seq(NROW(seg.res))), function(x) get.ccf.dr(x, CNn = 2))
+   ccf.baf    <- lapply(split(seg.res,seq(NROW(seg.res))), function(x) get.ccf.baf(x, CNn = 2))
+   seg.res    <- cbind(seg.res, do.call(rbind, ccf.dr), do.call(rbind, ccf.baf))
    if (!female){
       if (sum(segs.is.xy) >= 1) {
          cn.alleles  <- baf.bayes(Bf = NA, CNt.max = CNt.max,
@@ -98,9 +132,9 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                                   weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)
 
          seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
-         CNt.float  <- apply(seg.xy, 1, function(x) get.dr(x, CNn = 1))
-         ccf.baf    <- apply(seg.xy, 1, function(x) get.ccf.baf(x, CNn = 1))
-         seg.xy     <- cbind(seg.xy, CNt.float, CCF.baf = ccf.baf)
+         ccf.dr     <- lapply(split(seg.xy, seq(NROW(seg.xy))), function(x) get.ccf.dr(x, CNn = 1))
+         ccf.baf    <- lapply(split(seg.xy, seq(NROW(seg.xy))), function(x) get.ccf.baf(x, CNn = 1))
+         seg.xy     <- cbind(seg.xy, do.call(rbind, ccf.dr), do.call(rbind, ccf.baf))
          seg.res    <- rbind(seg.res, seg.xy)
       }
    }
@@ -131,13 +165,48 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                     mufreq = as.numeric(x['F']),
                     CNt = as.numeric(x['CNt']),
                     Mt = Mta,
+                    N = as.numeric(x['good.reads']),
                     CNn = as.numeric(x['CNn']))
       }
-      ccfs <-  apply( mut.res, 1, function(x) get.ccf.mut(x))
-      mut.res <- cbind(mut.res, CCF = round(ccfs, 3))
+      ccfs <-  lapply(split(mut.res, seq(NROW(mut.res))), function(x) get.ccf.mut(x))
+      mut.res <- cbind(mut.res, do.call(rbind, ccfs))
       write.table(mut.res, file = muts.file,
                   col.names = TRUE, row.names = FALSE, sep = "\t")
    }
+
+   s2 <- matrix(c(10000, 0, 0, 1), ncol = 2)
+   m2 <- c(180, 3)
+   psiinv2 <- diag(c(1/10000, 1), 2)
+   prior <- list(alpha = 1, nu1 = 4,
+                 nu2 = 4, s2 = s2,
+                 m2 = m2, psiinv2 = psiinv2,
+                 tau1 = 0.01, tau2 = 0.01)
+   nburn <- 5000
+   nsave <- 5000
+   nskip <- 3
+   ndisplay <- 1000
+   mcmc <- list(nburn = nburn,
+                nsave = nsave,
+                nskip = nskip,
+                ndisplay = ndisplay)
+   fit1 <- DPMdencens(left = cbind(seg.res$CCF.ratio.left[seg.res$CNt > 0], seg.res$CCF.baf.left[seg.res$CNt > 0]),
+                      right = cbind(seg.res$CCF.ratio.right[seg.res$CNt > 0], seg.res$CCF.baf.right[seg.res$CNt > 0]),
+                      ngrid = 100, prior = prior, mcmc = mcmc,
+                      state = state, status = TRUE)
+
+   dir.plot <- function (dp, colFn = colorRampPalette(c('white', 'red')), ci = 0.95, ...) {
+      z <- matrix(rank(dp$fbiv[[1]]), nrow = nrow(dp$fbiv[[1]])) / length(dp$fbiv[[1]])
+      map <- makecmap(c(ci, 1), colFn = colFn, include.lowest = FALSE)
+      colorgram(x = dp$grid[, 1], y = dp$grid[, 2], z = z,
+                map = map, outlier="white", key = NA, ...)
+   }
+   pdf(segs.d.plot, width = 4, height = 4)
+      dir.plot(dp = fit1, n = 200, ci = 0.99, las = 1, xlab = "CCF ratio", ylab = "CCF Bf", xlim = c(0,2), ylim = c(0,2))
+      contour(x = fit1$grid[, 1], y = fit1$grid[, 2], z = fit1$fbiv[[1]] ,
+              levels = quantile(fit1$fbiv[[1]], c(.999)), drawlabels = FALSE, add = T,
+              method = "edge", lty = 1, lwd = 1)
+      abline(h = c(0,0.5,1), v = c(0,0.5,1), lty = 2, lwd = 0.8)
+   dev.off()
 }
 
 
