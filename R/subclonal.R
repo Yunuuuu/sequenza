@@ -17,14 +17,18 @@ mufreq.ccf <- function(cellularity, mufreq, Mt, CNt, CNn = 2, N, ci = 0.95) {
 ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
                       normal.ploidy = 2, avg.depth.ratio = 1, sd, N, ci = 0.95) {
    calc.dr <- function(x) {
-      theoretical.CNt(x, CNn = 2, cellularity, ploidy, normal.ploidy = normal.ploidy,
+      theoretical.CNt(x, CNn = CNn, cellularity, ploidy, normal.ploidy = normal.ploidy,
                       avg.depth.ratio = avg.depth.ratio)
    }
    ci <- qt(ci, df = N - 1) * sd / sqrt(N)
    dr.left  <- calc.dr(depth.ratio - ci)
    dr.right <- calc.dr(depth.ratio + ci)
    dr       <- calc.dr(depth.ratio)
-   cbind(CNt.float = dr, CCF.ratio.left = dr.left/CNt, CCF.ratio = dr/CNt, CCF.ratio.right = dr.right/CNt)
+   if (dr >= CNt) {
+      cbind(CNt.float = dr, CCF.ratio.left = CNt/dr.left, CCF.ratio = CNt/dr, CCF.ratio.right = CNt/dr.right)
+   } else {
+      cbind(CNt.float = dr, CCF.ratio.left = dr.left/CNt, CCF.ratio = dr/CNt, CCF.ratio.right = dr.right/CNt)
+   }
 }
 
 baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95) {
@@ -37,7 +41,11 @@ baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95) {
       normal.comp <- 1 - cellularity
       eb.multiplicity <- rel.freq.ebf * (tumor.comp + normal.comp)
       b.multiplicity  <- rel.freq.bf * (tumor.comp + normal.comp)
-      b.multiplicity / eb.multiplicity
+      if (b.multiplicity >=  eb.multiplicity) {
+         eb.multiplicity / b.multiplicity
+      }else {
+         b.multiplicity / eb.multiplicity
+      }
    }
    ci <- qt(ci, df = N - 1) * sd / sqrt(N)
    ccf.left  <- calc.ccf(Bf - ci)
@@ -58,6 +66,8 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    muts.file   <- makeFilename("mutations_ccf.txt")
    segs.file   <- makeFilename("segments_floats.txt")
    segs.d.plot <- makeFilename("dirichlet_segment.pdf")
+   clust.file   <- makeFilename("segments_clusters.txt")
+   clust.plot   <- makeFilename("segments_clusters.pdf")
 
    seg.tab     <- do.call(rbind, sequenza.extract$segments[chromosome.list])
    seg.tab     <- na.exclude(seg.tab)
@@ -197,8 +207,8 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    dir.plot <- function (dp, colFn = colorRampPalette(c('white', 'red')), ci = 0.95, ...) {
       z <- matrix(rank(dp$fbiv[[1]]), nrow = nrow(dp$fbiv[[1]])) / length(dp$fbiv[[1]])
       map <- makecmap(c(ci, 1), colFn = colFn, include.lowest = FALSE)
-      colorgram(x = dp$grid[, 1], y = dp$grid[, 2], z = z,
-                map = map, outlier="white", key = NA, ...)
+      suppressWarnings(colorgram(x = dp$grid[, 1], y = dp$grid[, 2], z = z,
+                map = map, outlier="white", key = NA, ...))
    }
    pdf(segs.d.plot, width = 4, height = 4)
       dir.plot(dp = fit1, n = 200, ci = 0.99, las = 1, xlab = "CCF ratio", ylab = "CCF Bf", xlim = c(0,2), ylim = c(0,2))
@@ -206,6 +216,18 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
               levels = quantile(fit1$fbiv[[1]], c(.999)), drawlabels = FALSE, add = T,
               method = "edge", lty = 1, lwd = 1)
       abline(h = c(0,0.5,1), v = c(0,0.5,1), lty = 2, lwd = 0.8)
+   dev.off()
+   seg.res  <- seg.res[seg.res$CNt > 0, ]
+   seg.size <- (seg.res$end.pos - seg.res$start.pos) /1e6
+
+   write.table(cbind(seg.res, cluster = fit1$state$ss), file = clust.file,
+               col.names = TRUE, row.names = FALSE, sep = "\t")
+   pdf(clust.plot, width = 6, height = 6)
+   plot(seg.res$CCF.ratio, seg.res$CCF.baf, col = fit1$state$ss)
+   plot(seg.res$CCF.ratio[seg.size >=3], seg.res$CCF.baf[seg.size >=3], col = fit1$state$ss[seg.size >=3],
+        xlim = c(0, 1), ylim = c(0, 1), xlab = "CCF depth ratio", ylab = "CCF B allele frequency")
+   plot(seg.res$Bf, seg.res$depth.ratio, col = fit1$state$ss, xlim = c(0, 0.5), ylim = c(0, 2.5))
+      baf.ratio.model.fit(cellularity = cellularity, ploidy = ploidy, segs = seg.res, col = fit1$state$ss)
    dev.off()
 }
 
