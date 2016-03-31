@@ -1,9 +1,9 @@
-cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity", zlab = "Scaled rank LPP", 
+cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity", zlab = "Scaled rank LPP",
                      colFn = colorRampPalette(c('white', 'lightblue')), ...) {
   z <- matrix(rank(cp.table$lpp), nrow = nrow(cp.table$lpp)) / length(cp.table$lpp)
   map <- makecmap(c(0, 1), colFn = colFn, include.lowest = TRUE)
-  colorgram(x = cp.table$ploidy, y = cp.table$cellularity, z = z, 
-            map = map, las = 1, 
+  colorgram(x = cp.table$ploidy, y = cp.table$cellularity, z = z,
+            map = map, las = 1,
             xlab = xlab, ylab = ylab, zlab = zlab, ...)
 }
 
@@ -35,7 +35,7 @@ cp.plot.contours <- function(cp.table, likThresh = c(0.95), alternative = TRUE,
          legend(legend.pos, legend = c(paste("C.R.", names(LikThresh), sep = " "),
                                        "Point estimate", "Alternative solutions"),
                 col = c(col[1:length(LikThresh)], "black", "black"), lty = c(rep(1, length(LikThresh)), NA, NA),
-                pch = c(rep(NA, length(LikThresh)), pch, alt.pch), border = NA, bty = "n")         
+                pch = c(rep(NA, length(LikThresh)), pch, alt.pch), border = NA, bty = "n")
       }
    }
    invisible(LikThresh)
@@ -97,7 +97,7 @@ plotWindows <- function(seqz.window, m.lty = 1, m.lwd = 3,
    rect(xleft = seqz.window$start, ybottom = seqz.window$q0,
         xright = seqz.window$end, ytop = seqz.window$q1,
         col = q.bg, border = NA)
-   segments(y0 = seqz.window$mean, x0 = seqz.window$start, x1 = seqz.window$end, 
+   segments(y0 = seqz.window$mean, x0 = seqz.window$start, x1 = seqz.window$end,
             lty = m.lty, lwd = m.lwd, col = m.col)
 
 }
@@ -155,7 +155,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
                data.model$baf <- rbind(c(0,0,max(data.model$baf$BAF),0), data.model$baf)
             } else {
                data.model$baf <- rbind(c(0,0,1,0), data.model$baf)
-            }       
+            }
             types          <- types.matrix(CNt.min = CNt.min, CNt.max = CNt.max, CNn = CNn)
             data.model$muf <- cbind(types, model.points(cellularity = cellularity, ploidy = ploidy,
                                                    types = types, avg.depth.ratio = avg.depth.ratio))
@@ -343,7 +343,7 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
 
 baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001, 0.5, 0.005),
                                 ratio.space = seq(0.01, 2.5, 0.05), avg.depth.ratio = 1, CNt.max = 7,
-                                segment.filter = 3e6) {
+                                segment.filter = 3e6, col = 'black') {
    s.b   <- mean(segs$sd.BAF, na.rm = TRUE)
    s.r   <- mean(segs$sd.ratio, na.rm = TRUE)
    l.s   <- segs$end.pos - segs$start.pos
@@ -356,7 +356,7 @@ baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001
                            avg.depth.ratio = avg.depth.ratio,
                            sd.Bf = s.b, weight.Bf = 10,
                            sd.ratio = s.r, weight.ratio = 10, ratio.priority = F,
-                           CNn = 2) 
+                           CNn = 2)
    both.space <- as.data.frame(both.space)
    z <- tapply(both.space$LPP, list(test.values$Bf, test.values$ratio), mean)
    x <- as.numeric(rownames(z))
@@ -376,8 +376,9 @@ baf.ratio.model.fit <- function(cellularity, ploidy, segs, BAF.space = seq(0.001
              outlier = "white", las = 1, xlim = c(0, 0.5)))
    axis(side = 4, at = mpts$depth.ratio, labels = mpts$CNt, las = 1)
    mtext(text = "Copy number", side = 4, line = 2)
-   points(x = segs$Bf[s.big], y = segs$depth.ratio[s.big], pch = 1, cex = 1)
-   points(x = segs$Bf[!s.big], y = segs$depth.ratio[!s.big], pch = ".", cex = 1)
+   segs$col <- col
+   points(x = segs$Bf[s.big], y = segs$depth.ratio[s.big], pch = 1, cex = 1, col = segs$col[s.big])
+   points(x = segs$Bf[!s.big], y = segs$depth.ratio[!s.big], pch = ".", cex = 1, col = segs$col[!s.big])
 }
 
 plotRawGenome <- function(sequenza.extract, cellularity, ploidy, CNt.max = 7, main = "", ...){
