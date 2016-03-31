@@ -41,7 +41,9 @@ baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95) {
       normal.comp <- 1 - cellularity
       eb.multiplicity <- rel.freq.ebf * (tumor.comp + normal.comp)
       b.multiplicity  <- rel.freq.bf * (tumor.comp + normal.comp)
-      if (b.multiplicity >=  eb.multiplicity) {
+      if (is.na(eb.multiplicity)) {
+         NA
+      } else if (b.multiplicity >=  eb.multiplicity) {
          eb.multiplicity / b.multiplicity
       }else {
          b.multiplicity / eb.multiplicity
@@ -68,6 +70,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    segs.d.plot <- makeFilename("dirichlet_segment.pdf")
    clust.file   <- makeFilename("segments_clusters.txt")
    clust.plot   <- makeFilename("segments_clusters.pdf")
+   clust.genome <- makeFilename("genome_clusters.pdf")
 
    seg.tab     <- do.call(rbind, sequenza.extract$segments[chromosome.list])
    seg.tab     <- na.exclude(seg.tab)
@@ -129,8 +132,8 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                             weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
 
    seg.res    <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
-   ccf.dr     <- lapply(split(seg.res,seq(NROW(seg.res))), function(x) get.ccf.dr(x, CNn = 2))
-   ccf.baf    <- lapply(split(seg.res,seq(NROW(seg.res))), function(x) get.ccf.baf(x, CNn = 2))
+   ccf.dr     <- lapply(split(seg.res, seq(nrow(seg.res))), function(x) get.ccf.dr(x, CNn = 2))
+   ccf.baf    <- lapply(split(seg.res, seq(nrow(seg.res))), function(x) get.ccf.baf(x, CNn = 2))
    seg.res    <- cbind(seg.res, do.call(rbind, ccf.dr), do.call(rbind, ccf.baf))
    if (!female){
       if (sum(segs.is.xy) >= 1) {
@@ -142,8 +145,8 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                                   weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)
 
          seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
-         ccf.dr     <- lapply(split(seg.xy, seq(NROW(seg.xy))), function(x) get.ccf.dr(x, CNn = 1))
-         ccf.baf    <- lapply(split(seg.xy, seq(NROW(seg.xy))), function(x) get.ccf.baf(x, CNn = 1))
+         ccf.dr     <- lapply(split(seg.xy, seq(nrow(seg.xy))), function(x) get.ccf.dr(x, CNn = 1))
+         ccf.baf    <- lapply(split(seg.xy, seq(nrow(seg.xy))), function(x) get.ccf.baf(x, CNn = 1))
          seg.xy     <- cbind(seg.xy, do.call(rbind, ccf.dr), do.call(rbind, ccf.baf))
          seg.res    <- rbind(seg.res, seg.xy)
       }
@@ -228,6 +231,9 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
         xlim = c(0, 1), ylim = c(0, 1), xlab = "CCF depth ratio", ylab = "CCF B allele frequency")
    plot(seg.res$Bf, seg.res$depth.ratio, col = fit1$state$ss, xlim = c(0, 0.5), ylim = c(0, 2.5))
       baf.ratio.model.fit(cellularity = cellularity, ploidy = ploidy, segs = seg.res, col = fit1$state$ss)
+   dev.off()
+   pdf(clust.genome, width = 15, height = 5)
+      genome.view(cbind(seg.res, cluster = fit1$state$ss), info.type = "clusters")
    dev.off()
 }
 
