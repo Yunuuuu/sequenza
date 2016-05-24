@@ -238,9 +238,9 @@ find.breaks <- function(seqz.baf, gamma = 80, kmin = 10, baf.thres = c(0, 0.5),
    } else {
       stop("Supported segmentation algorithms are only \'aspcf\' or \'pcf\' from the copynumber package.")
    }
-    if (length(grep("chr", seqz.baf$chromosome)) > 0) {
-        allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")
-    }
+   if (length(grep("chr", seqz.baf$chromosome)) > 0) {
+      allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")
+   }
    breaks   <- allele.seg[, c("chrom", "start.pos", "end.pos", "arm")]
    not.uniq <- which(breaks$end.pos == c(breaks$start.pos[-1],0))
    breaks$end.pos[not.uniq]<- breaks$end.pos[not.uniq] - 1
