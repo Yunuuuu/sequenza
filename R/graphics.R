@@ -283,7 +283,7 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL, segments
 #
 #}
 
-genome.view <- function(seg.cn, info.type = "AB", ...) {
+genome.view <- function(seg.cn, info.type = "AB", col = NA, ...) {
    chr.order <- unique(seg.cn$chromosome)
    if (info.type == "clusters") {
       seg.list  <- split(x = seg.cn[,c("chromosome", "start.pos", "end.pos", "CNt", "cluster")],
@@ -319,7 +319,7 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
                y0 = (abs.segments$B-0.1), y1 = (abs.segments$B-0.1), col="blue", lwd = 5, lend = 1)
       segments(x0 = abs.segments$abs.start, x1 = abs.segments$abs.end,
                y0 = (abs.segments$A+0.1), y1 = (abs.segments$A+0.1), col="red", lwd = 5, lend = 1)
-   } else if (info.type == "clusters") {
+   } else if (info.type == "colors") {
       abs.segments <- abs.segments[!is.na(abs.segments$CNt), ]
       plot(x = c(min(abs.segments$abs.start), max(abs.segments$abs.end)),
            y = c(min(abs.segments$CNt), max(abs.segments$CNt)), type = "n",
@@ -330,7 +330,8 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
            side = 2, line = 0, las = 1)
       #abline(h = c(min(abs.segments$CNt):max(abs.segments$CNt)), lty = 2)
       segments(x0 = abs.segments$abs.start, x1 = abs.segments$abs.end,
-               y0 = abs.segments$CNt, y1= abs.segments$CNt, col= abs.segments$cluster, lwd = 5, lend = 1)
+               y0 = abs.segments$CNt, y1= abs.segments$CNt,
+               col = col[!is.na(abs.segments$CNt)], lwd = 5, lend = 1)
    } else {
       abs.segments <- abs.segments[!is.na(abs.segments$CNt), ]
       plot(x = c(min(abs.segments$abs.start), max(abs.segments$abs.end)),
