@@ -1,3 +1,34 @@
+baf.test <- function(Bf, cellularity, B, CNt, CNn = 2, sd.Bf = 0.1) {
+   if (B >= CNt) {
+      B = CNt - B
+   }
+   model.baf  <- expected.baf(sd = sd.Bf, CNn = CNn, CNt = CNt, cellularity = cellularity)
+   test.baf   <- model.baf[model.baf$B == B & model.baf$CNt == CNt, ]$BAF
+   #min.offset <- 1e-323
+   dt2(mean = Bf, sd = sd.Bf, x = test.baf, df = 5, log = TRUE)
+}
+
+baf.test.fit <- function(cellularity = seq(0.3, 1, by = 0.01), ...) {
+   fit.cell <- function(cellularity) {
+      baf.test(cellularity = cellularity, ...)
+   }
+   res <- sapply(cellularity, fit.cell)
+   cbind(cellularity = cellularity, LPP = res)
+}
+
+ratio.test <- function(depth.ratio, cellularity, ploidy, CNt, CNn = 2, sd.ratio = 0.1, avg.depth.ratio = 1) {
+   test.ratio  <- theoretical.depth.ratio(CNt = CNt, CNn = CNn, cellularity = cellularity, ploidy = ploidy, avg.depth.ratio = avg.depth.ratio)
+   dt2(mean = depth.ratio, sd = sd.ratio, x = test.ratio, df = 5, log = TRUE)
+}
+
+ratio.test.fit <- function(cellularity = seq(0.3, 1, by = 0.01), ...) {
+   fit.cell <- function(cellularity) {
+      ratio.test(cellularity = cellularity, ...)
+   }
+   res <- sapply(cellularity, fit.cell)
+   cbind(cellularity = cellularity, LPP = res)
+}
+
 mufreq.ccf <- function(cellularity, mufreq, Mt, CNt, CNn = 2, N, ci = 0.95) {
    calc.ccf <- function (x) {
       rel.freq    <- x/cellularity
@@ -16,44 +47,170 @@ mufreq.ccf <- function(cellularity, mufreq, Mt, CNt, CNn = 2, N, ci = 0.95) {
 
 ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
                       normal.ploidy = 2, avg.depth.ratio = 1, sd, N, ci = 0.95) {
+
+   res <- ratio.test.fit (depth.ratio = depth.ratio, CNt = CNt, CNn = CNn,
+                           ploidy = ploidy, avg.depth.ratio = avg.depth.ratio,
+                           cellularity = seq(from = 0, to = 1, by = 0.01))
+   range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
+   res        <- res[res[, 2] >= range.lpp, ]
+   ccf.left   <- res[which.min(res[, 1]), 1] / cellularity
+   ccf        <- res[which.max(res[, 2]), 1] / cellularity
+   ccf.right  <- res[which.max(res[, 1]), 1] / cellularity
    calc.dr <- function(x) {
       theoretical.CNt(x, CNn = CNn, cellularity, ploidy, normal.ploidy = normal.ploidy,
                       avg.depth.ratio = avg.depth.ratio)
    }
-   ci <- qt(ci, df = N - 1) * sd / sqrt(N)
-   dr.left  <- calc.dr(depth.ratio - ci)
-   dr.right <- calc.dr(depth.ratio + ci)
+   #ci <- qt(ci, df = N - 1) * sd / sqrt(N)
+   #dr.left  <- calc.dr(depth.ratio - ci)
+   #dr.right <- calc.dr(depth.ratio + ci)
    dr       <- calc.dr(depth.ratio)
-   if (dr >= CNt) {
-      cbind(CNt.float = dr, CCF.ratio.left = CNt/dr.left, CCF.ratio = CNt/dr, CCF.ratio.right = CNt/dr.right)
+   #if (dr >= CNt) {
+   #   cbind(CNt.float = dr, CCF.ratio.left = (CNt + offset)/(dr.left + offset), CCF.ratio = (CNt + offset)/(dr + offset), CCF.ratio.right = (CNt + offset)/(dr.right + offset))
+   #} else {
+   #   cbind(CNt.float = dr, CCF.ratio.left = (dr.left + offset)/(CNt + offset), CCF.ratio = (dr + offset)/(CNt + offset), CCF.ratio.right = (dr.right + offset)/(CNt + offset))
+   #}
+   #CNt <- abs(round(dr, 0))
+   #cbind(CNt.float = dr, CCF.ratio.left = 1 - abs(dr.left - CNt), CCF.ratio =  1 - abs(dr - CNt), CCF.ratio.right = 1 - abs(dr.right - CNt))
+   cbind(CNt.float = dr, CCF.ratio.left = ccf.left, CCF.ratio =  ccf, CCF.ratio.right = ccf.right)
+
+}
+
+baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95, offset = 1e-10) {
+
+   res <- baf.test.fit(Bf = Bf, CNt = CNt, CNn = CNn, sd.Bf = sd, B = B,
+                        cellularity = seq(from = 0, to = 1, by = 0.01))
+   range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
+   res        <- res[res[, 2] >= range.lpp, ]
+   ccf.left   <- res[which.min(res[, 1]), 1] / cellularity
+   ccf        <- res[which.max(res[, 2]), 1] / cellularity
+   ccf.right  <- res[which.max(res[, 1]), 1] / cellularity
+   # eBf <- expected.baf(CNt = CNt, cellularity = cellularity, sd = sd)
+   # eBf <- eBf$BAF[eBf$B == B & eBf$CNt == CNt]
+   # calc.ccf <- function(x) {
+   #    rel.freq.ebf <- eBf / cellularity
+   #    rel.freq.bf  <- x / cellularity
+   #    tumor.comp  <- cellularity * B
+   #    normal.comp <- 1 - cellularity
+   #    eb.multiplicity <- rel.freq.ebf * (tumor.comp + normal.comp)
+   #    b.multiplicity  <- rel.freq.bf * (tumor.comp + normal.comp)
+   #    if (is.na(eb.multiplicity)) {
+   #       NA
+   #    } else if (b.multiplicity >=  eb.multiplicity) {
+   #       (eb.multiplicity + offset) / (b.multiplicity + offset)
+   #    }else {
+   #       (b.multiplicity + offset) / (eb.multiplicity + offset)
+   #    }
+   # }
+   # ci <- qt(ci, df = N - 1) * sd / sqrt(N)
+   # ccf.left  <- calc.ccf(Bf - ci)
+   # ccf.right <- calc.ccf(Bf + ci)
+   # ccf       <- calc.ccf(Bf)
+   # cbind(CCF.baf.left = ccf.left, CCF.baf = ccf, CCF.baf.right = ccf.right)
+   cbind(CCF.baf.left = ccf.left, CCF.baf = ccf, CCF.baf.right = ccf.right)
+}
+
+get_clust_info <- function(segs, min.size = 1e3) {
+
+   seg.size <- segs$end.pos - segs$start.pos
+   segs     <- segs[seg.size >= min.size, ]
+   seg.size <- seg.size[seg.size >= min.size]
+   tot.size <- sum(as.numeric(seg.size))
+   split_cl <- split(x = data.frame(baf = segs$CCF.baf, ratio = segs$CCF.ratio, size = seg.size),
+                     f = segs$cluster)
+   size     <- lapply(split(x = seg.size/tot.size, f = segs$cluster),
+                      FUN = function(x) sum(x, na.rm = TRUE))
+   ccf.b    <-  lapply(split_cl,
+                       FUN = function(x) weighted.mean(x$baf, w = sqrt(x$size), na.rm = TRUE))
+   ccf.r    <-  lapply(split_cl,
+                       FUN = function(x) weighted.mean(x$ratio, w = sqrt(x$size), na.rm = TRUE))
+   list(size = size, CCF.baf = ccf.b, CCF.ratio = ccf.r)
+}
+
+chromosomes.info <- function() {
+   #remove chr9 weird area chr9:47367679-50367679 -> chr9:37890000-71410000
+   data.frame(
+      chrom = c(1:22, "X", "Y"),
+      start.cent = c(121535434, 92326171, 90504854, 49660117, 46405641,
+                     58830166, 58054331, 43838887, 37890000, 39254935,
+                     51644205, 34856694, 16000000, 16000000, 17000000,
+                     35335801, 22263006, 15460898, 24681782, 26369569,
+                     11288129, 13000000, 58632012, 10104553),
+      end.cent = c(124535434, 95326171, 93504854, 52660117, 49405641,
+                   61830166, 61054331, 46838887, 71410000, 42254935,
+                   54644205, 37856694, 19000000, 19000000, 20000000,
+                   38335801, 25263006, 18460898, 27681782, 29369569,
+                   14288129, 16000000, 61632012, 13104553),
+      end.pos = c(249250621, 243199373, 198022430, 191154276, 180915260,
+                  171115067, 159138663, 146364022, 141213431, 135534747,
+                  135006516, 133851895, 115169878, 107349540, 102531392,
+                  90354753, 81195210, 78077248, 63025520, 59128983, 51304566,
+                  48129895, 155270560, 59373566)
+   )
+}
+
+compare_segs_cluster <- function(seg_1, seg_2, c_info, max_gap = 1e3) {
+   both_before_cent <- seg_1$end.pos <  c_info$start.cent & seg_1$end.pos < c_info$start.cent
+   both_after_cent <- seg_1$start.pos > c_info$end.cent
+   if (both_before_cent | both_after_cent) {
+      if (seg_1$end.pos <= (seg_2$start.pos + max_gap) ) {
+         if (seg_1$CNt == seg_2$CNt & seg_1$A == seg_2$A & seg_1$cluster == seg_2$cluster) {
+            seg_tot = seg_1
+            seg_tot$end.pos = seg_2$end.pos
+            return(seg_tot)
+         } else {
+            return(seg_1)
+         }
+      } else {
+         return(seg_1)
+      }
    } else {
-      cbind(CNt.float = dr, CCF.ratio.left = dr.left/CNt, CCF.ratio = dr/CNt, CCF.ratio.right = dr.right/CNt)
+      return(seg_1)
    }
 }
 
-baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95) {
-   eBf <- expected.baf(CNt = CNt, cellularity = cellularity, sd = sd)
-   eBf <- eBf$BAF[eBf$B == B & eBf$CNt == CNt]
-   calc.ccf <- function(x) {
-      rel.freq.ebf <- eBf / cellularity
-      rel.freq.bf  <- x / cellularity
-      tumor.comp  <- cellularity * B
-      normal.comp <- 1 - cellularity
-      eb.multiplicity <- rel.freq.ebf * (tumor.comp + normal.comp)
-      b.multiplicity  <- rel.freq.bf * (tumor.comp + normal.comp)
-      if (is.na(eb.multiplicity)) {
-         NA
-      } else if (b.multiplicity >=  eb.multiplicity) {
-         eb.multiplicity / b.multiplicity
-      }else {
-         b.multiplicity / eb.multiplicity
-      }
+merge_segs_cluster <- function(segs, max_gap = 1e3) {
+   chromosomes_info <- chromosomes.info()
+   if (length(grep("chr", segs$chromosome)) > 0) {
+      chromosomes_info$chrom <- paste("chr", chromosomes_info$chrom, sep = "")
    }
-   ci <- qt(ci, df = N - 1) * sd / sqrt(N)
-   ccf.left  <- calc.ccf(Bf - ci)
-   ccf.right <- calc.ccf(Bf + ci)
-   ccf       <- calc.ccf(Bf)
-   cbind(CCF.baf.left = ccf.left, CCF.baf = ccf, CCF.baf.right = ccf.right)
+   chromosomes <- unique(segs$chromosome)
+   segs.split  <- split(segs, segs$chromosome)
+   chr_list <- list()
+   for (chr in chromosomes) {
+      c_info   <- chromosomes_info[chromosomes_info$chrom == chr, ]
+      segs_chr <- segs.split[[chr]]
+      merged   <- list()
+      segs_t   <- NULL
+      if (nrow(segs_chr) == 1) {
+         i = 0
+      } else {
+         for (i in 1:(nrow(segs_chr) - 1)) {
+            if (is.null(segs_t)) {
+               segs_t <- compare_segs_cluster(segs_chr[i, ], segs_chr[i + 1, ], c_info)
+            } else {
+               segs_t <- compare_segs_cluster(segs_t, segs_chr[i, ], c_info)
+            }
+            if (segs_t$end.pos == segs_chr[i, 'end.pos'] &
+                segs_t$start.pos == segs_chr[i, 'start.pos']) {
+               merged <- c(merged, list(segs_t))
+               segs_t <- NULL
+            } else if(segs_t$end.pos == segs_chr[i, 'end.pos'] &
+                      segs_t$start.pos != segs_chr[i, 'start.pos']) {
+               merged <- c(merged, list(segs_t))
+            } else if (segs_t$end.pos != segs_chr[i, 'end.pos'] &
+                       segs_t$start.pos != segs_chr[i, 'start.pos'])
+               merged <- c(merged, list(segs_t))
+            segs_t <- NULL
+         }
+      }
+      if (!is.null(segs_t)) {
+         merged <- c(merged, list(segs_t))
+      } else {
+         merged <- c(merged, list(segs_chr[i + 1, ]))
+      }
+      chr_list <- c(chr_list, list(do.call(rbind, merged)))
+   }
+   return(do.call(rbind, chr_list))
 }
 
 sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out.dir = getwd(),
@@ -75,9 +232,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    seg.tab     <- do.call(rbind, sequenza.extract$segments[chromosome.list])
    seg.tab     <- na.exclude(seg.tab)
    seg.len     <- (seg.tab$end.pos - seg.tab$start.pos)/1e6
-   #avg.depth.ratio <- mean(sequenza.extract$gc$adj[, 2])
-   #avg.depth.ratio <- weighted.mean(x = seg.tab$depth.ratio, w = seg.len)
-   #avg.depth.ratio <- center.ratio(seg.tab)
+
    avg.depth.ratio <- 1
 
    if (is.null(cp.table) && (is.null(cellularity) || is.null(ploidy))){
@@ -132,8 +287,19 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                             weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
 
    seg.res    <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
-   ccf.dr     <- lapply(split(seg.res, seq(nrow(seg.res))), function(x) get.ccf.dr(x, CNn = 2))
-   ccf.baf    <- lapply(split(seg.res, seq(nrow(seg.res))), function(x) get.ccf.baf(x, CNn = 2))
+   no_ai      <- seg.res$A == seg.res$B & seg.res$CNt != 0
+   no_mean    <- seg.res$CNt == round(ploidy, 0)
+   no_cnv     <- no_ai | no_mean
+   seg.res_tmp <- seg.res
+   fix_CNt <- function(segs, avg.depth.ratio) {
+      segs_gain <- segs$depth.ratio >= avg.depth.ratio
+      segs$CNt[segs_gain] <- segs$CNt[segs_gain] + 1
+      segs$CNt[!segs_gain] <- segs$CNt[!segs_gain] - 1
+      segs$CNt
+   }
+   seg.res_tmp$CNt[no_cnv] <- fix_CNt(seg.res_tmp[no_cnv, ], avg.depth.ratio = avg.depth.ratio)
+   ccf.dr     <- lapply(split(seg.res_tmp, seq(nrow(seg.res))), function(x) get.ccf.dr(x, CNn = 2))
+   ccf.baf    <- lapply(split(seg.res_tmp, seq(nrow(seg.res))), function(x) get.ccf.baf(x, CNn = 2))
    seg.res    <- cbind(seg.res, do.call(rbind, ccf.dr), do.call(rbind, ccf.baf))
    if (!female){
       if (sum(segs.is.xy) >= 1) {
@@ -195,15 +361,15 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                  m2 = m2, psiinv2 = psiinv2,
                  tau1 = 0.01, tau2 = 0.01)
    nburn <- 5000
-   nsave <- 5000
+   nsave <- 8000
    nskip <- 3
    ndisplay <- 1000
    mcmc <- list(nburn = nburn,
                 nsave = nsave,
                 nskip = nskip,
                 ndisplay = ndisplay)
-   fit1 <- DPMdencens(left = cbind(seg.res$CCF.ratio.left[seg.res$CNt > 0], seg.res$CCF.baf.left[seg.res$CNt > 0]),
-                      right = cbind(seg.res$CCF.ratio.right[seg.res$CNt > 0], seg.res$CCF.baf.right[seg.res$CNt > 0]),
+   fit1 <- DPMdencens(left = cbind(seg.res$CCF.ratio.left, seg.res$CCF.baf.left),
+                      right = cbind(seg.res$CCF.ratio.right, seg.res$CCF.baf.right),
                       ngrid = 100, prior = prior, mcmc = mcmc,
                       state = state, status = TRUE)
 
@@ -213,28 +379,132 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
       suppressWarnings(colorgram(x = dp$grid[, 1], y = dp$grid[, 2], z = z,
                 map = map, outlier="white", key = NA, ...))
    }
-   pdf(segs.d.plot, width = 4, height = 4)
-      dir.plot(dp = fit1, n = 200, ci = 0.99, las = 1, xlab = "CCF ratio", ylab = "CCF Bf", xlim = c(0,2), ylim = c(0,2))
-      contour(x = fit1$grid[, 1], y = fit1$grid[, 2], z = fit1$fbiv[[1]] ,
-              levels = quantile(fit1$fbiv[[1]], c(.999)), drawlabels = FALSE, add = T,
-              method = "edge", lty = 1, lwd = 1)
-      abline(h = c(0,0.5,1), v = c(0,0.5,1), lty = 2, lwd = 0.8)
-   dev.off()
-   seg.res  <- seg.res[seg.res$CNt > 0, ]
+
+   #seg.res  <- seg.res[seg.res$CNt > 0, ]
    seg.size <- (seg.res$end.pos - seg.res$start.pos) /1e6
 
-   write.table(cbind(seg.res, cluster = fit1$state$ss), file = clust.file,
+   #seg.res.merged <- merge_segs_cluster(cbind(seg.res, cluster = fit1$state$ss))
+   seg.res <- cbind(seg.res, cluster = fit1$state$ss)
+
+   clust <- get_clust_info(seg.res)
+
+   clust <- data.frame(cluster = names(clust$size),
+                       size = do.call(c, clust$size),
+                       CCF.ratio = do.call(c, clust$CCF.ratio),
+                       CCF.baf = do.call(c, clust$CCF.baf),
+                       stringsAsFactors = FALSE)
+   #radius_clonal = 0.1
+   #intercept_err = 0.75
+   #clonal_1 = sqrt((1- clust$CCF.ratio)^2 + (1 - clust$CCF.baf)^2) <= radius_clonal
+   #clonal_2 = sign((1 - intercept_err) * (clust$CCF.baf - 0) - (1 - 0) * (clust$CCF.ratio - intercept_err)) <= 0
+   #clonal_3 = sign((1 - 0) * (clust$CCF.baf - intercept_err) - (1 - intercept_err) * (clust$CCF.ratio - 0)) >= 0
+
+
+   #clonal = clonal_1 | clonal_2 | clonal_3
+   #position = sign((Bx - Ax) * (Y - Ay) - (By - Ay) * (X - Ax))
+
+   plot_rectangle <- function(intercept, ...) {
+      segments(x0 = 0, y0 = intercept, x1 = 1 - intercept, y1 = 1, ...)
+      segments(x0 = intercept, y0 = 0, x1 = 1, y1 = 1 - intercept, ...)
+      segments(x0 = 0, y0 = intercept, x1 = intercept, y1 = 0, ...)
+      segments(x0 = 1 - intercept, y0 = 1, x1 = 1, y1 = 1 - intercept, ...)
+
+      segments(x0 = 0, y0 = 0, x1 = intercept, y1 = 1, ...)
+      segments(x0 = 1, y0 = 1, x1 = 0, y1 = 1 - intercept, ...)
+      segments(x0 = 0, y0 = 0, x1 = 1, y1 = intercept, ...)
+      segments(x0 = 1, y0 = 1, x1 = 1 - intercept, y1 = 0, ...)
+   }
+   #clonal_1 = sign((1 - intercept_err) * (clust$CCF.baf - 0) - (1 - 0) * (clust$CCF.ratio - intercept_err)) <= 0
+   intercept = 0.2
+
+   is_clonal <- function(x, y, intercept) {
+      give_side <- function(x, y, a, b) {
+         sign((b[1] - a[1]) * (y - a[2]) - (b[2] - a[2]) * (x - a[1]))
+      }
+      clonal_1 = give_side(x = x, y = y,
+                           a = c(0, intercept), b =  c(1 - intercept, 1)) < 0
+      clonal_2 = give_side(x = x, y = y,
+                           a = c(intercept, 0), b =  c(1, 1 - intercept)) >0
+      clonal_3 = give_side(x = x, y = y,
+                           a = c(0, intercept), b =  c(intercept, 0)) > 0
+      clonal_4 = give_side(x = x, y = y,
+                           a = c(1 - intercept, 1), b =  c(1, 1 - intercept)) < 0
+      clonal_5 = give_side(x = x, y = y,
+                           a = c(0, 0), b =  c(intercept, 1)) < 0
+      clonal_6 = give_side(x = x, y = y,
+                           a = c(1, 1), b =  c(0, 1 - intercept)) > 0
+      clonal_7 = give_side(x = x, y = y,
+                           a = c(0, 0), b =  c(1, intercept)) > 0
+      clonal_8 = give_side(x = x, y = y,
+                           a = c(1, 1), b =  c(1 - intercept, 0)) < 0
+
+      subclonal = clonal_1 & clonal_2 & clonal_3 & clonal_4 & clonal_5 & clonal_6 & clonal_7 & clonal_8
+      !subclonal
+   }
+
+   clonal = is_clonal(x = clust$CCF.ratio, y = clust$CCF.baf, intercept = intercept)
+
+   clust_status = setNames(c("subclonal", "clonal")[clonal + 1], clust$cluster)
+   seg_status = clust_status[seg.res$cluster]
+   seg_status[seg_status == "subclonal"] <-  c("subclonal", "clonal")[
+      is_clonal(x = seg.res$CCF.ratio.left[seg_status == "subclonal"],
+                y = seg.res$CCF.baf.left[seg_status == "subclonal"],
+                intercept = intercept) + 1 ]
+   seg_status[seg_status == "subclonal"] <-  c("subclonal", "clonal")[
+      is_clonal(x = seg.res$CCF.ratio.right[seg_status == "subclonal"],
+                y = seg.res$CCF.baf.right[seg_status == "subclonal"],
+                intercept = intercept) + 1 ]
+   seg.res <- cbind(seg.res, status = seg_status)
+   write.table(seg.res, file = clust.file,
                col.names = TRUE, row.names = FALSE, sep = "\t")
+
+   pdf(segs.d.plot, width = 6, height = 6)
+      dir.plot(dp = fit1, n = 200, ci = 0.95, las = 1, xlab = "CCF Copy number", ylab = "CCF B allele",
+               xlim = c(0,2), ylim = c(0,2), colFn = colorRampPalette(c('yellow', "orange", "red")))
+      #contour(x = fit1$grid[, 1], y = fit1$grid[, 2], z = fit1$fbiv[[1]] ,
+      #        levels = quantile(fit1$fbiv[[1]], c(.95)), drawlabels = FALSE, add = T,
+      #        method = "edge", lty = 1, lwd = 1)
+      abline(h = c(0, 0.5, 1, 1.5),
+             v = c(0, 0.5, 1, 1.5),
+             lty = 2, lwd = 0.8)
+      points(x = clust$CCF.ratio, y = clust$CCF.baf,
+             cex = log(clust$size * 100), pch = 21)
+      text(clust$cluster, x = clust$CCF.ratio, y = clust$CCF.baf)
+   dev.off()
+
    pdf(clust.plot, width = 6, height = 6)
-   plot(seg.res$CCF.ratio, seg.res$CCF.baf, col = fit1$state$ss)
-   plot(seg.res$CCF.ratio[seg.size >=3], seg.res$CCF.baf[seg.size >=3], col = fit1$state$ss[seg.size >=3],
-        xlim = c(0, 1), ylim = c(0, 1), xlab = "CCF depth ratio", ylab = "CCF B allele frequency")
-   plot(seg.res$Bf, seg.res$depth.ratio, col = fit1$state$ss, xlim = c(0, 0.5), ylim = c(0, 2.5))
+      plot(x = 0, y = 0, ylim = c(0, 1), las = 1, bty = 'n', type = 'n',
+           xlim = c(0, 1), xlab = "CCF Copy number", ylab = "CCF B allele")
+      abline(a = 0, b = 1, lty = 2)
+      abline(h = seq(0, 1, 0.25), lty = 2, lwd = 0.5)
+      abline(v = seq(0, 1, 0.25), lty = 2, lwd = 0.5)
+      #lines(x=c(intercept_err, 1), y = c(0, 1), lty = 2, lwd = 0.2)
+      #lines(x=c(0, 1), y = c(intercept_err, 1), lty = 2, lwd = 0.2)
+      plot_rectangle(intercept = intercept, lty = 2, lwd = 0.2 )
+      points(x = clust$CCF.ratio, y = clust$CCF.baf,
+             cex = log(clust$size * 100), pch = 21, col = NA,
+             bg = c("lightblue", "lightsalmon")[clonal + 1])
+      text(clust$cluster, x = clust$CCF.ratio, y = clust$CCF.baf,
+           pos = 2, offset = clust$size)
+      legend("topleft", legend = c("clonal", "subclonal"),
+             fill = c("lightsalmon","lightblue"),
+             bty = "n", border = FALSE)
+      plot(seg.res$CCF.ratio, seg.res$CCF.baf, col = fit1$state$ss)
+      plot(seg.res$CCF.ratio[seg.size >=3], seg.res$CCF.baf[seg.size >=3], col = fit1$state$ss[seg.size >=3],
+           xlim = c(0, 1), ylim = c(0, 1), xlab = "CCF depth ratio", ylab = "CCF B allele frequency")
+      plot(seg.res$Bf, seg.res$depth.ratio, col = fit1$state$ss, xlim = c(0, 0.5), ylim = c(0, 2.5))
       baf.ratio.model.fit(cellularity = cellularity, ploidy = ploidy, segs = seg.res, col = fit1$state$ss)
    dev.off()
+
    pdf(clust.genome, width = 15, height = 5)
-      genome.view(cbind(seg.res, cluster = fit1$state$ss), info.type = "clusters")
+      genome.view(seg.res, info.type = "colors",
+                  col = c("lightblue", "lightsalmon")[(seg.res$status == "clonal") + 1])
+      legend("topleft", legend = c("clonal", "subclonal"),
+             fill = c("lightsalmon","lightblue"),
+             bty = "n", border = FALSE)
    dev.off()
+
+
 }
 
 
