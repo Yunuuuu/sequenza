@@ -189,7 +189,7 @@ merge_segs_cluster <- function(segs, max_gap = 1e3) {
 }
 
 sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out.dir = getwd(),
-                               cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20,
+                               cellularity = NULL, ploidy = NULL, female = TRUE, CNt.max = 20, subclonal_filter = 0.2,
                                ratio.priority = FALSE, XY = c(X = "X", Y = "Y"), chromosome.list = 1:24){
    if(!file.exists(out.dir)) {
       dir.ok <- dir.create(path = out.dir, recursive = TRUE)
@@ -390,7 +390,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
       segments(x0 = 1, y0 = 1, x1 = 1 - intercept, y1 = 0, ...)
    }
    #clonal_1 = sign((1 - intercept_err) * (clust$CCF.baf - 0) - (1 - 0) * (clust$CCF.ratio - intercept_err)) <= 0
-   intercept = 0.2
+   intercept = subclonal_filter
 
    is_clonal <- function(x, y, intercept) {
       give_side <- function(x, y, a, b) {
