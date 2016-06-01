@@ -270,6 +270,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
       segs_gain <- segs$depth.ratio >= avg.depth.ratio
       segs$CNt[segs_gain] <- segs$CNt[segs_gain] + 1
       segs$CNt[!segs_gain] <- segs$CNt[!segs_gain] - 1
+      segs$CNt[segs$CNt == 0] <- 1
       segs$CNt
    }
    seg.res_tmp$CNt[no_cnv] <- fix_CNt(seg.res_tmp[no_cnv, ], avg.depth.ratio = avg.depth.ratio)
