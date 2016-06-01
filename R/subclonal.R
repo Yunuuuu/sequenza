@@ -51,28 +51,21 @@ ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
    res <- ratio.test.fit (depth.ratio = depth.ratio, CNt = CNt, CNn = CNn,
                            ploidy = ploidy, avg.depth.ratio = avg.depth.ratio,
                            cellularity = seq(from = 0, to = 1, by = 0.01))
-   range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
-   res        <- res[res[, 2] >= range.lpp, ]
-   ccf.left   <- res[which.min(res[, 1]), 1] / cellularity
-   ccf        <- res[which.max(res[, 2]), 1] / cellularity
-   ccf.right  <- res[which.max(res[, 1]), 1] / cellularity
    calc.dr <- function(x) {
       theoretical.CNt(x, CNn = CNn, cellularity, ploidy, normal.ploidy = normal.ploidy,
                       avg.depth.ratio = avg.depth.ratio)
    }
-   #ci <- qt(ci, df = N - 1) * sd / sqrt(N)
-   #dr.left  <- calc.dr(depth.ratio - ci)
-   #dr.right <- calc.dr(depth.ratio + ci)
    dr       <- calc.dr(depth.ratio)
-   #if (dr >= CNt) {
-   #   cbind(CNt.float = dr, CCF.ratio.left = (CNt + offset)/(dr.left + offset), CCF.ratio = (CNt + offset)/(dr + offset), CCF.ratio.right = (CNt + offset)/(dr.right + offset))
-   #} else {
-   #   cbind(CNt.float = dr, CCF.ratio.left = (dr.left + offset)/(CNt + offset), CCF.ratio = (dr + offset)/(CNt + offset), CCF.ratio.right = (dr.right + offset)/(CNt + offset))
-   #}
-   #CNt <- abs(round(dr, 0))
-   #cbind(CNt.float = dr, CCF.ratio.left = 1 - abs(dr.left - CNt), CCF.ratio =  1 - abs(dr - CNt), CCF.ratio.right = 1 - abs(dr.right - CNt))
-   cbind(CNt.float = dr, CCF.ratio.left = ccf.left, CCF.ratio =  ccf, CCF.ratio.right = ccf.right)
-
+   range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
+   res        <- res[res[, 2] >= range.lpp, ]
+   if (is.na( range.lpp)) {
+      cbind(CNt.float = dr, CCF.ratio.left = NA, CCF.ratio =  NA, CCF.ratio.right = NA)
+   } else {
+      ccf.left   <- res[which.min(res[, 1]), 1] / cellularity
+      ccf        <- res[which.max(res[, 2]), 1] / cellularity
+      ccf.right  <- res[which.max(res[, 1]), 1] / cellularity
+      cbind(CNt.float = dr, CCF.ratio.left = ccf.left, CCF.ratio =  ccf, CCF.ratio.right = ccf.right)
+   }
 }
 
 baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95, offset = 1e-10) {
@@ -80,33 +73,15 @@ baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95, offset =
    res <- baf.test.fit(Bf = Bf, CNt = CNt, CNn = CNn, sd.Bf = sd, B = B,
                         cellularity = seq(from = 0, to = 1, by = 0.01))
    range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
-   res        <- res[res[, 2] >= range.lpp, ]
-   ccf.left   <- res[which.min(res[, 1]), 1] / cellularity
-   ccf        <- res[which.max(res[, 2]), 1] / cellularity
-   ccf.right  <- res[which.max(res[, 1]), 1] / cellularity
-   # eBf <- expected.baf(CNt = CNt, cellularity = cellularity, sd = sd)
-   # eBf <- eBf$BAF[eBf$B == B & eBf$CNt == CNt]
-   # calc.ccf <- function(x) {
-   #    rel.freq.ebf <- eBf / cellularity
-   #    rel.freq.bf  <- x / cellularity
-   #    tumor.comp  <- cellularity * B
-   #    normal.comp <- 1 - cellularity
-   #    eb.multiplicity <- rel.freq.ebf * (tumor.comp + normal.comp)
-   #    b.multiplicity  <- rel.freq.bf * (tumor.comp + normal.comp)
-   #    if (is.na(eb.multiplicity)) {
-   #       NA
-   #    } else if (b.multiplicity >=  eb.multiplicity) {
-   #       (eb.multiplicity + offset) / (b.multiplicity + offset)
-   #    }else {
-   #       (b.multiplicity + offset) / (eb.multiplicity + offset)
-   #    }
-   # }
-   # ci <- qt(ci, df = N - 1) * sd / sqrt(N)
-   # ccf.left  <- calc.ccf(Bf - ci)
-   # ccf.right <- calc.ccf(Bf + ci)
-   # ccf       <- calc.ccf(Bf)
-   # cbind(CCF.baf.left = ccf.left, CCF.baf = ccf, CCF.baf.right = ccf.right)
-   cbind(CCF.baf.left = ccf.left, CCF.baf = ccf, CCF.baf.right = ccf.right)
+   if (is.na( range.lpp)) {
+      cbind(CCF.baf.left = NA, CCF.baf = NA, CCF.baf.right = NA)
+   } else {
+      res        <- res[res[, 2] >= range.lpp, ]
+      ccf.left   <- res[which.min(res[, 1]), 1] / cellularity
+      ccf        <- res[which.max(res[, 2]), 1] / cellularity
+      ccf.right  <- res[which.max(res[, 1]), 1] / cellularity
+      cbind(CCF.baf.left = ccf.left, CCF.baf = ccf, CCF.baf.right = ccf.right)
+   }
 }
 
 get_clust_info <- function(segs, min.size = 1e3) {
