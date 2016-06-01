@@ -57,10 +57,10 @@ ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
    }
    dr       <- calc.dr(depth.ratio)
    range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
-   res        <- res[res[, 2] >= range.lpp, ]
    if (is.na( range.lpp)) {
       cbind(CNt.float = dr, CCF.ratio.left = NA, CCF.ratio =  NA, CCF.ratio.right = NA)
    } else {
+      res        <- res[res[, 2] >= range.lpp, ]
       ccf.left   <- res[which.min(res[, 1]), 1] / cellularity
       ccf        <- res[which.max(res[, 2]), 1] / cellularity
       ccf.right  <- res[which.max(res[, 1]), 1] / cellularity
@@ -71,9 +71,9 @@ ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
 baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95, offset = 1e-10) {
 
    res <- baf.test.fit(Bf = Bf, CNt = CNt, CNn = CNn, sd.Bf = sd, B = B,
-                        cellularity = seq(from = 0, to = 1, by = 0.01))
+                       cellularity = seq(from = 0, to = 1, by = 0.01))
    range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
-   if (is.na( range.lpp)) {
+   if (is.na(range.lpp)) {
       cbind(CCF.baf.left = NA, CCF.baf = NA, CCF.baf.right = NA)
    } else {
       res        <- res[res[, 2] >= range.lpp, ]
