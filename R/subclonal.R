@@ -421,14 +421,16 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    clonal = is_clonal(x = clust$CCF.ratio, y = clust$CCF.baf, intercept = intercept)
 
    clust_status = setNames(c("subclonal", "clonal")[clonal + 1], clust$cluster)
-   seg_status = clust_status[seg.res$cluster]
-   seg_status[seg_status == "subclonal"] <-  c("subclonal", "clonal")[
-      is_clonal(x = seg.res$CCF.ratio.left[seg_status == "subclonal"],
-                y = seg.res$CCF.baf.left[seg_status == "subclonal"],
+   seg_status = clust_status[as.character(seg.res$cluster)]
+   which.subclonal <- which(seg_status == "subclonal")
+   seg_status[which.subclonal] <-  c("subclonal", "clonal")[
+      is_clonal(x = seg.res$CCF.ratio.left[which.subclonal],
+                y = seg.res$CCF.baf.left[which.subclonal],
                 intercept = intercept) + 1 ]
-   seg_status[seg_status == "subclonal"] <-  c("subclonal", "clonal")[
-      is_clonal(x = seg.res$CCF.ratio.right[seg_status == "subclonal"],
-                y = seg.res$CCF.baf.right[seg_status == "subclonal"],
+   which.subclonal <- which(seg_status == "subclonal")
+   seg_status[which.subclonal] <-  c("subclonal", "clonal")[
+      is_clonal(x = seg.res$CCF.ratio.right[which.subclonal],
+                y = seg.res$CCF.baf.right[which.subclonal],
                 intercept = intercept) + 1 ]
    seg.res <- cbind(seg.res, status = seg_status)
    write.table(seg.res, file = clust.file,
