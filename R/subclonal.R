@@ -288,8 +288,9 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
 
          seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
          ccf.dr     <- lapply(split(seg.xy, seq(nrow(seg.xy))), function(x) get.ccf.dr(x, CNn = 1))
-         ccf.baf    <- lapply(split(seg.xy, seq(nrow(seg.xy))), function(x) get.ccf.baf(x, CNn = 1))
-         seg.xy     <- cbind(seg.xy, do.call(rbind, ccf.dr), do.call(rbind, ccf.baf))
+         #ccf.baf    <- lapply(split(seg.xy, seq(nrow(seg.xy))), function(x) get.ccf.baf(x, CNn = 1))
+         # set the CCF baf to 1 for homozygous genomes
+         seg.xy     <- cbind(seg.xy, do.call(rbind, ccf.dr),  CCF.baf.left = 1, CCF.baf = 1, CCF.baf.right = 1)
          seg.res    <- rbind(seg.res, seg.xy)
       }
    }
