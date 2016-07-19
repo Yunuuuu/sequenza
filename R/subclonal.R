@@ -243,6 +243,21 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
               N = as.numeric(x['N.BAF']),
               CNn = CNn)
    }
+   secondary_cn_subclonal <- function(segments, cellularity, ploidy, avg.depth.ratio) {
+      subclonal <- segments$status == 'subclonal'
+      types  <- types.matrix(CNt.min=0, CNt.max=max(segments$CNt), CNn=2)
+      points <- model.points(cellularity, ploidy, avg.depth.ratio=avg.depth.ratio, types = types)
+      points <- cbind(types, points)
+      points <- unique(cbind(points$CNt, points$depth.ratio))
+      #mid_cnt <-  points[which.min(abs(points[, 2] - avg.depth.ratio)), 1]
+      points <- setNames(nm= points[, 1], points[, 2])
+      secondary_cnt <- segments$CNt
+      more_cnt <- points[as.character(segments$CNt)] > segments$depth.ratio & subclonal & segments$CNt > 0 # & segments$CNt != (mid_cnt - 1)
+      less_cnt <- points[as.character(segments$CNt)] < segments$depth.ratio & subclonal # & segments$CNt != (mid_cnt + 1)
+      secondary_cnt[more_cnt] <- secondary_cnt[more_cnt] + 1
+      secondary_cnt[less_cnt] <- secondary_cnt[less_cnt] - 1
+      cbind(segments, subCNt = secondary_cnt)
+   }
    if (female){
       segs.is.xy <- seg.tab$chromosome == XY["Y"]
       mut.is.xy  <- mut.tab$chromosome == XY["Y"]
@@ -434,6 +449,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                 y = seg.res$CCF.baf.right[which.subclonal],
                 intercept = intercept) + 1 ]
    seg.res <- cbind(seg.res, status = seg_status)
+   seg.res <- secondary_cn_subclonal(seg.res, cellularity, ploidy, avg.depth.ratio)
    write.table(seg.res, file = clust.file,
                col.names = TRUE, row.names = FALSE, sep = "\t")
 
