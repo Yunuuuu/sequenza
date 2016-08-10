@@ -69,7 +69,6 @@ ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
 }
 
 baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95, offset = 1e-10) {
-
    res <- baf.test.fit(Bf = Bf, CNt = CNt, CNn = CNn, sd.Bf = sd, B = B,
                        cellularity = seq(from = 0, to = 1, by = 0.01))
    range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
@@ -205,7 +204,8 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    clust.genome <- makeFilename("genome_clusters.pdf")
 
    seg.tab     <- do.call(rbind, sequenza.extract$segments[chromosome.list])
-   seg.tab     <- na.exclude(seg.tab)
+   #seg.tab     <- na.exclude(seg.tab)
+
    seg.len     <- (seg.tab$end.pos - seg.tab$start.pos)/1e6
 
    avg.depth.ratio <- 1
@@ -245,7 +245,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    }
    secondary_cn_subclonal <- function(segments, cellularity, ploidy, avg.depth.ratio) {
       subclonal <- segments$status == 'subclonal'
-      types  <- types.matrix(CNt.min=0, CNt.max=max(segments$CNt), CNn=2)
+      types  <- types.matrix(CNt.min=0, CNt.max=max(segments$CNt, na.rm = TRUE), CNn=2)
       points <- model.points(cellularity, ploidy, avg.depth.ratio=avg.depth.ratio, types = types)
       points <- cbind(types, points)
       points <- unique(cbind(points$CNt, points$depth.ratio))
@@ -277,6 +277,7 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                             weight.Bf = 1, ratio.priority = ratio.priority, CNn = 2)
 
    seg.res    <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
+
    no_ai      <- seg.res$A == seg.res$B & seg.res$CNt != 0
    no_mean    <- seg.res$CNt == round(ploidy, 0)
    no_cnv     <- no_ai | no_mean
@@ -284,10 +285,16 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
    fix_CNt <- function(segs, avg.depth.ratio) {
       segs_gain <- segs$depth.ratio >= avg.depth.ratio
       segs$CNt[segs_gain] <- segs$CNt[segs_gain] + 1
+      segs$A[segs_gain] <- segs$A[segs_gain] + 1
       segs$CNt[!segs_gain] <- segs$CNt[!segs_gain] - 1
-      segs$CNt
+      segs$B[!segs_gain & segs$B > 0] <- segs$B[!segs_gain & segs$B > 0] - 1
+      segs$A[!segs_gain & segs$B == 0] <- segs$A[!segs_gain & segs$B == 0] - 1
+      segs
    }
-   seg.res_tmp$CNt[no_cnv] <- fix_CNt(seg.res_tmp[no_cnv, ], avg.depth.ratio = avg.depth.ratio)
+   fixed_nocv <-  fix_CNt(seg.res_tmp[no_cnv, ], avg.depth.ratio = avg.depth.ratio)
+   seg.res_tmp$CNt[no_cnv] <- fixed_nocv$CNt
+   seg.res_tmp$A[no_cnv] <- fixed_nocv$A
+   seg.res_tmp$B[no_cnv] <- fixed_nocv$B
    seg.res_tmp$CNt[seg.res_tmp$CNt == 0] <- 1
    ccf.dr     <- lapply(split(seg.res_tmp, seq(nrow(seg.res))), function(x) get.ccf.dr(x, CNn = 2))
    ccf.baf    <- lapply(split(seg.res_tmp, seq(nrow(seg.res))), function(x) get.ccf.baf(x, CNn = 2))
@@ -300,7 +307,6 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                                   avg.depth.ratio = avg.depth.ratio, sd.ratio = seg.tab$sd.ratio[segs.is.xy],
                                   weight.ratio = seg.len[segs.is.xy], sd.Bf = NA,
                                   weight.Bf = NA, ratio.priority = ratio.priority, CNn = 1)
-
          seg.xy     <- cbind(seg.tab[segs.is.xy, ], cn.alleles)
          ccf.dr     <- lapply(split(seg.xy, seq(nrow(seg.xy))), function(x) get.ccf.dr(x, CNn = 1))
          #ccf.baf    <- lapply(split(seg.xy, seq(nrow(seg.xy))), function(x) get.ccf.baf(x, CNn = 1))
