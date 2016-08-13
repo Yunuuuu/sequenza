@@ -95,7 +95,7 @@ expected.baf <- function(sd, ...) {
    mean.bf <- function(x) {
       weighted.mean(x=c(x["BAF"], x["eBAF"]), w = c((1-x["wgh"]), x["wgh"]))
    }
-   baf$BAF <- apply(cbind(BAF = baf$BAF, eBAF = BAF, wgh = wgh), 1, FUN = mean.bf)
+   #baf$BAF <- apply(cbind(BAF = baf$BAF, eBAF = BAF, wgh = wgh), 1, FUN = mean.bf)
    baf
 }
 

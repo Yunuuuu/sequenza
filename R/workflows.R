@@ -55,11 +55,16 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1, gamma =
       if (nrow(seqz.het) > 0) {
          breaks.method.i <- breaks.method
 
-         seqz.b.win <- windowValues(x = seqz.het$Bf[het.filt],
-                                   positions = seqz.het$position[het.filt],
-                                   chromosomes = seqz.het$chromosome[het.filt],
-                                   window = window, overlap = overlap,
-                                   weight = seqz.het$good.reads[het.filt])
+         # seqz.b.win <- windowValues(x = seqz.het$Bf[het.filt],
+         #                           positions = seqz.het$position[het.filt],
+         #                           chromosomes = seqz.het$chromosome[het.filt],
+         #                           window = window, overlap = overlap,
+         #                           weight = seqz.het$good.reads[het.filt])
+         seqz.b.win <- windowBf(Af = seqz.het$Af, Bf = seqz.het$Bf,
+                               good.reads = seqz.het$good.reads,
+                               chromosomes = seqz.het$chromosome,
+                               positions = seqz.het$position, conf = 0.95,
+                               window = window, overlap = overlap)
          if (is.null(breaks.all)){
             if (breaks.method.i == "full") {
                breaks <- find.breaks(seqz.data, gamma = gamma.pcf, assembly = assembly,
