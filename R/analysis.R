@@ -134,7 +134,7 @@ b_allele_freq <- function(Af, Bf, good.reads, conf = 0.95) {
    if (length(Bf) > 1) {
       dd    <- density(c(Bf, Af),
                        weight = c(good.reads, good.reads)/
-                          (2 * sum(good.reads)))
+                       (2 * sum(good.reads)))
       points.max <- which(diff(sign(diff(dd$y)))==-2) + 1
       if (length(points.max) < 1) {
          points.max <- which(diff(sign(diff(dd$y)))==-1) + 1
@@ -367,7 +367,8 @@ segment.breaks <- function(seqz.tab, breaks, min.reads.baf = 1,
         A.split <- split(seqz.b.i$Af, f = fact.b.i)
         B.split <- split(seqz.b.i$Bf, f = fact.b.i)
         d.split <- split(seqz.b.i$good.reads, f = fact.b.i)
-        window.quantiles <- mapply(b_allele_freq, Af = A.split, Bf = B.split, good.reads = d.split, conf = 0.95)        seg.i.r.sd <- sapply(X = split(seqz.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = function(a) sd(a, na.rm = TRUE))
+        window.quantiles <- mapply(b_allele_freq, Af = A.split, Bf = B.split, good.reads = d.split, conf = 0.95)
+        seg.i.r.sd <- sapply(X = split(seqz.tab[[i]]$adjusted.ratio, f = fact.r.i), FUN = function(a) sd(a, na.rm = TRUE))
         seg.i.b.sd <- sapply(X = split(seqz.b.i$Bf, f = fact.b.i), FUN = function(a) sd(a, na.rm = TRUE))
         segments.i <- data.frame(chromosome  = names(seqz.tab)[i], start.pos = as.numeric(breaks.vect[-length(breaks.vect)]),
                                  end.pos = as.numeric(breaks.vect[-1]), Bf = window.quantiles[2,], N.BAF = seg.i.s.b, sd.BAF = seg.i.b.sd,
