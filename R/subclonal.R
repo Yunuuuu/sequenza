@@ -1,6 +1,15 @@
 baf.test <- function(Bf, cellularity, B, CNt, CNn = 2, sd.Bf = 0.1) {
-   if (B >= CNt) {
-      B = CNt - B
+   if (!(is.na(CNt) | is.na(B))) {
+         if (B >= CNt) {
+         B = CNt - B
+      }
+   } else {
+      if (is.na(CNt)) {
+         CNt = 1
+      }
+      if (is.na(B)) {
+         B = 1
+      }
    }
    model.baf  <- expected.baf(sd = sd.Bf, CNn = CNn, CNt = CNt, cellularity = cellularity)
    test.baf   <- model.baf[model.baf$B == B & model.baf$CNt == CNt, ]$BAF
@@ -47,7 +56,22 @@ mufreq.ccf <- function(cellularity, mufreq, Mt, CNt, CNn = 2, N, ci = 0.95) {
 
 ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
                       normal.ploidy = 2, avg.depth.ratio = 1, sd, N, ci = 0.95) {
-
+   dr <- theoretical.depth.ratio(CNt = 0:20, cellularity = cellularity, ploidy = ploidy,
+                                 normal.ploidy = normal.ploidy, avg.depth.ratio = avg.depth.ratio,
+                                 CNn = CNn)
+   ratios <- data.frame(CNt=0:20, ratio = dr)
+   norm_cn <- which.min(abs(ratios$ratio - 1))
+   mid_cn = ratios$CNt[norm_cn]
+   mid_dr = ratios$ratio[norm_cn]
+   if (!is.na(CNt)) {
+      if (CNt == mid_cn) {
+         if(depth.ratio > mid_dr) {
+            CNt = CNt + 1
+         } else {
+            CNt = CNt - 1
+         }
+      }
+   }
    res <- ratio.test.fit (depth.ratio = depth.ratio, CNt = CNt, CNn = CNn,
                            ploidy = ploidy, avg.depth.ratio = avg.depth.ratio,
                            cellularity = seq(from = 0, to = 1, by = 0.01))
@@ -55,23 +79,34 @@ ratio.ccf <- function(depth.ratio, CNt, CNn = 2, cellularity, ploidy,
       theoretical.CNt(x, CNn = CNn, cellularity, ploidy, normal.ploidy = normal.ploidy,
                       avg.depth.ratio = avg.depth.ratio)
    }
-   dr       <- calc.dr(depth.ratio)
+   dr.f       <- calc.dr(depth.ratio)
    range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
    if (is.na( range.lpp)) {
-      cbind(CNt.float = dr, CCF.ratio.left = 1, CCF.ratio =  1, CCF.ratio.right = 1)
+      cbind(CNt.float = dr.f, CCF.ratio.left = 1, CCF.ratio =  1, CCF.ratio.right = 1)
    } else {
       res        <- res[res[, 2] >= range.lpp, ]
       ccf.left   <- res[which.min(res[, 1]), 1] / cellularity
       ccf        <- res[which.max(res[, 2]), 1] / cellularity
       ccf.right  <- res[which.max(res[, 1]), 1] / cellularity
-      cbind(CNt.float = dr, CCF.ratio.left = ccf.left, CCF.ratio =  ccf, CCF.ratio.right = ccf.right)
+      cbind(CNt.float = dr.f, CCF.ratio.left = ccf.left, CCF.ratio =  ccf, CCF.ratio.right = ccf.right)
    }
 }
 
 baf.ccf <- function(cellularity, Bf, B, CNt, CNn = 2, sd, N, ci = 0.95, offset = 1e-10) {
-   res <- baf.test.fit(Bf = Bf, CNt = CNt, CNn = CNn, sd.Bf = sd, B = B,
+   if (!(is.na(CNt) | is.na(B))) {
+      if ((CNt - B) == B) {
+         if (B > 0) {
+            B = B - 1
+         } else {
+            CNt = CNt + 1
+         }
+      }
+      res <- baf.test.fit(Bf = Bf, CNt = CNt, CNn = CNn, sd.Bf = sd, B = B,
                        cellularity = seq(from = 0, to = 1, by = 0.01))
-   range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
+      range.lpp  <- quantile(res[, 2], ci, na.rm = TRUE)
+   } else {
+      range.lpp <- NA
+   }
    if (is.na(range.lpp)) {
       cbind(CCF.baf.left = 1, CCF.baf = 1, CCF.baf.right = 1)
    } else {
@@ -278,26 +313,52 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
 
    seg.res    <- cbind(seg.tab[!segs.is.xy, ], cn.alleles)
 
-   no_ai      <- seg.res$A == seg.res$B & seg.res$CNt != 0
-   no_mean    <- seg.res$CNt == round(ploidy, 0)
-   no_cnv     <- no_ai | no_mean
+   #no_ai      <- which(seg.res$A == seg.res$B & seg.res$CNt != 0)
+   #dr <- theoretical.depth.ratio(CNt=0:CNt.max, cellularity = cellularity,
+   #                              ploidy = ploidy)
+   #ratios <- data.frame(CNt=0:CNt.max, ratio = dr)
+   #norm_cn <- which.min(abs(ratios$ratio - 1))
+   #mid_cn = ratios$CNt[norm_cn]
+   #no_mean    <- which(seg.res$CNt == mid_cn)
+   #if (mid_cn%%2 == 0) {
+   #   no_cnv     <- sort(unique(c(no_ai, no_mean)))
+   #} else {
+   #   no_cnv     <- no_ai
+   #}
    seg.res_tmp <- seg.res
-   fix_CNt <- function(segs, avg.depth.ratio) {
-      segs_gain <- segs$depth.ratio >= avg.depth.ratio
-      segs$CNt[segs_gain] <- segs$CNt[segs_gain] + 1
-      segs$A[segs_gain] <- segs$A[segs_gain] + 1
-      segs$CNt[!segs_gain] <- segs$CNt[!segs_gain] - 1
-      segs$B[!segs_gain & segs$B > 0] <- segs$B[!segs_gain & segs$B > 0] - 1
-      segs$A[!segs_gain & segs$B == 0] <- segs$A[!segs_gain & segs$B == 0] - 1
+   fix_CNt <- function(segs, mid_cn, avg.depth.ratio) {
+      segs_gain <- which(segs$depth.ratio >= avg.depth.ratio & segs$CNt > 0)
+      segs_loss <- which(segs$depth.ratio <= avg.depth.ratio & segs$CNt > 0)
+      segs_mid <- which(segs$CNt == mid_cn)
+      mid_gain <- sort(unique(intersect(segs_gain, segs_mid)))
+      mid_loss <- sort(unique(intersect(segs_loss, segs_mid)))
+      if (mid_cn%%2 == 0) {
+         segs$CNt[mid_gain] <- segs$CNt[mid_gain] + 1
+         segs$A[mid_gain] <- segs$A[mid_gain] + 1
+         segs$CNt[mid_loss] <- segs$CNt[mid_loss] - 1
+         segs$A[mid_gain] <- segs$A[mid_gain] - 1
+      }
+
+      zero_b <- which(segs$B == 0)
+      more_b <- which(segs$B > 0)
+      segs$B[sort(unique(intersect(segs_loss, more_b)))] <- segs$B[sort(unique(intersect(segs_loss, more_b)))] - 1
+      segs$A[sort(unique(intersect(segs_loss, zero_b)))] <- segs$A[sort(unique(intersect(segs_loss, zero_b)))] - 1
+      segs$A[segs_zero] <- segs$A[segs_zero] + 1
+      segs$CNt[segs_zero] <- segs$CNt[segs_zero] + 1
       segs
    }
-   fixed_nocv <-  fix_CNt(seg.res_tmp[no_cnv, ], avg.depth.ratio = avg.depth.ratio)
-   seg.res_tmp$CNt[no_cnv] <- fixed_nocv$CNt
-   seg.res_tmp$A[no_cnv] <- fixed_nocv$A
-   seg.res_tmp$B[no_cnv] <- fixed_nocv$B
-   seg.res_tmp$CNt[seg.res_tmp$CNt == 0] <- 1
+   #fixed_nocv <-  fix_CNt(seg.res_tmp[no_cnv, ], avg.depth.ratio = avg.depth.ratio)
+   #seg.res_tmp$CNt[no_cnv] <- fixed_nocv$CNt
+   #seg.res_tmp$A[no_cnv] <- fixed_nocv$A
+   #seg.res_tmp$B[no_cnv] <- fixed_nocv$B
+   seg.res_tmp$CNt[which(seg.res_tmp$CNt == 0)] <- 1
    ccf.dr     <- lapply(split(seg.res_tmp, seq(nrow(seg.res))), function(x) get.ccf.dr(x, CNn = 2))
+   cat("done1\n")
    ccf.baf    <- lapply(split(seg.res_tmp, seq(nrow(seg.res))), function(x) get.ccf.baf(x, CNn = 2))
+   cat("done2\n")
+   cat(dim(seg.res), "segs\n")
+   cat(dim(do.call(rbind, ccf.baf)), "baf\n")
+   cat(dim(do.call(rbind, ccf.dr)), "dr\n")
    seg.res    <- cbind(seg.res, do.call(rbind, ccf.dr), do.call(rbind, ccf.baf))
    if (!female){
       if (sum(segs.is.xy) >= 1) {
