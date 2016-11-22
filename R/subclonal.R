@@ -427,8 +427,13 @@ sequenza.subclonal <- function(sequenza.extract, cp.table = NULL, sample.id, out
                 nsave = nsave,
                 nskip = nskip,
                 ndisplay = ndisplay)
-   fit1 <- DPMdencens(left = cbind(seg.res$CCF.ratio.left, seg.res$CCF.baf.left),
-                      right = cbind(seg.res$CCF.ratio.right, seg.res$CCF.baf.right),
+   dim_segs = length(seg.res$CCF.ratio.left)
+   noise1 = rnorm(dim_segs, 0, 0.01)
+   noise2 = rnorm(dim_segs, 0, 0.01)
+   noise3 = rnorm(dim_segs, 0, 0.01)
+   noise4 = rnorm(dim_segs, 0, 0.01)
+   fit1 <- DPMdencens(left = cbind(seg.res$CCF.ratio.left + noise1, seg.res$CCF.baf.left + noise2),
+                      right = cbind(seg.res$CCF.ratio.right + noise3, seg.res$CCF.baf.right + noise4),
                       ngrid = 100, prior = prior, mcmc = mcmc,
                       state = state, status = TRUE)
 
