@@ -1,0 +1,65 @@
+export(
+    read_seqz,
+    theoretical_depth_ratio,
+    theoretical_baf,
+    theoretical_mufreq,
+    baf_types_matrix,
+    mufreq_types_matrix,
+    baf_model_points,
+    mufreq_model_points,
+)
+
+# Import all packages listed as Imports or Depends
+import(
+    parallel,
+    stats4,
+    squash,
+    iotools,
+    readr
+)
+
+importFrom('grDevices',
+    'colorRampPalette',
+    'dev.off',
+    'gray.colors',
+    'heat.colors',
+    'palette',
+    'pdf',
+    'rgb'
+)
+importFrom('graphics',
+    'abline',
+    'axis',
+    'barplot',
+    'contour',
+    'legend',
+    'mtext',
+    'par',
+    'plot',
+    'points',
+    'polygon',
+    'rect',
+    'segments',
+    'strwidth',
+    'text'
+)
+importFrom('stats',
+    'dbinom',
+    'dpois',
+    'dt',
+    'median',
+    'na.exclude',
+    'quantile',
+    'sd',
+    'setNames',
+    'weighted.mean'
+)
+importFrom('utils',
+    'packageVersion',
+    'read.delim',
+    'read.table',
+    'setTxtProgressBar',
+    'tail',
+    'txtProgressBar',
+    'write.table'
+)
