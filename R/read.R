@@ -1,5 +1,6 @@
-read_seqz <- function(file, n_lines = NULL,
-    col_types = c("ciciidddcddccc"), chr_name = NULL, ...) {
+read_seqz <- function(file, n_lines = NULL, gzip = TRUE,
+    col_types = c("ciciidddcddccc"), chr_name = NULL,
+    buffer = 33554432, parallel = 2L, ...) {
 
     if (is.null(n_lines)) {
         skip <- 1
@@ -12,16 +13,16 @@ read_seqz <- function(file, n_lines = NULL,
         }
         n_max <- n_lines[2] - skip
     }
-
-    if (!is.null(chr_name)) {
-        skip <- 1
-        n_max <- Inf
-    }
-
     col_names <- colnames(readr::read_tsv(file = file, n_max = 1,
         col_names = TRUE, col_types = col_types))
-    readr::read_tsv(file = file, col_types = col_types, skip = skip,
-        n_max = n_max, col_names = col_names, ...)
+    if (!is.null(chr_name)) {
+        read_seqz_chr(file, chr_name = chr_name, col_types = col_types,
+            col_names = col_names, gzip = gzip,
+            buffer = buffer, parallel = parallel)
+    } else {
+        readr::read_tsv(file = file, col_types = col_types, skip = skip,
+            n_max = n_max, col_names = col_names, ...)
+    }
 }
 
 gc_sample_stats <- function (file, col_types = "c----d---d----", ...) {
@@ -40,8 +41,8 @@ gc_sample_stats <- function (file, col_types = "c----d---d----", ...) {
     chr_dim
 }
 
-read_seqz_chr <- function(file, chr_name, n, col_names, parallel = 1L,
-    col_types = c("ciciidddcddccc"), gzip = TRUE) {
+read_seqz_chr <- function(file, chr_name, col_names, col_types,
+    gzip, buffer, parallel) {
     if (gzip == TRUE) {
         con <- gzfile(file, "rb")
     } else {
@@ -56,7 +57,8 @@ read_seqz_chr <- function(file, chr_name, n, col_names, parallel = 1L,
         x[x$chromosome == chr_name, ]
     }
     res <- chunk.apply(input = con, FUN = parse_chunck, chr_name = chr_name,
-        col_names = col_names, col_types = col_types, parallel = parallel)
+        col_names = col_names, col_types = col_types, CH.MAX.SIZE = buffer,
+        parallel = parallel)
     close(con)
     res
 }
