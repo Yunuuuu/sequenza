@@ -1,7 +1,9 @@
 \name{model_points}
+
 \alias{model_points}
 \alias{baf_model_points}
 \alias{mufreq_model_points}
+
 \title{Generate B-allele frequency, mutation frequency and depth ratios at given model points, cellularity and ploidy values}
 
 \description{
@@ -43,13 +45,13 @@ For \alias{mufreq_model_points} a matrix of two columns:
 
 # Simulate a cellularity of 0.5, ploidy of 2 and types from min CNt 0
 # and max = 4 on an originally diploid genome:
-types <- types_matrix(CNt_min = 0, CNt_max = 4, CNn = 2)
-cbind(types, model_points(cellularity = 0.5, ploidy = 2,
-                          types = types, avg_depth_ratio = 1))
+types <- baf_types_matrix(CNt_min = 0, CNt_max = 4, CNn = 2)
+cbind(types, baf_model_points(cellularity = 0.5, ploidy = 2,
+                          baf_types = types, avg_depth_ratio = 1))
 # Simulate a cellularity of 0.5, ploidy of 2 and types from min CNt 0
 # and max = 4 on an originally monoallelic genome:
-types <- types_matrix(CNt_min = 0, CNt_max = 4, CNn = 1)
-cbind(types, model_points(cellularity = 0.5, ploidy = 2,
-                          types = types, avg_depth_ratio = 1))
+types <- mufreq_types_matrix(CNt_min = 0, CNt_max = 4, CNn = 1)
+cbind(types, mufreq_model_points(cellularity = 0.5, ploidy = 2,
+                          mufreq_types = types, avg_depth_ratio = 1))
 
 }

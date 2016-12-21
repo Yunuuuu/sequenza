@@ -6,13 +6,12 @@ export(
     baf_types_matrix,
     mufreq_types_matrix,
     baf_model_points,
-    mufreq_model_points,
+    mufreq_model_points
 )
 
 # Import all packages listed as Imports or Depends
 import(
     parallel,
-    stats4,
     squash,
     iotools,
     readr

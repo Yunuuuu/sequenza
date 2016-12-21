@@ -10,16 +10,17 @@
 }
 
 \usage{
-theoretical_baf(CNt, CNn = 2, cellularity)
-theoretical_depth_ratio(CNt, CNn = 2, cellularity, ploidy,
-                        normal_ploidy = 2, avg_depth_ratio = 1)
-theoretical_mufreq(Mt, CNt, CNn = 2, cellularity)
+    theoretical_depth_ratio(CNt, cellularity, ploidy, CNn = 2,
+        normal_ploidy = 2, avg_depth_ratio = 1)
+    theoretical_baf(CNt, B, cellularity, CNn = 2)
+    theoretical_mufreq(CNt, Mt, cellularity, CNn = 2)
 
 }
 
 \arguments{
   \item{CNn}{copy number in the normal sample.}
   \item{CNt}{copy number in the tumor sample.}
+  \item{B}{number of B-alleles in the tumor sample.}
   \item{Mt}{number of alleles carrying the mutation.}
   \item{cellularity}{fraction of tumor cells in the sample.}
   \item{ploidy}{2 * ratio between total DNA content in a tumor cell and a normal cell.}

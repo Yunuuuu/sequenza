@@ -1,5 +1,5 @@
 read_seqz <- function(file, n_lines = NULL, gzip = TRUE,
-    col_types = c("ciciidddcddccc"), chr_name = NULL,
+    col_types = "ciciidddcddccc", chr_name = NULL,
     buffer = 33554432, parallel = 2L, ...) {
 
     if (is.null(n_lines)) {

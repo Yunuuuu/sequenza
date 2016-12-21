@@ -1,4 +1,4 @@
-theoretical_depth_ratio <- function(CNt, CNn = 2, cellularity, ploidy,
+theoretical_depth_ratio <- function(CNt, cellularity, ploidy, CNn = 2,
     normal_ploidy = 2, avg_depth_ratio = 1) {
     cellu_copy_term <- (1 - cellularity) + (CNt / CNn * cellularity)
     ploidy_cellu_term <- (ploidy / normal_ploidy * cellularity)
@@ -6,14 +6,14 @@ theoretical_depth_ratio <- function(CNt, CNn = 2, cellularity, ploidy,
     avg_depth_ratio * cellu_copy_term / ploidy_cellu_term
 }
 
-theoretical_baf <- function(cellularity, CNt, B, CNn = 2) {
+theoretical_baf <- function(CNt, B, cellularity, CNn = 2) {
     baf <- ( (B * cellularity) + ( 1 - cellularity) ) /
         ( (CNt * cellularity) + CNn * ( 1 - cellularity) )
     baf[CNn <= 1] <- NA
     baf
 }
 
-theoretical_mufreq <- function(Mt, CNt, CNn = 2, cellularity) {
+theoretical_mufreq <- function(CNt, Mt, cellularity, CNn = 2) {
     normal_alleles <- (CNt - Mt) * cellularity + CNn * (1 - cellularity)
     all_alleles <- (CNt * cellularity) + CNn * (1 - cellularity)
     1 - (normal_alleles / all_alleles)
