@@ -33,7 +33,7 @@ baf_types_matrix <- function(CNt_min, CNt_max, CNn = 2) {
     times_b <- sapply(b_comb, length)
     CNt <- rep(CNt, times = times_b)
     B <- unlist(b_comb)
-    cbind(CNn = CNn, CNt = CNt, B = B, A = CNt - B)
+    cbind(CNn = CNn, CNt = CNt, B = B)
 }
 
 mufreq_types_matrix <- function(CNt_min, CNt_max, CNn = 2) {
