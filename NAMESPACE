@@ -15,7 +15,7 @@ import(
     squash,
     iotools,
     readr,
-    seqminer,
+    seqminer
 )
 
 importFrom("iotools",
