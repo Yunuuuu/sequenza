@@ -1,12 +1,12 @@
 export(
-    read_seqz,
-    theoretical_depth_ratio,
-    theoretical_baf,
-    theoretical_mufreq,
-    baf_types_matrix,
-    mufreq_types_matrix,
-    baf_model_points,
-    mufreq_model_points
+    read.seqz,
+    theoretical.depth.ratio,
+    theoretical.baf,
+    theoretical.mufreq,
+    baf.types.matrix,
+    mufreq.types.matrix,
+    baf.model.points,
+    mufreq.model.points
 )
 
 # Import all packages listed as Imports or Depends
@@ -14,51 +14,61 @@ import(
     parallel,
     squash,
     iotools,
-    readr
+    readr,
+    seqminer,
 )
 
-importFrom('grDevices',
-    'colorRampPalette',
-    'dev.off',
-    'gray.colors',
-    'heat.colors',
-    'palette',
-    'pdf',
-    'rgb'
+importFrom("iotools",
+    "mstrsplit",
+    "chunk.apply"
 )
-importFrom('graphics',
-    'abline',
-    'axis',
-    'barplot',
-    'contour',
-    'legend',
-    'mtext',
-    'par',
-    'plot',
-    'points',
-    'polygon',
-    'rect',
-    'segments',
-    'strwidth',
-    'text'
+
+importFrom("readr",
+    "read_tsv"
 )
-importFrom('stats',
-    'dbinom',
-    'dpois',
-    'dt',
-    'median',
-    'na.exclude',
-    'quantile',
-    'sd',
-    'setNames',
-    'weighted.mean'
+
+importFrom("grDevices",
+    "colorRampPalette",
+    "dev.off",
+    "gray.colors",
+    "heat.colors",
+    "palette",
+    "pdf",
+    "rgb"
 )
-importFrom('utils',
-    'packageVersion',
-    'read.delim',
-    'read.table',
-    'setTxtProgressBar',
-    'tail',
-    'txtProgressBar',
-    'write.table'
+importFrom("graphics",
+    "abline",
+    "axis",
+    "barplot",
+    "contour",
+    "legend",
+    "mtext",
+    "par",
+    "plot",
+    "points",
+    "polygon",
+    "rect",
+    "segments",
+    "strwidth",
+    "text"
+)
+importFrom("stats",
+    "dbinom",
+    "dpois",
+    "dt",
+    "median",
+    "na.exclude",
+    "quantile",
+    "sd",
+    "setNames",
+    "weighted.mean"
+)
+importFrom("utils",
+    "packageVersion",
+    "read.delim",
+    "read.table",
+    "setTxtProgressBar",
+    "tail",
+    "txtProgressBar",
+    "write.table"
 )
