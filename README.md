@@ -8,13 +8,6 @@ Sequenza is a tool to analyze genomic sequencing data from paired normal-tumor s
 
 ## Installation
 
-Install Bioconductor dependencies:
-
-```R
-source("https://bioconductor.org/biocLite.R")
-biocLite("copynumber")
-```
-
 Get the released version from CRAN:
 
 ```R
@@ -27,4 +20,26 @@ Or the development version from github:
 # install.packages("devtools")
 library(devtools)
 install_bitbucket("ffavero/sequenza@cleanup")
+```
+
+## Testing
+
+Unit tests are written using the package `testthat`.
+You need to have the package installed in order to run the tests.
+
+Dowload the latest sourcecode:
+
+```bash
+git clone https://ffavero@bitbucket.org/ffavero/sequenza.git
+# Change to sequenza root directory
+cd sequenza
+# Run R
+R
+```
+
+Load devtools and run the tests suite:
+```R
+library(devtools)
+# Run testthat suite:
+devtools::test()
 ```
