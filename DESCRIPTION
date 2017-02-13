@@ -1,5 +1,5 @@
 Package: sequenza
-Title:   Copy Number Estimation from Tumor Genome Sequencing Data
+Title: Copy Number Estimation from Tumor Genome Sequencing Data
 Description: Tools to analyze genomic sequencing data from
  paired normal-tumor samples, including cellularity and ploidy estimation; mutation
  and copy number (allele-specific and total copy number) detection, quantification
@@ -9,7 +9,7 @@ Date: 2016-11-14
 Author: Francesco Favero, Andrea M. Marquard, Tejal Joshi, Aron C. Eklund
 Maintainer: Francesco Favero <favero@cbs.dtu.dk>
 Depends: R (>= 3.0.0), parallel, squash, iotools, readr, seqminer
-Suggests:
+Suggests: testthat
 License: GPL-3
 URL: http://cbs.dtu.dk/biotools/sequenza/, Mailing list:
         https://groups.google.com/forum/#!forum/sequenza-user-group
