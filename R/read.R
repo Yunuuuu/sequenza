@@ -1,6 +1,10 @@
-read_seqz <- function(file, n_lines = NULL, gzip = TRUE,
+read.seqz <- function(file, n_lines = NULL, gzip = TRUE,
     col_types = "ciciidddcddccc", chr_name = NULL,
-    buffer = 33554432, parallel = 2L, ...) {
+    buffer = 33554432, parallel = 2L,
+    col_names = c("chromosome", "position", "base.ref", "depth.normal",
+                  "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal",
+                  "GC.percent", "good.reads", "AB.normal", "AB.tumor",
+                  "tumor.strand"), ...) {
 
     if (is.null(n_lines)) {
         skip <- 1
@@ -13,19 +17,22 @@ read_seqz <- function(file, n_lines = NULL, gzip = TRUE,
         }
         n_max <- n_lines[2] - skip
     }
-    col_names <- colnames(readr::read_tsv(file = file, n_max = 1,
-        col_names = TRUE, col_types = col_types))
     if (!is.null(chr_name)) {
-        read_seqz_chr(file, chr_name = chr_name, col_types = col_types,
-            col_names = col_names, gzip = gzip,
-            buffer = buffer, parallel = parallel)
+        tbi <- file.exists(paste(file, "tbi", sep = "."))
+        if (tbi) {
+            read.seqz.tbi(file, chr_name, col_names, col_types)
+        } else {
+            read.seqz.chr(file, chr_name = chr_name, col_types = col_types,
+                col_names = col_names, gzip = gzip,
+                buffer = buffer, parallel = parallel)
+        }
     } else {
         readr::read_tsv(file = file, col_types = col_types, skip = skip,
             n_max = n_max, col_names = col_names, ...)
     }
 }
 
-gc_sample_stats <- function (file, col_types = "c----d---d----", ...) {
+gc.sample.stats <- function (file, col_types = "c----d---d----", ...) {
     seqz_data <- readr::read_tsv(file, col_types = col_types, ...)
     #gc_stats <- gc_norm(x  = seqz_data[, 2],
     #                   gc = seqz_data[, 3])
@@ -41,7 +48,7 @@ gc_sample_stats <- function (file, col_types = "c----d---d----", ...) {
     chr_dim
 }
 
-read_seqz_chr <- function(file, chr_name, col_names, col_types,
+read.seqz.chr <- function(file, chr_name, col_names, col_types,
     gzip, buffer, parallel) {
     if (gzip == TRUE) {
         con <- gzfile(file, "rb")
@@ -61,4 +68,11 @@ read_seqz_chr <- function(file, chr_name, col_names, col_types,
         parallel = parallel)
     close(con)
     res
+}
+
+read.seqz.tbi <- function(file, chr_name, col_names, col_types) {
+    res <- seqminer::tabix.read(file, chr_name)
+    res <- readr::read_tsv(file = paste(mstrsplit(res), collapse = "\n"),
+        col_types = col_types, skip = 0, n_max = Inf,
+        col_names = col_names, progress = FALSE)
 }
