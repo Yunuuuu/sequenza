@@ -21,7 +21,7 @@ Or the development version from github:
 ```R
 # install.packages("devtools")
 library(devtools)
-install_bitbucket("ffavero/sequenza@cleanup")
+install_bitbucket("sequenza_tools/sequenza@cleanup")
 ```
 
 ## Testing
@@ -32,7 +32,7 @@ You need to have the package installed in order to run the tests.
 Clone the latest version:
 
 ```bash
-git clone https://bitbucket.org/ffavero/sequenza.git
+git clone https://bitbucket.org/sequenza_tools/sequenza.git
 # Change to sequenza root directory
 cd sequenza
 # Run R
