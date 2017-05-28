@@ -1,6 +1,6 @@
 export(
     read.seqz,
-    theoretical.depth.ratio,
+    theoretical.depth.ratio,../
     theoretical.baf,
     theoretical.mufreq,
     baf.types.matrix,
@@ -12,10 +12,7 @@ export(
 # Import all packages listed as Imports or Depends
 import(
     parallel,
-    squash,
-    iotools,
-    readr,
-    seqminer
+    squash
 )
 
 importFrom("iotools",
@@ -25,6 +22,10 @@ importFrom("iotools",
 
 importFrom("readr",
     "read_tsv"
+)
+
+importFrom("seqminer",
+    "tabix.read"
 )
 
 importFrom("grDevices",
