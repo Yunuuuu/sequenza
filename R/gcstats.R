@@ -65,3 +65,12 @@ get_gc <- function(gc_col) {
         },
         names_depths = names_depths))
 }
+
+mean_gc <- function(gc_mat) {
+    values <- as.numeric(colnames(gc_mat))
+    gc_mat[is.na(gc_mat)] <- 0
+    apply(gc_mat, 1, FUN = function(x, w) {
+            weighted.mean(x = w, w = x, na.rm = T)
+        },
+        w = values)
+}
