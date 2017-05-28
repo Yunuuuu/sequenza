@@ -83,9 +83,3 @@ mean_gc <- function(gc_mat) {
         },
         w = values)
 }
-
-plot_gc <- function(gc_mat, ...) {
-    colorgram(x = as.numeric(rownames(gc_mat)),
-        y = as.numeric(colnames(gc_mat)),
-        z = gc_mat,  ...)
-}
