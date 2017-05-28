@@ -12,13 +12,11 @@ read.seqz <- function(file, n_lines = NULL, gzip = TRUE,
     } else {
         n_lines <- round(sort(n_lines), 0)
         skip <- n_lines[1]
-        if (skip == 1) {
-            skip <- 0
-        }
+
         n_max <- n_lines[2] - skip + 1
     }
     if (!is.null(chr_name)) {
-        tbi <- file.exists(paste(file, "tbix", sep = "."))
+        tbi <- file.exists(paste(file, "tbi", sep = "."))
         if (tbi) {
             read.seqz.tbi(file, chr_name, col_names, col_types)
         } else {
@@ -28,7 +26,7 @@ read.seqz <- function(file, n_lines = NULL, gzip = TRUE,
         }
     } else {
         read_tsv(file = file, col_types = col_types, skip = skip,
-            n_max = n_max, col_names = col_names, ...)
+            n_max = n_max, col_names = col_names, progress = FALSE, ...)
     }
 }
 
