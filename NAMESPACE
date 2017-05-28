@@ -1,12 +1,13 @@
 export(
     read.seqz,
-    theoretical.depth.ratio,../
+    theoretical.depth.ratio,
     theoretical.baf,
     theoretical.mufreq,
     baf.types.matrix,
     mufreq.types.matrix,
     baf.model.points,
-    mufreq.model.points
+    mufreq.model.points,
+    windowValues
 )
 
 # Import all packages listed as Imports or Depends
