@@ -42,7 +42,8 @@ mufreq.types.matrix <- function(CNt.min, CNt.max, CNn = 2) {
     CNt <- cn_ratio_vect * CNn
     mut_comb <- lapply(CNt, FUN = function(x) seq(from = 0, to = x))
     times_muts <- sapply(mut_comb, length)
-    cbind(CNn = CNn, CNt = rep(CNt, times = times_muts), Mt = unlist(mut_comb) )
+    data.frame(CNn = CNn, CNt = rep(CNt, times = times_muts),
+        Mt = unlist(mut_comb))
 }
 
 baf.model.points <- function(cellularity, ploidy, baf_types, avg.depth.ratio) {
@@ -62,7 +63,7 @@ mufreq.model.points <- function(cellularity, ploidy, mufreq_types,
     depth_ratio <- theoretical.depth.ratio(cellularity = cellularity,
         ploidy = ploidy, CNn = mufreq_types[, "CNn"],
         CNt = mufreq_types[, "CNt"], avg.depth.ratio = avg.depth.ratio)
-    cbind(mufreqs, depth_ratio)
+    data.frame(mufreqs = mufreqs, depth.ratio = depth_ratio)
 }
 
 b_allele_freq <- function(Af, Bf, good.reads, conf = 0.95) {
