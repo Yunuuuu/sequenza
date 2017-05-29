@@ -29,6 +29,12 @@ importFrom("seqminer",
     "tabix.read"
 )
 
+importFrom("copynumber",
+    "winsorize",
+    "pcf",
+    "apcf"
+)
+
 importFrom("grDevices",
     "colorRampPalette",
     "dev.off",
