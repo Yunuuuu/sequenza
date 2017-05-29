@@ -28,6 +28,16 @@ plot_gc <- function(gc_mat, ...) {
         z = gc_mat,  ...)
 }
 
+cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity",
+    zlab = "Scaled rank LPP",
+    colFn = colorRampPalette(c("white", "lightblue")), ...) {
+    z <- matrix(rank(cp.table$lpp), nrow = nrow(cp.table$lpp)) /
+        length(cp.table$lpp)
+    map <- makecmap(c(0, 1), colFn = colFn, include.lowest = TRUE)
+    colorgram(x = cp.table$ploidy, y = cp.table$cellularity, z = z,
+        map = map, las = 1, xlab = xlab, ylab = ylab, zlab = zlab, ...)
+}
+
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL,
     segments = NULL,  min.N.baf = 1, min.N.ratio = 1e4, main = "",
     vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0),
