@@ -33,7 +33,7 @@ baf.types.matrix <- function(CNt.min, CNt.max, CNn = 2) {
     times_b <- sapply(b_comb, length)
     CNt <- rep(CNt, times = times_b)
     B <- unlist(b_comb)
-    cbind(CNn = CNn, CNt = CNt, B = B)
+    data.frame(CNn = CNn, CNt = CNt, B = B)
 }
 
 mufreq.types.matrix <- function(CNt.min, CNt.max, CNn = 2) {
@@ -51,7 +51,7 @@ baf.model.points <- function(cellularity, ploidy, baf_types, avg.depth.ratio) {
         avg.depth.ratio = avg.depth.ratio)
     baf <- theoretical.baf(cellularity = cellularity, CNn = baf_types[, "CNn"],
         CNt = baf_types[, "CNt"], B = baf_types[, "B"])
-    cbind(BAF = baf, depth_ratio = depth_ratio)
+    data.frame(BAF = baf, depth.ratio = depth_ratio)
 }
 
 mufreq.model.points <- function(cellularity, ploidy, mufreq_types,
@@ -63,4 +63,35 @@ mufreq.model.points <- function(cellularity, ploidy, mufreq_types,
         ploidy = ploidy, CNn = mufreq_types[, "CNn"],
         CNt = mufreq_types[, "CNt"], avg.depth.ratio = avg.depth.ratio)
     cbind(mufreqs, depth_ratio)
+}
+
+b_allele_freq <- function(Af, Bf, good.reads, conf = 0.95) {
+    if (length(Bf) > 1) {
+        dd <- density(c(Bf, Af), weight = c(good.reads, good.reads) /
+            (2 * sum(good.reads)))
+        points.max <- which(diff(sign(diff(dd$y))) == -2) + 1
+        if (length(points.max) < 1) {
+            points.max <- which(diff(sign(diff(dd$y))) == -1) + 1
+        }
+        l.max <- dd$x[points.max]
+        d.max <- dd$y[points.max]
+        b.val <- l.max[which.max(dd$y[dd$x %in% l.max])]
+        if (length(b.val) < 1) {
+            message('WARNING', l.max, d.max, b.val)
+            b.val <- min(l.max)
+        }
+        d.val <- d.max[which(l.max == b.val)]
+        b.range <- range(dd$x[dd$y >=  d.val - (d.val * (1 - conf))])
+        if (b.val > 0.5) {
+            b.val <- 1 - b.val
+        }
+        max_diff <- max(b.range) - b.val
+        min_diff <- b.val - min(b.range)
+        min_diff <- min(c(max_diff, min_diff))
+        c(b.val - min_diff, b.val, b.val + min_diff)
+    } else if (length(Bf) == 1) {
+        c(Bf, Bf, Bf)
+    } else {
+        c(NA, NA, NA)
+    }
 }
