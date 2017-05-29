@@ -38,9 +38,49 @@ cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity",
         map = map, las = 1, xlab = xlab, ylab = ylab, zlab = zlab, ...)
 }
 
+cp.plot.contours <- function(cp.table, likThresh = c(0.95),
+    alternative = TRUE, col = palette(), legend.pos = "bottomright",
+    pch = 18, alt.pch = 3, ...) {
+    znormsort <- sort(cp.table$lpp, decreasing = TRUE)
+    znormcumLik <- cumsum(znormsort)
+    n <- sapply(likThresh, function(x) sum(znormcumLik < x) + 1)
+    LikThresh <- znormsort[n]
+    names(LikThresh) <- paste0(likThresh * 100, "%")
+    contour(x = cp.table$ploidy, y = cp.table$cellularity, z = cp.table$lpp,
+        levels = znormsort[n], col = col, drawlabels = FALSE,
+        xlab = "Ploidy", ylab = "Cellularity", ...)
+    max.xy <- which(cp.table$lpp == max(cp.table$lpp), arr.ind = TRUE)
+    points(x = cp.table$ploidy[max.xy[, "row"]],
+        y = cp.table$cellularity[max.xy[, "col"]], pch = pch)
+    if (alternative == TRUE){
+        alt.sol <- alternative.cp.solutions(cp.table)
+        alt.sol <- alt.sol[-1, ]
+        points(x = alt.sol$ploidy, y = alt.sol$cellularity, pch = alt.pch)
+    }
+    if (!is.na(legend.pos)) {
+        if (alternative == FALSE) {
+            legend(legend.pos, legend = c(paste("C.R.", names(LikThresh),
+                sep = " "), "Point estimate"),
+                col = c(col[1:length(LikThresh)], "black"),
+                lty = c(rep(1, length(LikThresh)), NA),
+                pch = c(rep(NA, length(LikThresh)), pch),
+                border = NA, bty = "n")
+        } else {
+            legend(legend.pos, legend = c(paste("C.R.",
+                    names(LikThresh), sep = " "),
+                    "Point estimate", "Alternative solutions"),
+                col = c(col[1:length(LikThresh)], "black", "black"),
+                lty = c(rep(1, length(LikThresh)), NA, NA),
+                pch = c(rep(NA, length(LikThresh)), pch, alt.pch),
+                border = NA, bty = "n")
+        }
+    }
+   invisible(LikThresh)
+}
+
 chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL,
     segments = NULL,  min.N.baf = 1, min.N.ratio = 1e4, main = "",
-    vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = 'figure'), 0),
+    vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = "figure"), 0),
     BAF.style = "lines", CNn = 2, cellularity = NULL, ploidy = NULL,
     avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24", model.col = 1,
     x.chr.space = 10) {
