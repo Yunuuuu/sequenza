@@ -18,7 +18,8 @@ read.seqz <- function(file, n_lines = NULL, gzip = TRUE,
     if (!is.null(chr_name)) {
         tbi <- file.exists(paste(file, "tbi", sep = "."))
         if (tbi) {
-            read.seqz.tbi(file, chr_name, col_names, col_types)
+            read.seqz.tbi(file, split_chr_coord(chr_name),
+                col_names, col_types)
         } else {
             read.seqz.chr(file, chr_name = chr_name, col_types = col_types,
                 col_names = col_names, gzip = gzip,

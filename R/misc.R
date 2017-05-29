@@ -19,6 +19,23 @@ mclapplyPb <- function(X, FUN, mc.cores = getOption("mc.cores", 2L), ...) {
     res
 }
 
+split_chr_coord <- function (x) {
+    # Ensure that there is a start end coordinate
+    split_chr <- strsplit(x, split = ":")[[1]]
+    chromosome <- split_chr[1]
+    start_end <- split_chr[2]
+    split_coors <- strsplit(start_end, split = "-")[[1]]
+    start <- split_coors[1]
+    end <- split_coors[2]
+    if (is.na(start)) {
+        start <- 1
+    }
+    if (is.na(end)){
+        end <- 2147483647
+    }
+    paste0(chromosome, ":", start, "-", end)
+}
+
 weighted.median <- function(x, w, na.rm=TRUE, ties=NULL) {
   if (missing(w))
     w <- rep(1, length(x));
