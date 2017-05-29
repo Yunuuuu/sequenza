@@ -81,11 +81,11 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
             breaks_chr <- breaks[breaks$chrom == chr, ]
         }
         if (het_ok) {
-            seqz.b.win <- windowValues(x = seqz.het$Bf[het.filt],
-                positions = seqz.het$position[het.filt],
-                chromosomes = seqz.het$chromosome[het.filt],
-                window = window, overlap = overlap,
-                weight = seqz.het$good.reads[het.filt])
+            seqz.b.win <- windowBf(Af = seqz.het$Af, Bf = seqz.het$Bf,
+                good.reads = seqz.het$good.reads,
+                chromosomes = seqz.het$chromosome,
+                positions = seqz.het$position, conf = 0.95,
+                window = window, overlap = overlap)
         } else {
             seqz.b.win <- list()
             seqz.b.win[[1]] <- data.frame(start = min(seqz.data$position,
