@@ -22,10 +22,24 @@ plotWindows <- function(seqz.window, m.lty = 1, m.lwd = 3,
 
 }
 
-plot_gc <- function(gc_mat, ...) {
-    colorgram(x = as.numeric(rownames(gc_mat)),
-        y = as.numeric(colnames(gc_mat)),
-        z = gc_mat,  ...)
+plot_gc <- function(gc_list, range.gc = NULL, range.depth = NULL, ...) {
+    n <- gc_list$n
+    n[n == 0] <- NA
+    gc <- gc_list$gc
+    depth <- gc_list$depth
+    if (length(range.gc) == 2) {
+        range.gc <- sort(range.gc)
+        gc.select <- gc <= range.gc[2] & gc >= range.gc[1]
+        gc <- gc[gc.select]
+        n <- n[gc.select, ]
+    }
+    if (length(range.depth) == 2) {
+        range.depth <- sort(range.depth)
+        depth.select <- depth <= range.depth[2] & depth >= range.depth[1]
+        depth <- depth[depth.select]
+        n <- n[, depth.select]
+    }
+    colorgram(x = gc, y = depth, z = n,  ...)
 }
 
 cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity",
