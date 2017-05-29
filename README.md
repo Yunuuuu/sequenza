@@ -7,7 +7,9 @@
 ![Sequenza_logo](https://bytebucket.org/sequenza_tools/icons/raw/8c4b88fa31fb10c416ad69275d930b4cdc5a5ea7/png/sequenza/sequenza_150x270.png)
 
 
-Sequenza is a tool to analyze genomic sequencing data from paired normal-tumor samples, including cellularity and ploidy estimation; mutation and copy number (allele-specific and total copy number) detection, quantification and visualization.
+Sequenza is a tool to analyze genomic sequencing data from paired normal-tumor samples, 
+including cellularity and ploidy estimation; mutation and copy number (allele-specific 
+and total copy number) detection, quantification and visualization.
 
 ## Installation
 

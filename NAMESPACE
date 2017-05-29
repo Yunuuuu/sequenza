@@ -1,19 +1,28 @@
 export(
-    read.seqz,
-    theoretical.depth.ratio,
-    theoretical.baf,
-    theoretical.mufreq,
-    baf.types.matrix,
-    mufreq.types.matrix,
     baf.model.points,
+    baf.types.matrix,
+    chromosome.view,
+    cp.plot,
+    cp.plot.contours,
+    gc.sample.stats,
     mufreq.model.points,
+    mufreq.types.matrix,
+    read.seqz,
+    sequenza.extract,
+    sequenza.fit,
+    theoretical.baf,
+    theoretical.depth.ratio,
+    theoretical.mufreq,
     windowValues
 )
 
-# Import all packages listed as Imports or Depends
-import(
-    parallel,
-    squash
+importFrom("squash",
+    "colorgram",
+    "makecmap"
+)
+
+importFrom("parallel",
+    "mclapply"
 )
 
 importFrom("iotools",
@@ -32,7 +41,7 @@ importFrom("seqminer",
 importFrom("copynumber",
     "winsorize",
     "pcf",
-    "apcf"
+    "aspcf"
 )
 
 importFrom("grDevices",
@@ -62,6 +71,7 @@ importFrom("graphics",
 )
 importFrom("stats",
     "dbinom",
+    "density",
     "dpois",
     "dt",
     "median",
