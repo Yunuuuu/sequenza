@@ -16,18 +16,18 @@ gc.sample.stats <- function(file, col_types = "c--dd----d----",
         gc1 <- lapply(split(x[, 2], x[, 4]), table)
         gc2 <- lapply(split(x[, 3], x[, 4]), table)
         if (verbose){
-            cat(".")
+            message(".")
         }
         list(unique = u_chr, lines = n_chr, gc_nor = gc1, gc_tum = gc2)
     }
     if (verbose){
-        cat("reading chunks ")
+        message("reading chunks ")
     }
     res <- chunk.apply(input = con, FUN = parse_chunck, col_types = col_types,
         CH.MAX.SIZE = buffer, parallel = parallel)
     close(con)
     if (verbose){
-        cat(" done\n")
+        message(" done\n")
     }
     ord_chrom <- unique(Reduce("c", Reduce("c", res[, "unique"])))
     stats_chrom <- Reduce("c", res[, "lines"])
