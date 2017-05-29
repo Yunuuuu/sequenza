@@ -58,28 +58,26 @@ get_gc <- function(gc_col) {
     names_gc <- sort_char(names(all_depths))
     all_depths <- all_depths[names_gc]
     names_depths <- sort_char(unique(Reduce("c", lapply(all_depths, names))))
-    do.call(rbind, lapply(all_depths, FUN = function(x, names_depths) {
+    n <- do.call(rbind, lapply(all_depths, FUN = function(x, names_depths) {
             res <- x[names_depths]
             names(res) <- names_depths
             res
         },
         names_depths = names_depths))
+    n[is.na(n)] <- 0
+    list(gc = as.numeric(names_gc), depth = as.numeric(names_depths), n = n)
 }
 
-median_gc <- function(gc_mat) {
-    values <- as.numeric(colnames(gc_mat))
-    gc_mat[is.na(gc_mat)] <- 0
-    apply(gc_mat, 1, FUN = function(x, w) {
+median_gc <- function(gc_list) {
+    apply(gc_list$n, 1, FUN = function(x, w) {
             weighted.median(x = w, w = x, na.rm = T)
         },
-        w = values)
+        w = gc_list$depth)
 }
 
-mean_gc <- function(gc_mat) {
-    values <- as.numeric(colnames(gc_mat))
-    gc_mat[is.na(gc_mat)] <- 0
-    apply(gc_mat, 1, FUN = function(x, w) {
+mean_gc <- function(gc_list) {
+    apply(gc_list, 1, FUN = function(x, w) {
             weighted.mean(x = w, w = x, na.rm = T)
         },
-        w = values)
+        w = gc_list$depth)
 }
