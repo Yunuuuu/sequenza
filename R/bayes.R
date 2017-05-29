@@ -59,7 +59,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
     priors <- priors / sum(priors)
 
     bayes.fit <- function (x, mat, model.pts, priors, ratio.priority) {
-        test.ratio <- model.pts$depth.ratio
+        test.ratio <- log(model.pts$depth.ratio)
         test.baf <- model.pts$BAF
         min.offset <- 1e-323
         score.r <- dt2(sd = mat[x, ]$sd.ratio / sqrt(mat[x, ]$weight.ratio),
