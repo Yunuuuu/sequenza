@@ -125,7 +125,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
         }
         chromosome.view(mut.tab = sequenza.extract$mutations[[i]],
             baf.windows = sequenza.extract$BAF[[i]],
-            ratio.windows = sequenza.extract$ratio[[i]], BAF.style = "lines",
+            ratio.windows = sequenza.extract$ratio[[i]],
             cellularity = cellularity, ploidy = ploidy, main = i,
             segments = seg.res[seg.res$chromosome == i, ],
             avg.depth.ratio = avg.depth.ratio, CNn = CNn, min.N.ratio = 1)
@@ -136,7 +136,8 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
         genome.view(seg.res)
     }
     genome.view(seg.res, "CN")
-    plotRawGenome(sequenza.extract, cellularity = cellularity, ploidy = ploidy)
+    plotRawGenome(sequenza.extract, cellularity = cellularity, ploidy = ploidy,
+        mirror.BAF = TRUE)
     dev.off()
     barscn <- data.frame(size = seg.res$end.pos - seg.res$start.pos,
         CNt = seg.res$CNt)
@@ -159,7 +160,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
             row.names = FALSE, sep = "\t", quote = FALSE)
     }
     pdf(fit.file, width = 6, height = 6)
-        baf.ratio.model.fit(cellularity = cellularity, ploidy = ploidy,
+        baf.model.view(cellularity = cellularity, ploidy = ploidy,
             segs = seg.res[!segs.is.xy, ])
     dev.off()
     if (!is.null(cp.table)){
@@ -168,7 +169,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
             row.names = FALSE, sep = "\t", quote = FALSE)
         pdf(afit.file)
         for (sol in 1:nrow(alt.sol)){
-            baf.ratio.model.fit(cellularity = alt.sol$cellularity[sol],
+            baf.model.view(cellularity = alt.sol$cellularity[sol],
                 ploidy = alt.sol$ploidy[sol], segs = seg.res[!segs.is.xy, ])
         }
         dev.off()
