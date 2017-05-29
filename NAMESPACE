@@ -32,7 +32,7 @@ importFrom("seqminer",
 importFrom("copynumber",
     "winsorize",
     "pcf",
-    "apcf"
+    "aspcf"
 )
 
 importFrom("grDevices",

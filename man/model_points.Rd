@@ -23,10 +23,10 @@
   \item{avg_depth_ratio}{average normalized depth ratio.}
 }
 \value{
-For \alias{baf_model_points}
+For \code{baf_model_points}
   \item{BAF}{modelled values of B-allele frequency for the given types.}
   \item{depth_ratio}{modelled values of depth ratio for the given types.}
-For \alias{mufreq_model_points} a matrix of two columns:
+For \code{mufreq_model_points} a matrix of two columns:
   \item{mufreqs}{modelled values of mutation frequency for the given types.}
   \item{depth_ratio}{modelled values of depth ratio for the given types.}
 }
