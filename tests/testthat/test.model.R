@@ -37,7 +37,7 @@ test_that("Testing baf types matrix", {
             z - y
         }
     ))
-    mat_b <- cbind(CNn = rep(2, length(Bs) + 1),
+    mat_b <- data.frame(CNn = rep(2, length(Bs) + 1),
                    CNt = c(0, CNts), B = c(0, Bs))
     mat_b <- mat_b[mat_b[, "B"] <= mat_b[, "CNt"] / 2, ]
     r1 <- baf.types.matrix(CNt.min = 0, CNt.max = 3, CNn = 2)
@@ -48,7 +48,7 @@ test_that("Testing mufreq types matrix", {
     x <- 3
     CNts <- do.call(c, sapply(1:x, FUN = function(x) rep(x, x + 1)))
     Mts <- do.call(c, sapply(1:x, FUN = function(x) 0:x))
-    mat_m <- cbind(CNn = rep(2, length(Mts) + 1),
+    mat_m <- data.frame(CNn = rep(2, length(Mts) + 1),
                    CNt = c(0, CNts), Mt = c(0, Mts))
     r1 <- mufreq.types.matrix(CNt.min = 0, CNt.max = 3, CNn = 2)
     expect_equal(r1, mat_m)
