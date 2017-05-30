@@ -111,8 +111,8 @@ baf.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
             ploidy = result$ploidy[ii], ...)
         sum(L.model[,4])
     }
-    bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp,
-        mc.cores = mc.cores)
+    bayes.res <- pblapply(X = 1:nrow(result), FUN = fit.cp,
+        cl = mc.cores)
     result$LPP <- unlist(bayes.res)
     z <- tapply(result$LPP, list(result$ploidy, result$cellularity), mean)
     x <- as.numeric(rownames(z))
@@ -181,8 +181,8 @@ mufreq.model.fit <- function(cellularity = seq(0.3, 1, by = 0.01),
             ploidy = result$ploidy[ii], ...)
         sum(L.model[, 4])
     }
-    bayes.res <- mclapplyPb(X = 1:nrow(result), FUN = fit.cp,
-        mc.cores = mc.cores)
+    bayes.res <- pblapply(X = 1:nrow(result), FUN = fit.cp,
+        cl = mc.cores)
     result$LPP <- unlist(bayes.res)
     z <- tapply(result$LPP, list(result$ploidy, result$cellularity), mean)
     x <- as.numeric(rownames(z))
