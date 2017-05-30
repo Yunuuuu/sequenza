@@ -14,6 +14,8 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
     cp.file   <- make_filename("CP_contours.pdf")
     cint.file <- make_filename("confints_CP.txt")
     chrw.file <- make_filename("chromosome_view.pdf")
+    depths.file <- make_filename("chromosome_depths.pdf")
+    gc.file <- make_filename("gc_plots.pdf")
     geno.file <- make_filename("genome_view.pdf")
     cn.file <- make_filename("CN_bars.pdf")
     fit.file <- make_filename("model_fit.pdf")
@@ -34,6 +36,15 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
     if (is.null(cp.table) && (is.null(cellularity) || is.null(ploidy))){
         stop("cp.table and/or cellularity and ploidy argument are required.")
     }
+    pdf(depths.file)
+    for (i in unique(seg.tab$chromosome)) {
+        par(mfcol = c(2, 1))
+        plotWindows(sequenza.extract$normal[[i]])
+        plotWindows(sequenza.extract$tumor[[i]])
+        plotWindows(sequenza.extract$ratio[[i]])
+    }
+    dev.off()
+
     if (!is.null(cp.table)){
         assign(x = paste0(sample.id, "_sequenza_cp_table"), value = cp.table)
         save(list = paste0(sample.id, "_sequenza_cp_table"), file = robj.fit)
