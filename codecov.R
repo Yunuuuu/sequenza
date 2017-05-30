@@ -1,6 +1,11 @@
 
 setRepositories(graphics = FALSE, ind = 1:6)
 chooseCRANmirror(graphics = FALSE, ind = 2)
+
+lib <- "~/R/x86_64-unknown-linux-gnu-library/3.3"
+dir.create(path = lib, recursive = TRUE)
+.libPaths(c(lib, .libPaths()))
+
 install.packages(c("covr", "devtools"))
 library(covr)
 library(devtools)
