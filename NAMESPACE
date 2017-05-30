@@ -16,16 +16,19 @@ export(
     theoretical.mufreq,
     windowValues
 )
-
 importFrom("squash",
     "colorgram",
     "makecmap"
 )
 
-importFrom("parallel",
-    "mclapply"
+importFrom("pbapply",
+    "pblapply"
 )
 
+importFrom("squash",
+    "colorgram",
+    "makecmap"
+)
 importFrom("iotools",
     "mstrsplit",
     "chunk.apply"
