@@ -5,10 +5,11 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     min.fw.freq = 0, verbose = TRUE, chromosome.list = NULL,
     breaks = NULL, breaks.method = "het", assembly = "hg19",
     weighted.mean = TRUE, normalization.method = "mean",
-    ignore.normal = FALSE, gc.stats = NULL){
+    ignore.normal = FALSE, parallel = 2L, gc.stats = NULL){
 
     if (is.null(gc.stats)) {
-        gc.stats <- gc.sample.stats(file, gzip = gz, verbose = verbose)
+        gc.stats <- gc.sample.stats(file, gzip = gz, verbose = verbose,
+            parallel = parallel)
     }
     chr.vect <- as.character(gc.stats$file.metrics$chr)
     if (normalization.method != "mean") {
