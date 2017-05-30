@@ -76,7 +76,7 @@ median_gc <- function(gc_list) {
 }
 
 mean_gc <- function(gc_list) {
-    apply(gc_list, 1, FUN = function(x, w) {
+    apply(gc_list$n, 1, FUN = function(x, w) {
             weighted.mean(x = w, w = x, na.rm = T)
         },
         w = gc_list$depth)
