@@ -10,6 +10,7 @@ export(
     read.seqz,
     sequenza.extract,
     sequenza.fit,
+    sequenza.results,
     theoretical.baf,
     theoretical.depth.ratio,
     theoretical.mufreq,
