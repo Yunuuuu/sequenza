@@ -38,7 +38,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
     }
     pdf(depths.file)
     for (i in unique(seg.tab$chromosome)) {
-        par(mfcol = c(2, 1))
+        par(mfcol = c(3, 1))
         plotWindows(sequenza.extract$normal[[i]])
         plotWindows(sequenza.extract$tumor[[i]])
         plotWindows(sequenza.extract$ratio[[i]])
