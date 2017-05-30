@@ -22,7 +22,7 @@ plotWindows <- function(seqz.window, m.lty = 1, m.lwd = 3,
 
 }
 
-plot_gc <- function(gc_list, range.gc = NULL, range.depth = NULL, ...) {
+gc.plot <- function(gc_list, range.gc = NULL, range.depth = NULL, ...) {
     n <- gc_list$n
     n[n == 0] <- NA
     gc <- gc_list$gc
@@ -40,6 +40,18 @@ plot_gc <- function(gc_list, range.gc = NULL, range.depth = NULL, ...) {
         n <- n[, depth.select]
     }
     colorgram(x = gc, y = depth, z = n,  ...)
+}
+
+gc.summary.plot <- function(gc_list, mean.col = 1, median.col = 2,
+    scale.subset = 1.5, ...){
+    mengc <- mean_gc(gc_list)
+    medgc <- median_gc(gc_list)
+    max_depth <- round(max(c(mengc, medgc)) * scale.subset, 0)
+    gc.plot(gc_list, range.depth = c(0, max_depth), ...)
+    lines(x = gc_list$gc, y = mengc, lwd = 3, col = mean.col)
+    lines(x = gc_list$gc, y = medgc, lwd = 3, col = median.col)
+    legend("topright", c("Mean depth", "Median depth"),
+        col = c(mean.col, median.col), bg = "white", lty = 1, lwd = 3)
 }
 
 cp.plot <- function (cp.table, xlab = "Ploidy", ylab = "Cellularity",

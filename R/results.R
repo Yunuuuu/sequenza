@@ -36,12 +36,22 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
     if (is.null(cp.table) && (is.null(cellularity) || is.null(ploidy))){
         stop("cp.table and/or cellularity and ploidy argument are required.")
     }
+
+    pdf(gc.file, width = 10, height = 5)
+    par(mfrow=c(1, 2))
+    gc.summary.plot(sequenza.extract$gc$normal, mean.col = "lightsalmon",
+        median.col = "lightgreen", las = 1, xlab = "GC", ylab = "Depth",
+        zlab = "N", main = "GC density in the normal sample")
+    gc.summary.plot(sequenza.extract$gc$tumor, mean.col = "lightsalmon",
+        median.col = "lightgreen", las = 1, xlab = "GC", ylab = "Depth",
+        zlab = "N", main = "GC density in the tumor sample")
+    dev.off()
     pdf(depths.file)
     for (i in unique(seg.tab$chromosome)) {
         par(mfcol = c(3, 1))
-        plotWindows(sequenza.extract$normal[[i]])
-        plotWindows(sequenza.extract$tumor[[i]])
-        plotWindows(sequenza.extract$ratio[[i]])
+        plotWindows(sequenza.extract$normal[[i]],ylab = "normal depth", main = i)
+        plotWindows(sequenza.extract$tumor[[i]],ylab = "tumor depth")
+        plotWindows(sequenza.extract$ratio[[i]],ylab = "depth ratio")
     }
     dev.off()
 
