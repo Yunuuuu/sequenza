@@ -9,4 +9,4 @@ pipelines:
   default:
     - step:
         script:
-          - Rscript cedecov.R
+          - Rscript codecov.R
