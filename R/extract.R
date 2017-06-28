@@ -15,9 +15,17 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     if (normalization.method != "mean") {
         gc.normal.vect  <- median_gc(gc.stats$normal)
         gc.tumor.vect  <- median_gc(gc.stats$tumor)
+        avg_tum_depth <- weighted.median(x = gc.stats$tumor$depth,
+            w = colSums(gc.stats$tumor$n))
+        avg_nor_depth <- weighted.median(x = gc.stats$normal$depth,
+            w = colSums(gc.stats$normal$n))
     } else {
         gc.normal.vect  <- mean_gc(gc.stats$normal)
         gc.tumor.vect  <- mean_gc(gc.stats$tumor)
+        avg_tum_depth <- weighted.mean(x = gc.stats$tumor$depth,
+            w = colSums(gc.stats$tumor$n))
+        avg_nor_depth <- weighted.mean(x = gc.stats$normal$depth,
+            w = colSums(gc.stats$normal$n))
     }
     windows.baf   <- list()
     windows.ratio <- list()
@@ -51,8 +59,10 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
             gc.tumor.vect[as.character(seqz.data$GC.percent)]
         norm_normal_depth <- seqz.data$depth.normal /
             gc.normal.vect[as.character(seqz.data$GC.percent)]
-        norm.gc.stats <- depths_gc(norm_normal_depth,
-            norm_tumor_depth, seqz.data$GC.percent)
+        norm.gc.stats <- depths_gc(
+            depth_n = round(norm_normal_depth * avg_nor_depth, 0),
+            depth_t = round(norm_tumor_depth * avg_tum_depth, 0),
+            gc = seqz.data$GC.percent)
         if (ignore.normal) {
             seqz.data$adjusted.ratio <- round(norm_tumor_depth, 3)
         } else {
