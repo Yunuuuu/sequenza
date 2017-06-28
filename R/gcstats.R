@@ -29,17 +29,26 @@ gc.sample.stats <- function(file, col_types = "c--dd----d----",
     if (verbose){
         message(" done\n")
     }
-    ord_chrom <- unique(Reduce("c", Reduce("c", res[, "unique"])))
-    stats_chrom <- Reduce("c", res[, "lines"])
-    stats_chrom <- sapply(splash_table(res[, "lines"]), sum)
-    stats_chrom <- stats_chrom[ord_chrom]
-    stats_start <- cumsum(c(1, stats_chrom[-length(stats_chrom)]))
-    stats_end   <- stats_start + stats_chrom - 1
-    stats_chrom <- data.frame(chr = ord_chrom, n_lines = stats_chrom,
-        start = stats_start, end = stats_end)
-        gc_norm <- get_gc(res[, "gc_nor"])
-        gc_tum <- get_gc(res[, "gc_tum"])
-    list(file.metrics = stats_chrom, normal = gc_norm, tumor = gc_tum)
+    unfold_gc(res, stats = TRUE)
+}
+
+unfold_gc <- function(x, stats = TRUE) {
+    gc_norm <- get_gc(x[, "gc_nor"])
+    gc_tum <- get_gc(x[, "gc_tum"])
+    if (stats) {
+        ord_chrom <- unique(Reduce("c", Reduce("c", x[, "unique"])))
+        stats_chrom <- Reduce("c", x[, "lines"])
+        stats_chrom <- sapply(splash_table(x[, "lines"]), sum)
+        stats_chrom <- stats_chrom[ord_chrom]
+        stats_start <- cumsum(c(1, stats_chrom[-length(stats_chrom)]))
+        stats_end   <- stats_start + stats_chrom - 1
+        stats_chrom <- data.frame(chr = ord_chrom, n_lines = stats_chrom,
+            start = stats_start, end = stats_end)
+
+        list(file.metrics = stats_chrom, normal = gc_norm, tumor = gc_tum)
+    } else {
+        list(normal = gc_norm, tumor = gc_tum)
+    }
 }
 
 splash_table <- function(lis_obj){
@@ -80,4 +89,8 @@ mean_gc <- function(gc_list) {
             weighted.mean(x = w, w = x, na.rm = T)
         },
         w = gc_list$depth)
+}
+
+depth_gc <- function(depth, gc) {
+    lapply(split(depth, gc), table)
 }
