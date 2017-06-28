@@ -25,10 +25,10 @@
         and a normal cell.}
     \item{baf_types}{matrix with the sets of copy numbers and number of
         mutated alleles over which to model mutation frequency and depth ratio.
-        The matrix can be generated with \code{\link{baf_types_matrix}}.}
+        The matrix can be generated with \code{\link{baf.types.matrix}}.}
     \item{mufreq_types}{matrix with the sets of copy numbers and number of
         mutated alleles over which to model mutation frequency and depth ratio.
-        The matrix can be generated with \code{\link{mufreq_types_matrix}}.}
+        The matrix can be generated with \code{\link{mufreq.types.matrix}}.}
     \item{avg.depth.ratio}{average normalized depth ratio.}
 }
 \value{
@@ -44,23 +44,23 @@
     The \code{baf.model.points} and \code{mufreq.model.points} functions
     generate the theoretical values of B-allele frequency, mutation frequency
     and depth ratio for the given type tags. To learn more about type tags
-    see \code{\link{types_matrix}}.
+    see \code{\link{types.matrix}}.
 }
 
 \seealso{
-    \code{\link{types_matrix}}, \code{\link{theoretical_depth_ratio}},
-    \code{\link{theoretical_mufreq}}.
+    \code{\link{types.matrix}}, \code{\link{theoretical.depth.ratio}},
+    \code{\link{theoretical.baf}} \code{\link{theoretical.mufreq}}.
 }
 
-\examples{ß
+\examples{
     # Simulate a cellularity of 0.5, ploidy of 2 and types from min CNt 0
     # and max = 4 on an originally diploid genome:
-    types <- baf_types_matrix(CNt_min = 0, CNt_max = 4, CNn = 2)
+    types <- baf.types.matrix(CNt.min = 0, CNt.max = 4, CNn = 2)
     cbind(types, baf.model.points(cellularity = 0.5, ploidy = 2,
         baf_types = types, avg.depth.ratio = 1))
     # Simulate a cellularity of 0.5, ploidy of 2 and types from min CNt 0
     # and max = 4 on an originally monoallelic genome:
-    types <- mufreq_types_matrix(CNt_min = 0, CNt_max = 4, CNn = 1)
+    types <- mufreq.types.matrix(CNt.min = 0, CNt.max = 4, CNn = 1)
     cbind(types, mufreq.model.points(cellularity = 0.5, ploidy = 2,
         mufreq_types = types, avg.depth.ratio = 1))
 }

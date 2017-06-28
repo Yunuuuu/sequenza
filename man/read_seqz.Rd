@@ -31,6 +31,12 @@
     \item{n_lines}{vector of length 2 specifying the first and last line to
         read from the file. If specified, only the selected portion of the
         file will be used.}
+    \item{buffer}{maximal size of each chunk in bytes(see
+        \code{\link{chunk.apply}}).}
+    \item{parallel}{integer, number of threads used to process a seqz file
+        (see \code{\link{chunk.apply}}).}
+    \item{col_names}{names of the columns of the seqz file. The default
+        corresponds to the columns names of a seqz file.}
     \item{...}{any arguments accepted by \code{read_tsv}.}
 }
 
