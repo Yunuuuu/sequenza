@@ -15,9 +15,8 @@
     chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
         min.N.baf = 1, min.N.ratio = 10000, main = "", vlines = FALSE,
         legend.inset = c(-20 * strwidth("a", units = "figure"), 0),
-        BAF.style = "lines", CNn = 2, cellularity = NULL, ploidy = NULL,
-        avg.depth.ratio = NULL, model.lwd = 1, model.lty = "24",
-        model.col = 1, x.chr.space = 10)
+        CNn = 2, cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL,
+        model.lwd = 1, model.lty = "24", model.col = 1, x.chr.space = 10)
     genome.view(seg.cn, info.type = "AB", ...)
 }
 
@@ -46,9 +45,6 @@
     \item{legend.inset}{the inset argument to pass to the \code{\link{legend}}
         function. Defines the distance between the mutation legend and the
         plot border.}
-    \item{BAF.style}{the style to visualize the theoretical thresholds for the
-        B allele frequency panel. Possible values are "lines", "blocks", "none".
-        Default is "none".}
     \item{model.lwd}{width of the theoretical lines, if the segments matrix
         contains the columns A, B and CNt.}
     \item{model.lty}{line type of the theoretical lines, if the segments matrix
