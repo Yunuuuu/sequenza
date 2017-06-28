@@ -8,8 +8,8 @@
     at given model points, cellularity and ploidy values}
 
 \description{
-    The \code{baf.model.points} and \code{mufreq.model.points} function combine
-    \code{theoretical_baf}, \code{theoretical_mufreq} and
+    The \code{baf.model.points} and \code{mufreq.model.points} functions
+    combine \code{theoretical_baf}, \code{theoretical_mufreq} and
     \code{theoretical_depth_ratio} to model the theoretical respective values
         at known values of cellularity and ploidy.
 }

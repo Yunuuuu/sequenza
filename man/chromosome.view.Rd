@@ -12,10 +12,10 @@
 }
 
 \usage{
-    chromosome.view(baf.windows, ratio.windows, mut.tab = NULL, segments = NULL,
-        min.N.baf = 1, min.N.ratio = 10000, main = "", vlines = FALSE,
-        legend.inset = c(-20 * strwidth("a", units = "figure"), 0),
-        CNn = 2, cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL,
+    chromosome.view(baf.windows, ratio.windows, mut.tab = NULL,
+        segments = NULL, min.N.baf = 1, min.N.ratio = 10000, main = "",
+        vlines = FALSE, legend.inset = c(-20 * strwidth("a", units = "figure"),
+        0), CNn = 2, cellularity = NULL, ploidy = NULL, avg.depth.ratio = NULL,
         model.lwd = 1, model.lty = "24", model.col = 1, x.chr.space = 10)
     genome.view(seg.cn, info.type = "AB", ...)
 }
