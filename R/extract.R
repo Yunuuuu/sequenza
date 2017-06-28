@@ -145,7 +145,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     names(windows.tumor) <- chromosome.list
     names(mutation.list) <- chromosome.list
     names(segments.list) <- chromosome.list
-    gc_norm <- unfold_gc(do.call(rbind, norm.gc.list))
+    gc_norm <- unfold_gc(do.call(rbind, norm.gc.list), stats = FALSE)
     list(BAF = windows.baf, ratio = windows.ratio,
         normal = windows.normal, tumor = windows.tumor,
         mutations = mutation.list, segments = segments.list,
