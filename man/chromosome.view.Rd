@@ -59,15 +59,18 @@
         the x-axis.}
     \item{seg.cn}{genome wide segments, with the columns A, B and CNt.}
     \item{info.type}{information to plot in \code{genome.view}. Available
-        options are "CNt" to draw the copy numbers and "AB" (default) to draw
-        the two alleles.}
+        options are "CNt" for total copy numbers and "AB" (default) for
+        the alleles specific copy number.}
     \item{...}{optional arguments passed to \code{\link{plot}}.}
 }
 
 \details{
-    \code{chromosome.view} is a convenient plotting function using
-    \code{\link{plotWindows}} and \code{\link{par}} parameters, to display a
-    summary of the sequencing observations and the results of the model.
+    \code{chromosome.view} is a plotting function based on the default
+    \code{\link{plot}} function and \code{\link{par}} to display multiple
+    panels. The plotting function \code{\link{plotWindows}} is used to plot
+    the binned data of \code{depth-ratio} and \code{b-allele frequency}.
+    The function displays the observations reulting from the sequencing
+    post-procssing as well the results of the model.
 }
 
 \seealso{
