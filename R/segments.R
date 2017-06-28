@@ -5,7 +5,7 @@ extract_breaks <- function(data, data_het, ratio, baf, breaks, gamma, kmin,
     if (is.null(breaks)) {
         if (method %in% method_list) {
             if (method == "fast"){
-                breaks <- breaks_fast(ratio = ratio, baf = baf,
+                breaks <- breaks_fast(ratio_win = ratio, baf_win = baf,
                     gamma = gamma, kmin = kmin, chr = chromosome)
             } else {
                 breaks <- breaks_het(data = data_het, gamma = gamma,
