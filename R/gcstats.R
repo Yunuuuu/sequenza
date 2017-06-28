@@ -91,6 +91,8 @@ mean_gc <- function(gc_list) {
         w = gc_list$depth)
 }
 
-depth_gc <- function(depth, gc) {
-    lapply(split(depth, gc), table)
+depths_gc <- function(depth_n, depth_t, gc) {
+    gc_nor <- lapply(split(depth_n, gc), table)
+    gc_tum <- lapply(split(depth_t, gc), table)
+    list(gc_nor = gc_nor, gc_tum = gc_tum)
 }
