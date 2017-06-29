@@ -40,16 +40,16 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
     pdf(gc.file, width = 10, height = 5)
     par(mfrow=c(1, 2))
     gc.summary.plot(sequenza.extract$gc$normal, mean.col = "lightsalmon",
-        median.col = "lightgreen", las = 1, xlab = "GC", ylab = "Depth",
+        median.col = "lightgreen", las = 1, xlab = "GC %", ylab = "Depth",
         zlab = "N", main = "GC vs raw depth in the normal sample")
     gc.summary.plot(sequenza.extract$gc_norm$normal, mean.col = "lightsalmon",
-        median.col = "lightgreen", las = 1, xlab = "GC", ylab = "Depth",
+        median.col = "lightgreen", las = 1, xlab = "GC %", ylab = "Depth",
         zlab = "N", main = "GC vs normalized depth in the normal sample")
     gc.summary.plot(sequenza.extract$gc$tumor, mean.col = "lightsalmon",
-        median.col = "lightgreen", las = 1, xlab = "GC", ylab = "Depth",
+        median.col = "lightgreen", las = 1, xlab = "GC %", ylab = "Depth",
         zlab = "N", main = "GC vs raw depth in the tumor sample")
     gc.summary.plot(sequenza.extract$gc_norm$tumor, mean.col = "lightsalmon",
-        median.col = "lightgreen", las = 1, xlab = "GC", ylab = "Depth",
+        median.col = "lightgreen", las = 1, xlab = "GC %", ylab = "Depth",
         zlab = "N", main = "GC vs normalized depth in the tumor sample")
     dev.off()
     pdf(depths.file)
