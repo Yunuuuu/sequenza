@@ -52,12 +52,39 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
         median.col = "lightgreen", las = 1, xlab = "GC %", ylab = "Depth",
         zlab = "N", main = "GC vs normalized depth in the tumor sample")
     dev.off()
-    pdf(depths.file)
+    pdf(depths.file, height = 10, width = 15)
     for (i in unique(seg.tab$chromosome)) {
-        par(mfcol = c(3, 1))
-        plotWindows(sequenza.extract$normal[[i]],ylab = "normal depth", main = i)
-        plotWindows(sequenza.extract$tumor[[i]],ylab = "tumor depth")
-        plotWindows(sequenza.extract$ratio[[i]],ylab = "depth ratio")
+        max_coord_chr_i <- max(sequenza.extract$ratio[[i]]$end)
+        par(mfcol = c(3, 2), xaxt = "n", mar = c(0, 4, 3, 0), oma = c(5, 0, 4, 0))
+        plotWindows(sequenza.extract$depths$raw$normal[[i]],
+            ylab = "normal depth", ylim = c(0, 2.5),
+            main = paste("raw", i, sep = " "))
+        plotWindows(sequenza.extract$depths$raw$tumor[[i]],
+            ylab = "tumor depth", ylim = c(0, 2.5))
+        plotWindows(sequenza.extract$raw_ratio[[i]],
+            ylab = "depth ratio", ylim = c(0, 2.5))
+        par(xaxt = "s")
+        axis(labels = as.character(round(seq(0, max_coord_chr_i / 1e6,
+                by = 10), 0)),
+            side = 1, line = 0, at = seq(0, max_coord_chr_i, by = 1e7),
+            outer = FALSE, cex = par("cex.axis") * par("cex"))
+        mtext("Position (Mb)", side = 1, line = 3, outer = FALSE,
+            cex = par("cex.lab") * par("cex"))
+        par(xaxt = "n")
+        plotWindows(sequenza.extract$depths$norm$normal[[i]],
+            ylab = "normal depth", ylim = c(0, 2.5),
+            main = paste("normalized", i, sep = " "))
+        plotWindows(sequenza.extract$depths$norm$tumor[[i]],
+            ylab = "tumor depth", ylim = c(0, 2.5))
+        plotWindows(sequenza.extract$ratio[[i]],
+            ylab = "depth ratio", ylim = c(0, 2.5))
+        par(xaxt = "s")
+        axis(labels = as.character(round(seq(0, max_coord_chr_i / 1e6,
+                by = 10), 0)),
+            side = 1, line = 0, at = seq(0, max_coord_chr_i, by = 1e7),
+            outer = FALSE, cex = par("cex.axis") * par("cex"))
+        mtext("Position (Mb)", side = 1, line = 3, outer = FALSE,
+            cex = par("cex.lab") * par("cex"))
     }
     dev.off()
 

@@ -29,8 +29,11 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     }
     windows.baf   <- list()
     windows.ratio <- list()
+    windows.raw_ratio <- list()
     windows.normal <- list()
     windows.tumor <- list()
+    windows.n_normal <- list()
+    windows.n_tumor <- list()
     mutation.list <- list()
     segments.list <- list()
     norm.gc.list <- list()
@@ -74,14 +77,29 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
             chromosomes = seqz.data$chromosome,
             window = window, overlap = overlap,
             weight = seqz.data$depth.normal)
-        seqz.n.win <- windowValues(x = seqz.data$depth.normal,
+        seqz.n.win <- windowValues(x = seqz.data$depth.normal / avg_nor_depth,
             positions = seqz.data$position,
             chromosomes = seqz.data$chromosome,
             window = window, overlap = overlap)
-        seqz.t.win <- windowValues(x = seqz.data$depth.tumor,
+        seqz.t.win <- windowValues(x = seqz.data$depth.tumor / avg_tum_depth,
             positions = seqz.data$position,
             chromosomes = seqz.data$chromosome,
             window = window, overlap = overlap)
+        seqz.r_r.win <- windowValues(x = seqz.data$depth.ratio / (
+                avg_tum_depth / avg_nor_depth),
+            positions = seqz.data$position,
+            chromosomes = seqz.data$chromosome,
+            window = window, overlap = overlap,
+            weight = seqz.data$depth.normal)
+        seqz.n_n.win <- windowValues(x = norm_normal_depth,
+            positions = seqz.data$position,
+            chromosomes = seqz.data$chromosome,
+            window = window, overlap = overlap)
+        seqz.n_t.win <- windowValues(x = norm_tumor_depth,
+            positions = seqz.data$position,
+            chromosomes = seqz.data$chromosome,
+            window = window, overlap = overlap)
+
 
         seqz.hom <- seqz.data$zygosity.normal == "hom"
         seqz.het <- seqz.data[!seqz.hom, ]
@@ -137,8 +155,11 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
             min.fw.freq = min.fw.freq, segments = seg.s1)
 
         windows.ratio[[which(chromosome.list == chr)]] <- seqz.r.win[[1]]
+        windows.raw_ratio[[which(chromosome.list == chr)]] <- seqz.r_r.win[[1]]
         windows.normal[[which(chromosome.list == chr)]] <- seqz.n.win[[1]]
         windows.tumor[[which(chromosome.list == chr)]] <- seqz.t.win[[1]]
+        windows.n_normal[[which(chromosome.list == chr)]] <- seqz.n_n.win[[1]]
+        windows.n_tumor[[which(chromosome.list == chr)]] <- seqz.n_t.win[[1]]
         windows.baf[[which(chromosome.list == chr)]]   <- seqz.b.win[[1]]
         segments.list[[which(chromosome.list == chr)]] <- seg.s1
         mutation.list[[which(chromosome.list == chr)]] <- mut.tab
@@ -151,8 +172,11 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     }
     names(windows.baf)   <- chromosome.list
     names(windows.ratio) <- chromosome.list
+    names(windows.raw_ratio) <- chromosome.list
     names(windows.normal) <- chromosome.list
     names(windows.tumor) <- chromosome.list
+    names(windows.n_normal) <- chromosome.list
+    names(windows.n_tumor) <- chromosome.list
     names(mutation.list) <- chromosome.list
     names(segments.list) <- chromosome.list
 
@@ -177,7 +201,10 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     }
 
     list(BAF = windows.baf, ratio = windows.ratio,
-        normal = windows.normal, tumor = windows.tumor,
+        raw_ratio = windows.raw_ratio,
+        depths =  list(
+            raw = list(normal = windows.normal, tumor = windows.tumor),
+            norm = list(normal = windows.n_normal, tumor = windows.n_tumor)),
         mutations = mutation.list, segments = segments.list,
         chromosomes = chromosome.list, gc = gc.stats,
         gc_norm = gc_norm, avg.depth.ratio = avg_depth_ratio,
