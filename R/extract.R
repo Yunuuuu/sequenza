@@ -155,10 +155,31 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     names(windows.tumor) <- chromosome.list
     names(mutation.list) <- chromosome.list
     names(segments.list) <- chromosome.list
+
     gc_norm <- unfold_gc(do.call(rbind, norm.gc.list), stats = FALSE)
+
+    if (normalization.method != "mean") {
+        avg_tum_ndepth <- weighted.median(x = gc_norm$tumor$depth,
+            w = colSums(gc_norm$tumor$n))
+        avg_nor_ndepth <- weighted.median(x = gc_norm$normal$depth,
+            w = colSums(gc_norm$normal$n))
+    } else {
+        avg_tum_ndepth <- weighted.mean(x = gc_norm$tumor$depth,
+            w = colSums(gc_norm$tumor$n))
+        avg_nor_ndepth <- weighted.mean(x = gc_norm$normal$depth,
+            w = colSums(gc_norm$normal$n))
+    }
+    if (ignore.normal) {
+        avg_depth_ratio <- avg_tum_ndepth / avg_tum_depth
+    } else {
+        avg_depth_ratio <- (avg_tum_ndepth / avg_tum_depth) /
+            (avg_nor_ndepth / avg_nor_depth)
+    }
+
     list(BAF = windows.baf, ratio = windows.ratio,
         normal = windows.normal, tumor = windows.tumor,
         mutations = mutation.list, segments = segments.list,
         chromosomes = chromosome.list, gc = gc.stats,
-        gc_norm = gc_norm, avg.depth = 1)
+        gc_norm = gc_norm, avg.depth.ratio = avg_depth_ratio,
+        avg.depth.tumor = avg_tum_depth, avg.depth.normal = avg_nor_depth)
 }

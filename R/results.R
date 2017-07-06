@@ -29,7 +29,7 @@ sequenza.results <- function(sequenza.extract, cp.table = NULL,
     seg.tab <- do.call(rbind, sequenza.extract$segments[chromosome.list])
     seg.len <- (seg.tab$end.pos - seg.tab$start.pos) / 1e6
 
-    avg.depth.ratio <- 1
+    avg.depth.ratio <- sequenza.extract$avg.depth.ratio
     assign(x = paste0(sample.id, "_sequenza_extract"),
         value = sequenza.extract)
     save(list = paste0(sample.id, "_sequenza_extract"), file = robj.extr)

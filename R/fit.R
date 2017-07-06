@@ -5,15 +5,23 @@ sequenza.fit <- function(sequenza.extract, female = TRUE,
     ratio.priority = FALSE, method = "baf",
     priors.table = data.frame(CN = 2, value = 2), chromosome.list = 1:24,
     mc.cores = getOption("mc.cores", 2L)){
+
+    if (is.null(chromosome.list)) {
+        mut.all <- do.call(rbind, sequenza.extract$mutations)
+        mut.all <- na.exclude(mut.all)
+        segs.all <- do.call(rbind, sequenza.extract$segments)
+    } else {
+        mut.all <- do.call(rbind,
+            sequenza.extract$mutations[chromosome.list])
+        mut.all <- na.exclude(mut.all)
+        segs.all <- do.call(rbind,
+            sequenza.extract$segments[chromosome.list])
+    }
+    segs.len <- segs.all$end.pos - segs.all$start.pos
+    avg.depth.ratio <- sequenza.extract$avg.depth.ratio
+
     if (method == "baf") {
-        if (is.null(chromosome.list)) {
-            segs.all <- do.call(rbind, sequenza.extract$segments)
-        } else {
-            segs.all <- do.call(rbind,
-                sequenza.extract$segments[chromosome.list])
-        }
-        segs.len <- segs.all$end.pos - segs.all$start.pos
-        avg.depth.ratio <- 1
+
         avg.sd.ratio <- sum(segs.all$sd.ratio * segs.all$N.ratio,
             na.rm = TRUE) / sum(segs.all$N.ratio, na.rm = TRUE)
         avg.sd.Bf <- sum(segs.all$sd.BAF * segs.all$N.BAF, na.rm = TRUE) /
@@ -41,20 +49,7 @@ sequenza.fit <- function(sequenza.extract, female = TRUE,
             ploidy = ploidy, priors.table = priors.table,
             mc.cores = mc.cores, ratio.priority = ratio.priority)
     } else if (method == "mufreq") {
-        if (is.null(chromosome.list)) {
-            mut.all <- do.call(rbind, sequenza.extract$mutations)
-            mut.all <- na.exclude(mut.all)
-            segs.all <- do.call(rbind, sequenza.extract$segments)
-        } else {
-            mut.all <- do.call(rbind,
-                sequenza.extract$mutations[chromosome.list])
-            mut.all <- na.exclude(mut.all)
-            segs.all <- do.call(rbind,
-                sequenza.extract$segments[chromosome.list])
-        }
         mut.filt <- mut.all$F >= mufreq.treshold
-        segs.len <- segs.all$end.pos - segs.all$start.pos
-        avg.depth.ratio <- 1
         if (female){
             mut.is.xy  <- mut.all$chromosome == XY["Y"]
         } else{
