@@ -44,7 +44,7 @@ baf.bayes <- function(Bf, depth.ratio, cellularity, ploidy, avg.depth.ratio,
         sd.Bf = sd.Bf, sd.ratio = sd.ratio, weight.Bf = weight.Bf,
         weight.ratio = weight.ratio)
     baf_types <- baf.types.matrix(CNt.min = CNt.min,
-        CNt.max = CNt.max, CNn = 2)
+        CNt.max = CNt.max, CNn = CNn)
     model_baf <- baf.model.points(cellularity = cellularity,
         ploidy = ploidy, baf_types = baf_types,
         avg.depth.ratio = avg.depth.ratio)
