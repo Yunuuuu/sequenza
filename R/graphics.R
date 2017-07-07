@@ -264,15 +264,10 @@ chromosome.view <- function(baf.windows, ratio.windows, mut.tab = NULL,
 
 genome.view <- function(seg.cn, info.type = "AB", ...) {
     chr.order <- unique(seg.cn$chromosome)
-    if (info.type == "clusters") {
-        seg.list  <- split(x = seg.cn[,
-            c("chromosome", "start.pos", "end.pos", "CNt", "cluster")],
-            f = seg.cn$chromosome)
-    } else {
-        seg.list <- split(x = seg.cn[,
-            c("chromosome", "start.pos", "end.pos", "A", "B", "CNt")],
-            f = seg.cn$chromosome)
-    }
+    seg.list <- split(x = seg.cn[,
+        c("chromosome", "start.pos", "end.pos", "A", "B", "CNt")],
+        f = seg.cn$chromosome)
+
     seg.list <- seg.list[order(order(chr.order))]
     seg.max <- lapply(X = seg.list, FUN = function(x) x[nrow(x), "end.pos" ])
     seg.pos <- lapply(seg.list, "[", TRUE, c("start.pos", "end.pos"))
@@ -287,13 +282,14 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
     abs.list <- mapply(cbind, seg.list, seg.pos, SIMPLIFY = FALSE)
     abs.segments <- do.call(rbind, abs.list)
     if (info.type == "AB") {
-        abs.segments <- na.exclude(abs.segments)
+        na_As <- is.na(abs.segments$A)
+        max_A <- max(abs.segments$A, na.rm = TRUE)
+        abs.segments$A[na_As] <- abs.segments$CNt[na_As]
         plot(x = c(min(abs.segments$abs.start), max(abs.segments$abs.end)),
-            y = c(-0.1, (max(abs.segments$A) + 0.1)), type = "n",
+            y = c(-0.1, (max_A + 0.1)), type = "n",
             ylab = "Copy number", xlab = "Position (Mb)",
             xaxt = "n",  yaxt = "n", xaxs = "i", ...)
-        axis(labels = 0:max(abs.segments$A), at = 0:max(abs.segments$A),
-            side = 2, line = 0, las = 1)
+        axis(labels = 0:max_A, at = 0:max_A, side = 2, line = 0, las = 1)
         segments(x0 = abs.segments$abs.start, x1 = abs.segments$abs.end,
             y0 = (abs.segments$B - 0.1), y1 = (abs.segments$B - 0.1),
             col = "blue", lwd = 5, lend = 1)
@@ -301,13 +297,14 @@ genome.view <- function(seg.cn, info.type = "AB", ...) {
             y0 = (abs.segments$A + 0.1), y1 = (abs.segments$A + 0.1),
             col = "red", lwd = 5, lend = 1)
     } else {
-        abs.segments <- abs.segments[!is.na(abs.segments$CNt), ]
+        min_CNt <- min(abs.segments$CNt, na.rm = TRUE)
+        max_CNt <- max(abs.segments$CNt, na.rm = TRUE)
         plot(x = c(min(abs.segments$abs.start), max(abs.segments$abs.end)),
-            y = c(min(abs.segments$CNt), max(abs.segments$CNt)), type = "n",
+            y = c(min_CNt, max_CNt), type = "n",
             ylab = "Copy number", xlab = "Position (Mb)",
             xaxt = "n", yaxt = "n", xaxs = "i", ...)
-        axis(labels = min(abs.segments$CNt):max(abs.segments$CNt),
-            at = min(abs.segments$CNt):max(abs.segments$CNt),
+        axis(labels = min_CNt:max_CNt,
+            at = min_CNt:max_CNt,
             side = 2, line = 0, las = 1)
         segments(x0 = abs.segments$abs.start, x1 = abs.segments$abs.end,
             y0 = abs.segments$CNt, y1 = abs.segments$CNt, col = "red",
