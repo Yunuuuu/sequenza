@@ -99,7 +99,7 @@ find.breaks <- function(seqz.baf, gamma = 80, kmin = 10,
         allele.seg <- copynumber::pcf(data = logR.wins, verbose = verbose,
             gamma = gamma, kmin = kmin, ...)
     } else {
-      stop("Segmentation algorithms are only \'aspcf\' or \'pcf\'.")
+      stop("Segmentation algorithm must be either \'aspcf\' or \'pcf\'.")
     }
     if (length(grep("chr", seqz.baf$chromosome)) > 0) {
         allele.seg$chrom <- paste("chr", allele.seg$chrom, sep = "")

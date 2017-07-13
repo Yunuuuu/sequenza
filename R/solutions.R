@@ -7,15 +7,15 @@ get.ci <- function(cp.table, level = 0.95) {
         y = apply(cp.table$lpp, 1, max))
     values.y <- data.frame(x = apply(cp.table$lpp, 2, max),
     y = cp.table$cellularity)
-    up.x <- max(values.x$x[values.x$y >= LikThresh])
+    up.x  <- max(values.x$x[values.x$y >= LikThresh])
     low.x <- min(values.x$x[values.x$y >= LikThresh])
     max.x <- values.x$x[which.max(values.x$y)]
-    up.y <- max(values.y$y[values.y$x >= LikThresh])
+    up.y  <- max(values.y$y[values.y$x >= LikThresh])
     low.y <- min(values.y$y[values.y$x >= LikThresh])
     max.y <- values.y$y[which.max(values.y$x)]
-    results <- list()
     values.x$y <- values.x$y / sum(values.x$y)
     values.y$x <- values.y$x / sum(values.y$x)
+    results <- list()
     results$values.ploidy <- values.x
     results$confint.ploidy <- c(low.x, up.x)
     results$max.ploidy <- max.x

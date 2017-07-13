@@ -12,7 +12,7 @@ mut.fractions <- function(AB.tumor, Af, tumor.strand) {
         setNames(base.val, base.name)
     }
     base.freqs <- lapply(X = base.mut, FUN = frequencify)
-    fw.freqs   <- lapply(X = base.fw, FUN = frequencify)
+    fw.freqs   <- lapply(X = base.fw,  FUN = frequencify)
     n.base.mut <- do.call(c, lapply(X = base.mut, FUN = length))
     max.fq <- function (x) {
         freq.rel <- base.freqs[[x]] / F[x]
