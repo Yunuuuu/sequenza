@@ -11,20 +11,19 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
         gc.stats <- gc.sample.stats(file, gzip = gz, verbose = verbose,
             parallel = parallel)
     }
-    chr.vect <- as.character(gc.stats$file.metrics$chr)
-    if (normalization.method != "mean") {
-        gc.normal.vect  <- median_gc(gc.stats$normal)
-        gc.tumor.vect  <- median_gc(gc.stats$tumor)
-        avg_tum_depth <- weighted.median(x = gc.stats$tumor$depth,
-            w = colSums(gc.stats$tumor$n))
-        avg_nor_depth <- weighted.median(x = gc.stats$normal$depth,
-            w = colSums(gc.stats$normal$n))
-    } else {
-        gc.normal.vect  <- mean_gc(gc.stats$normal)
+    if (normalization.method == "mean") {
+        gc.normal.vect <- mean_gc(gc.stats$normal)
         gc.tumor.vect  <- mean_gc(gc.stats$tumor)
         avg_tum_depth <- weighted.mean(x = gc.stats$tumor$depth,
             w = colSums(gc.stats$tumor$n))
         avg_nor_depth <- weighted.mean(x = gc.stats$normal$depth,
+            w = colSums(gc.stats$normal$n))
+    } else {
+        gc.normal.vect <- median_gc(gc.stats$normal)
+        gc.tumor.vect  <- median_gc(gc.stats$tumor)
+        avg_tum_depth <- weighted.median(x = gc.stats$tumor$depth,
+            w = colSums(gc.stats$tumor$n))
+        avg_nor_depth <- weighted.median(x = gc.stats$normal$depth,
             w = colSums(gc.stats$normal$n))
     }
     windows.baf   <- list()
@@ -40,6 +39,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     if (is.null(dim(breaks))) {
         breaks <- NULL
     }
+    chr.vect <- as.character(gc.stats$file.metrics$chr)
     if (is.null(chromosome.list)) {
         chromosome.list <- chr.vect
     } else {
@@ -49,7 +49,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
         if (verbose){
             message("Processing ", chr, ": ", appendLF = FALSE)
         }
-        tbi <- file.exists(paste(file, "tbi", sep = "."))
+        tbi <- file.exists(paste0(file, ".tbi"))
         if (tbi) {
             seqz.data   <- read.seqz(file, gzip = gz, chr_name = chr)
         } else {
@@ -182,15 +182,15 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
 
     gc_norm <- unfold_gc(do.call(rbind, norm.gc.list), stats = FALSE)
 
-    if (normalization.method != "mean") {
-        avg_tum_ndepth <- weighted.median(x = gc_norm$tumor$depth,
-            w = colSums(gc_norm$tumor$n))
-        avg_nor_ndepth <- weighted.median(x = gc_norm$normal$depth,
-            w = colSums(gc_norm$normal$n))
-    } else {
+    if (normalization.method == "mean") {
         avg_tum_ndepth <- weighted.mean(x = gc_norm$tumor$depth,
             w = colSums(gc_norm$tumor$n))
         avg_nor_ndepth <- weighted.mean(x = gc_norm$normal$depth,
+            w = colSums(gc_norm$normal$n))
+    } else {
+        avg_tum_ndepth <- weighted.median(x = gc_norm$tumor$depth,
+            w = colSums(gc_norm$tumor$n))
+        avg_nor_ndepth <- weighted.median(x = gc_norm$normal$depth,
             w = colSums(gc_norm$normal$n))
     }
     if (ignore.normal) {
