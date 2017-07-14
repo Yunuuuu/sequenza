@@ -61,7 +61,7 @@
     # read all the chromosomes:
     seqz.data <- read.seqz(data.file)
     # Gather genome wide GC-stats from raw file:
-    gc.stats <- gc.sample.stats(data.file, gzip = TRUE)
+    gc.stats <- gc.sample.stats(data.file)
     gc.normal.vect <- mean_gc(gc.stats$normal)
     gc.tumor.vect <- mean_gc(gc.stats$tumor)
     # Read only one chromosome:

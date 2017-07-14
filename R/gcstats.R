@@ -1,10 +1,8 @@
 gc.sample.stats <- function(file, col_types = "c--dd----d----",
-    gzip, buffer = 33554432, parallel = 2L, verbose = TRUE) {
-    if (gzip == TRUE) {
-        con <- gzfile(file, "rb")
-    } else {
-        con <- file(file, "rb")
-    }
+    buffer = 33554432, parallel = 2L, verbose = TRUE) {
+
+    con <- gzfile(file, "rb")
+
     suppressWarnings(skip_line <- readLines(con, n = 1))
     remove(skip_line)
     parse_chunck <- function(x, col_types) {

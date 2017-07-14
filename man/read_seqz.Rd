@@ -8,8 +8,8 @@
 }
 
 \usage{
-    read.seqz(file, n_lines = NULL, gzip = TRUE, col_types = "ciciidddcddccc",
-        chr_name = NULL, buffer = 33554432, parallel = 2L,
+    read.seqz(file, n_lines = NULL, col_types = "ciciidddcddccc", chr_name = NULL,
+        buffer = 33554432, parallel = 2L,
         col_names = c("chromosome", "position", "base.ref", "depth.normal",
             "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal",
             "GC.percent", "good.reads", "AB.normal", "AB.tumor",
@@ -18,8 +18,6 @@
 
 \arguments{
     \item{file}{file name}
-    \item{gzip}{a logical inidicating if the input file is a gzipped
-        file (default), or is a plain text file.}
     \item{col_types}{a string describing the classes of each columns of the
         input file (see \code{\link{read_tsv}}). The default value corresponds
         to the columns of a seqz file.}

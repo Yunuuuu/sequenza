@@ -1,6 +1,5 @@
-read.seqz <- function(file, n_lines = NULL, gzip = TRUE,
-    col_types = "ciciidddcddccc", chr_name = NULL,
-    buffer = 33554432, parallel = 2L,
+read.seqz <- function(file, n_lines = NULL, col_types = "ciciidddcddccc",
+    chr_name = NULL, buffer = 33554432, parallel = 1,
     col_names = c("chromosome", "position", "base.ref", "depth.normal",
                   "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal",
                   "GC.percent", "good.reads", "AB.normal", "AB.tumor",
@@ -22,8 +21,7 @@ read.seqz <- function(file, n_lines = NULL, gzip = TRUE,
                 col_names, col_types)
         } else {
             read.seqz.chr(file, chr_name = chr_name, col_types = col_types,
-                col_names = col_names, gzip = gzip,
-                buffer = buffer, parallel = parallel)
+                col_names = col_names, buffer = buffer, parallel = parallel)
         }
     } else {
         read_tsv(file = file, col_types = col_types, skip = skip,
@@ -31,13 +29,9 @@ read.seqz <- function(file, n_lines = NULL, gzip = TRUE,
     }
 }
 
-read.seqz.chr <- function(file, chr_name, col_names, col_types,
-    gzip, buffer, parallel) {
-    if (gzip == TRUE) {
-        con <- gzfile(file, "rb")
-    } else {
-        con <- file(file, "rb")
-    }
+read.seqz.chr <- function(file, chr_name, col_names,
+    col_types, buffer, parallel) {
+    con <- gzfile(file, "rb")
     suppressWarnings(skip_line <- readLines(con, n = 1))
     remove(skip_line)
     parse_chunck <- function(x, chr_name, col_names, col_types) {

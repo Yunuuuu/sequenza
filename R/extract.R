@@ -1,4 +1,4 @@
-sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
+sequenza.extract <- function(file, window = 1e6, overlap = 1,
     gamma = 80, kmin = 10, gamma.pcf = 140, kmin.pcf = 40,
     mufreq.treshold = 0.10, min.reads = 40, min.reads.normal = 10,
     min.reads.baf = 1, max.mut.types = 1, min.type.freq = 0.9,
@@ -8,7 +8,7 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
     ignore.normal = FALSE, parallel = 2L, gc.stats = NULL){
 
     if (is.null(gc.stats)) {
-        gc.stats <- gc.sample.stats(file, gzip = gz, verbose = verbose,
+        gc.stats <- gc.sample.stats(file, verbose = verbose,
             parallel = parallel)
     }
     chr.vect <- as.character(gc.stats$file.metrics$chr)
@@ -51,11 +51,11 @@ sequenza.extract <- function(file, gz = TRUE, window = 1e6, overlap = 1,
         }
         tbi <- file.exists(paste(file, "tbi", sep = "."))
         if (tbi) {
-            seqz.data   <- read.seqz(file, gzip = gz, chr_name = chr)
+            seqz.data   <- read.seqz(file, chr_name = chr)
         } else {
             file.lines <- gc.stats$file.metrics[which(chr.vect == chr), ]
-            seqz.data   <- read.seqz(file, gzip = gz,
-                n_lines = c(file.lines$start, file.lines$end))
+            seqz.data   <- read.seqz(file, n_lines = c(file.lines$start,
+                file.lines$end))
         }
 
         norm_tumor_depth <- seqz.data$depth.tumor /
