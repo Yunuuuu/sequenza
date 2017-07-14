@@ -435,8 +435,8 @@ baf.model.view <- function(cellularity, ploidy, segs,
     suppressWarnings(colorgram(x, y, z, key = NA, nz = 1000,
         xlab = "B allele frequency", ylab = "Depth ratio",
         main = paste("cellularity:", cellularity, "ploidy:", ploidy,
-        "sd.BAF:", round(s.b,2), sep = " "),
-        map = makecmap(z, breaks = unique(quantile(z, seq(.25, 1, 0.0001))),
+        "sd.BAF:", round(s.b, 2), sep = " "),
+        map = makecmap(z, breaks = unique(quantile(z, seq(0.25, 1, 0.0001))),
             right = TRUE, n = 1000, colFn = rev.heat), outlier = "white",
         las = 1, xlim = c(0, 0.5)))
     axis(side = 4, at = mpts$depth.ratio, labels = mpts$CNt, las = 1)
