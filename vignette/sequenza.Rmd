@@ -1,11 +1,14 @@
 ---
 output:
-  pdf_document: default
-  html_document: default
+  html_document:
+    highlight: pygments
+  pdf_document:
+    latex_engine: xelatex
 ---
-\VignetteEngine{knitr::knitr}
-\VignetteIndexEntry{Sequenza user guide}
-
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Sequenza user guide}
+-->
 
 # Abstract
 
@@ -69,23 +72,27 @@ manual pages.
 
 The *sequenza-utils* command provides various tools, here we highlight only the
 basic usage:
+
  - Process a FASTA file to produce a GC [Wiggle](https://genome.ucsc.edu/goldenpath/help/wiggle.html)
  track file.
- ```bash
- sequenza−utils gc_wiggle −w 50 --fasta hg19.fa \
-     -o hg19.gc50Base.wig.gz
- ```
- - Process BAM and Wiggle files to produce a *seqz* file
- ```bash
- sequenza−utils bam2seqz -n normal.bam -t tumor.bam --fasta hg19.fa \
-     -gc hg19.gc50Base.wig.gz -o out.seqz.gz
- ```
- - Post-process by binning the original *seqz* file
- ```bash
- sequenza−utils seqz_binning --seqz out.seqz.gz -w 50 \
-     -o out small.seqz.gz
- ```
+ 
+```bash
+sequenza−utils gc_wiggle −w 50 --fasta hg19.fa -o hg19.gc50Base.wig.gz
+```
 
+ - Process BAM and Wiggle files to produce a *seqz* file
+ 
+```bash
+sequenza−utils bam2seqz -n normal.bam -t tumor.bam --fasta hg19.fa \
+    -gc hg19.gc50Base.wig.gz -o out.seqz.gz
+```
+
+ - Post-process by binning the original *seqz* file
+ 
+```bash
+sequenza−utils seqz_binning --seqz out.seqz.gz -w 50 -o out small.seqz.gz
+```
+ 
 ### Sequenza analysis
 
 ```{r load}
@@ -117,7 +124,7 @@ test <- sequenza.extract(data.file, verbose = FALSE)
  - sequenza.fit: run grid-search approach to estimate cellularity and ploidy
 ```{r fit, eval=FALSE}
 CP <- sequenza.fit(test)
-``` 
+```
 
  - sequenza.results: write files and plot using suggested or selected solution
 ```{r results}
@@ -161,7 +168,7 @@ cp.plot.contours(CP, add = TRUE,
 
 chromosome view...
 ```{r c_view, echo=TRUE, fig.height=6, fig.width=8, fig.align='center'}
-chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]], 
+chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]],
                 ratio.windows = test$ratio[[1]],  min.N.ratio = 1,
                 segments = seg.tab[seg.tab$chromosome == test$chromosomes[1],],
                 main = test$chromosomes[1],
