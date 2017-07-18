@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 \VignetteEngine{knitr::knitr}
 \VignetteIndexEntry{Sequenza user guide}
 
@@ -10,12 +15,22 @@ tumor. However, analysis of this data can be impeded by tumor cellularity and
 heterogeneity and by unwieldy data. Here we describe *Sequenza*, an R package
 that enables the efficient estimation of tumor cellularity and ploidy, and
 generation of copy number, loss-of-heterozygosity, and mutation frequency
-profiles. 
+profiles.
 
 This document details a typical analysis of matched tumor-normal exome sequence
 data using *sequenza*.
 
-## Installation
+## Getting started
+
+### Minimum requirements
+ - Software: R, Python, SAMtools, tabix
+ - Operating system: Linux, OS X, Windows
+ - Memory: Minimum 4 GB of RAM. Recommended >8 GB.
+ - Disk space: 1.5 GB for sample
+ - R version: 3.0.0
+ - Python version: 2.7 (or Pypy 2.*)
+
+### Installation
 
 The R package can be installed by:
 
@@ -24,45 +39,116 @@ setRepositories(graphics = FALSE, ind = 1:6)
 install.packages("sequenza")
 ```
 
-To install the python companion package *sequenza-utils* to preprocess BAMM
-file refers to the [project page](http://somehthing)
+To install the python companion package *sequenza-utils* to preprocess BAM
+files refers to the [*sequenza-utils*](https://pypi.org/project/sequenza-utils)
+project page, or simply use the python package manager from the command prompt:
 
+```bash
+pip install sequenza-utils
+```
 
 ## Running sequenza
 
-Load the package
-```r
-library(sequenza)
-```
-```{r echo=FALSE, message=FALSE}
-library(sequenza)
-data(CP.example)
-CP <- CP.example
-```
-In the package is provided a preprocessed test *seqz* file
+### Input files
 
-```{r}
+In order to obtain precise mutational and aberration patterns in a tumor sample,
+Sequenza requires a matched normal sample from the same patient. Typically, the
+following files are needed to get started with Sequenza.
+
+ - A BAM file (or a derived pileup file) from the tumor specimen.
+ - A BAM file (or a derived pileup file) from the normal specimen.
+ - A FASTA reference genomic sequence file
+
+
+The normal and tumor BAM files are processed to generate a *seqz* file, which
+is the required input for the analysis.
+It is possible to generate a *seqz* starting from other processed data, such as
+pileup, or the results from other analysis, all the available option are
+described in the [*sequenza-utils*](http://sequenza-utils.readthedocs.io/)
+manual pages.
+
+The *sequenza-utils* command provides various tools, here we highlight only the
+basic usage:
+ - Process a FASTA file to produce a GC [Wiggle](https://genome.ucsc.edu/goldenpath/help/wiggle.html)
+ track file.
+ ```bash
+ sequenza−utils gc_wiggle −w 50 --fasta hg19.fa \
+     -o hg19.gc50Base.wig.gz
+ ```
+ - Process BAM and Wiggle files to produce a *seqz* file
+ ```bash
+ sequenza−utils bam2seqz -n normal.bam -t tumor.bam --fasta hg19.fa \
+     -gc hg19.gc50Base.wig.gz -o out.seqz.gz
+ ```
+ - Post-process by binning the original *seqz* file
+ ```bash
+ sequenza−utils seqz_binning --seqz out.seqz.gz -w 50 \
+     -o out small.seqz.gz
+ ```
+
+### Sequenza analysis
+
+```{r load}
+library(sequenza)
+```
+
+In the package is provided a small *seqz* file
+
+```{r data}
 data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 data.file
 ```
 
-The main interface consists in 3 functions:
-  * sequenza.exctract: process seqz data, normalization and segmentation
-  * sequenza.fit: run grid-search approach to estimate cellularity and ploidy
-  * sequenza.results: write files and plot using suggested or selected solution
+```{r cp_data, echo=FALSE, message=FALSE}
+library(sequenza)
+data(CP.example)
+CP <- CP.example
+```
 
-```r
-test <- sequenza.extract(data.file)
-CP <- sequenza.extract(test)
+
+
+The main interface consists in 3 functions:
+
+ - sequenza.extract: process seqz data, normalization and segmentation
+```{r extract, message=TRUE}
+test <- sequenza.extract(data.file, verbose = FALSE)
+```
+
+ - sequenza.fit: run grid-search approach to estimate cellularity and ploidy
+```{r fit, eval=FALSE}
+CP <- sequenza.fit(test)
+``` 
+
+ - sequenza.results: write files and plot using suggested or selected solution
+```{r results}
 sequenza.results(sequenza.extract = test,
-    cp.table = CP.example, sample.id = "Test",
+    cp.table = CP, sample.id = "Test",
     out.dir="TEST")
-    
 ```
 
 ## Plots and Results
 
-Some explanation of the results follows here
+describe files in results folder...
+
+```{r res_dir}
+dir("TEST", pattern = "Test")
+
+```
+
+```{r read_segs, echo=FALSE}
+seg.tab <- read.table("TEST/Test_segments.txt",
+                      header = TRUE, sep ="\t")
+
+```
+maybe show some content...
+```{r head_segs, echo=FALSE}
+head(seg.tab)
+
+```
+or plot...
+```{r g_view, echo=FALSE, fig.height=5, fig.width=10, fig.align='center'}
+sequenza:::genome.view(seg.tab)
+```
 
 
 CP plot
@@ -74,4 +160,11 @@ cp.plot.contours(CP, add = TRUE,
 ```
 
 chromosome view...
-describe files in results folder
+```{r c_view, echo=TRUE, fig.height=6, fig.width=8, fig.align='center'}
+chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]], 
+                ratio.windows = test$ratio[[1]],  min.N.ratio = 1,
+                segments = seg.tab[seg.tab$chromosome == test$chromosomes[1],],
+                main = test$chromosomes[1],
+                cellularity = 0.89, ploidy = 1.9,
+                avg.depth.ratio = 1)
+```
