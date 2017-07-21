@@ -100,11 +100,11 @@
     ## Fast access to chromosome X using the file metrics
     gc.stats <- gc.sample.stats(data_file)
     chrX <- gc.stats$file.metrics[gc.stats$file.metrics$chr == "X", ]
-    seqz.data <- read.seqz(data_file, n.lines = c(chrX$start, chrX$end))
+    seqz.data <- read.seqz(data_file, n_lines = c(chrX$start, chrX$end))
 
     ## Compare the running time of the two different methods.
-    system.time(seqz.data <- read.seqz(data_file, n.lines = c(chrX$start, chrX$end)))
-    system.time(seqz.data <- read.seqz(data.file, chr.name = "X"))
+    system.time(seqz.data <- read.seqz(data_file, n_lines = c(chrX$start, chrX$end)))
+    system.time(seqz.data <- read.seqz(data_file, chr_name = "X"))
 
    }
 }
