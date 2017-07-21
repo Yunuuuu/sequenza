@@ -15,6 +15,7 @@ read.seqz <- function(file, n_lines = NULL, col_types = "ciciidddcddccc",
         n_max <- n_lines[2] - skip + 1
     }
     if (!is.null(chr_name)) {
+        chr_name <- as.character(chr_name)
         tbi <- file.exists(paste(file, "tbi", sep = "."))
         if (tbi) {
             read.seqz.tbi(file, split_chr_coord(chr_name),
