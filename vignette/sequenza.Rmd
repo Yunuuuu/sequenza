@@ -31,7 +31,7 @@ data using *sequenza*.
  - Memory: Minimum 4 GB of RAM. Recommended >8 GB.
  - Disk space: 1.5 GB for sample
  - R version: 3.0.0
- - Python version: 2.7 (or Pypy 2.*)
+ - Python version: 2.7 (or PyPy 2.*)
 
 ### Installation
 
@@ -42,8 +42,8 @@ setRepositories(graphics = FALSE, ind = 1:6)
 install.packages("sequenza")
 ```
 
-To install the python companion package *sequenza-utils* to preprocess BAM
-files refers to the [*sequenza-utils*](https://pypi.org/project/sequenza-utils)
+To install the Python companion package *sequenza-utils* to preprocess BAM
+files, refer to the [*sequenza-utils*](https://pypi.org/project/sequenza-utils)
 project page, or simply use the python package manager from the command prompt:
 
 ```bash
@@ -52,48 +52,48 @@ pip install sequenza-utils
 
 ## Running sequenza
 
-### Input files
+### Preprocessing of input files
 
 In order to obtain precise mutational and aberration patterns in a tumor sample,
 Sequenza requires a matched normal sample from the same patient. Typically, the
-following files are needed to get started with Sequenza.
+following files are needed to get started with Sequenza:
 
  - A BAM file (or a derived pileup file) from the tumor specimen.
  - A BAM file (or a derived pileup file) from the normal specimen.
  - A FASTA reference genomic sequence file
 
 
-The normal and tumor BAM files are processed to generate a *seqz* file, which
+The normal and tumor BAM files are processed together to generate a *seqz* file, which
 is the required input for the analysis.
 It is possible to generate a *seqz* starting from other processed data, such as
-pileup, or the results from other analysis, all the available option are
+pileup, or from the results from other analyses. The available options are
 described in the [*sequenza-utils*](http://sequenza-utils.readthedocs.io/)
 manual pages.
 
-The *sequenza-utils* command provides various tools, here we highlight only the
+The *sequenza-utils* command provides various tools; here we highlight only the
 basic usage:
 
  - Process a FASTA file to produce a GC [Wiggle](https://genome.ucsc.edu/goldenpath/help/wiggle.html)
- track file.
+ track file:
  
 ```bash
 sequenza−utils gc_wiggle −w 50 --fasta hg19.fa -o hg19.gc50Base.wig.gz
 ```
 
- - Process BAM and Wiggle files to produce a *seqz* file
+ - Process BAM and Wiggle files to produce a *seqz* file:
  
 ```bash
 sequenza−utils bam2seqz -n normal.bam -t tumor.bam --fasta hg19.fa \
     -gc hg19.gc50Base.wig.gz -o out.seqz.gz
 ```
 
- - Post-process by binning the original *seqz* file
+ - Post-process by binning the original *seqz* file:
  
 ```bash
 sequenza−utils seqz_binning --seqz out.seqz.gz -w 50 -o out small.seqz.gz
 ```
  
-### Sequenza analysis
+### Sequenza analysis (in R)
 
 ```{r load}
 library(sequenza)
@@ -114,7 +114,7 @@ CP <- CP.example
 
 
 
-The main interface consists in 3 functions:
+The main interface consists of 3 functions:
 
  - sequenza.extract: process seqz data, normalization and segmentation
 ```{r extract, message=TRUE}
@@ -126,7 +126,7 @@ test <- sequenza.extract(data.file, verbose = FALSE)
 CP <- sequenza.fit(test)
 ```
 
- - sequenza.results: write files and plot using suggested or selected solution
+ - sequenza.results: write files and plots using suggested or selected solution
 ```{r results}
 sequenza.results(sequenza.extract = test,
     cp.table = CP, sample.id = "Test",
