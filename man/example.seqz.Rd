@@ -25,17 +25,17 @@
         [,5] \tab depth.tumor   \tab Read depth in the tumor sample\cr
         [,6] \tab depth.ratio   \tab Ratio of \code{depth.tumor} and \code{depth.normal}\cr
         [,7] \tab Af            \tab A-allele frequency in the tumor sample\cr
-        [,8] \tab Bf            \tab B-allele frequency in the tumor sample, 
+        [,8] \tab Bf            \tab B-allele frequency in the tumor sample,
                                      in heterozygous positions only\cr
-        [,9] \tab zygosity.normal\tab Zygosity of the normal sample: 
+        [,9] \tab zygosity.normal\tab Zygosity of the normal sample:
                                      "hom" for homozygous or "het" for heterozygous\cr
         [,10] \tab GC.percent   \tab \% GC content\cr
-        [,11] \tab good.reads   \tab Number of reads from the tumor sample 
+        [,11] \tab good.reads   \tab Number of reads from the tumor sample
                                      which pass the quality threshold \cr
-        [,12] \tab AB.normal    \tab Base(s) found in the normal sample, 
+        [,12] \tab AB.normal    \tab Base(s) found in the normal sample,
                                      sorted by allele frequency if more than one\cr
-        [,13] \tab AB.tumor     \tab Base(s) found in the tumor sample \emph{but not} in 
-                                     the normal specimen, with their observed 
+        [,13] \tab AB.tumor     \tab Base(s) found in the tumor sample \emph{but not} in
+                                     the normal specimen, with their observed
                                      frequencies, separated by colons \cr
         [,14] \tab tumor.strand \tab Identical to \code{AB.tumor} but indicating, for
                                      each variant base, the fraction of reads
@@ -44,7 +44,7 @@
 }
 
 \source{
-This is derived from a TCGA specimen, but has been scrambled to anonymize the source. 
+This is derived from a TCGA specimen, but has been scrambled to anonymize the source.
 The reference genome is hg19.  The GC content was calculated in 50-base windows.
 }
 
