@@ -139,6 +139,9 @@ sequenza.extract <- function(file, window = 1e6, overlap = 1,
                     method = breaks.method)
             }
         }
+        if (class(breaks_chr) == "try-error") {
+           breaks_chr <- NULL
+        }
         if (is.null(breaks_chr) || nrow(breaks_chr) == 0 ||
             length(breaks_chr) == 0) {
             breaks_chr <- data.frame(chrom = chr,
