@@ -32,7 +32,8 @@ mutation.table <- function(seqz.tab, mufreq.treshold = 0.15,
     min.reads = 40, min.reads.normal = 10, max.mut.types = 3,
     min.type.freq = 0.9, min.fw.freq = 0, segments = NULL) {
     chroms <- unique(seqz.tab$chromosome)
-    hom.filt <- seqz.tab$zygosity.normal == "hom"
+    hom.filt <- seqz.tab$zygosity.normal == "hom" &
+       seqz.tab$AB.tumor != "."
     seqz.tab <- seqz.tab[hom.filt, ]
     reads.filt <- seqz.tab$good.reads >= min.reads &
         seqz.tab$depth.normal >= min.reads.normal
