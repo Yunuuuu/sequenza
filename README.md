@@ -1,7 +1,4 @@
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Sequenza user guide}
--->
+
 
 Sequenza: Copy Number Estimation from Tumor Genome Sequencing Data
 ==================================================================
@@ -178,15 +175,15 @@ The columns represents:
 
 #### Allele-specific copy number
 
-<img src="sequenza_files/figure-markdown_github/g_view-1.png" style="display: block; margin: auto;" />
+![picture](sequenza_files/figure-markdown_github/g_view-1.png)
 
 #### Total copy number
 
-<img src="sequenza_files/figure-markdown_github/g_view_tot-1.png" style="display: block; margin: auto;" />
+![picture](sequenza_files/figure-markdown_github/g_view_tot-1.png)
 
 #### Raw profile
 
-<img src="sequenza_files/figure-markdown_github/g_view_raw-1.png" style="display: block; margin: auto;" />
+![picture](sequenza_files/figure-markdown_github/g_view_raw-1.png)
 
 ### Grid search maximum likelihood
 
@@ -197,7 +194,7 @@ cp.plot.contours(CP, add = TRUE,
    col = c("lightsalmon", "red"), pch = 20)
 ```
 
-<img src="sequenza_files/figure-markdown_github/CPplot-1.png" style="display: block; margin: auto;" />
+![picture](sequenza_files/figure-markdown_github/CPplot-1.png)
 
 ### Chromosome view
 
@@ -212,4 +209,4 @@ chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]],
                 avg.depth.ratio = 1)
 ```
 
-<img src="sequenza_files/figure-markdown_github/c_view-1.png" style="display: block; margin: auto;" />
+![picture](sequenza_files/figure-markdown_github/c_view-1.png)
