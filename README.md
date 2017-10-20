@@ -2,6 +2,7 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Sequenza user guide}
 -->
+
 Sequenza: Copy Number Estimation from Tumor Genome Sequencing Data
 ==================================================================
 
