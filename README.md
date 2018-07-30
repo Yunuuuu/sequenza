@@ -26,7 +26,7 @@ Getting started
 
 -   Software: R, Python, SAMtools, tabix
 -   Operating system: Linux, OS X, Windows
--   Memory: Minimum 4 GB of RAM. Recommended &gt;8 GB.
+-   Memory: Minimum 4 GB of RAM. Recommended >8 GB.
 -   Disk space: 1.5 GB for sample (depending on sequencing depth)
 -   R version: 3.2.0
 -   Python version: 2.7, 3.4, 3.5, 3.6 (or PyPy)

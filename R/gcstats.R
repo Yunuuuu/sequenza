@@ -19,7 +19,7 @@ gc.sample.stats <- function(file, col_types = "c--dd----d----",
         list(unique = u_chr, lines = n_chr, gc_nor = gc1, gc_tum = gc2)
     }
     if (verbose){
-        message("Collecting GC inforomation ", appendLF = FALSE)
+        message("Collecting GC information ", appendLF = FALSE)
     }
     res <- chunk.apply(input = con, FUN = parse_chunck, col_types = col_types,
         CH.MAX.SIZE = buffer, parallel = parallel)
