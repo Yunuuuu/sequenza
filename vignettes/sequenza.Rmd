@@ -6,6 +6,10 @@ output:
     highlight: pygments
   pdf_document:
     latex_engine: xelatex
+vignette: >
+  %\VignetteIndexEntry{Sequenza user guide}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8} 
 ---
 <!--
 %\VignetteEngine{knitr::knitr}
