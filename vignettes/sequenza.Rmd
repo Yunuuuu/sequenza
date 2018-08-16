@@ -1,34 +1,32 @@
 ---
+title: "Sequenza User Guide"
+date: "`r Sys.Date()`"
+author: "[Francesco Favero](mailto:francesco.favero@bric.ku.dk)"
 output:
-  md_document:
-    variant: markdown_github
-  html_document:
-    highlight: pygments
-  pdf_document:
-    latex_engine: xelatex
+  rmdformats::readthedown:
+    self_contained: true
 vignette: >
-  %\VignetteIndexEntry{Sequenza user guide}
-  %\VignetteEngine{knitr::knitr}
-  %\VignetteEncoding{UTF-8} 
+  %\VignetteIndexEntry{Sequenza User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Sequenza user guide}
--->
 
-# Sequenza: Copy Number Estimation from Tumor Genome Sequencing Data
+# About
+
+> Sequenza: Copy Number Estimation from Tumor Genome Sequencing Data
+
+
+![](https://bytebucket.org/sequenza_tools/icons/raw/324bd43ac4d10546b64b04c38d8c513e8420346d/svg/sequenza_tools/sequenzaalpha_150.svg)
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/sequenza)](https://cran.r-project.org/package=sequenza)
 [![CRAN_Downloads_Badge](http://cranlogs.r-pkg.org/badges/sequenza)](https://cran.r-project.org/package=sequenza)
 [![CRAN_licence](https://img.shields.io/cran/l/sequenza.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
 
-![](https://bytebucket.org/sequenza_tools/icons/raw/324bd43ac4d10546b64b04c38d8c513e8420346d/svg/sequenza_tools/sequenzaalpha_150.svg)
 
-## About
 
 Sequenza is a tool to analyze genomic sequencing data from paired normal-tumor samples, including cellularity and ploidy estimation; mutation and copy number (allele-specific and total copy number) detection, quantification and visualization.
 
-## Introduction
+# Introduction
 
 Deep sequence of tumor DNA along with corresponding normal DNA can provide a
 valuable perspective on the mutations and aberrations that characterize the
@@ -41,9 +39,9 @@ profiles.
 This document details a typical analysis of matched tumor-normal exome sequence
 data using *sequenza*.
 
-## Getting started
+# Getting started
 
-### Minimum requirements
+## Minimum requirements
  - Software: R, Python, SAMtools, tabix
  - Operating system: Linux, OS X, Windows
  - Memory: Minimum 4 GB of RAM. Recommended >8 GB.
@@ -51,7 +49,7 @@ data using *sequenza*.
  - R version: 3.2.0
  - Python version: 2.7, 3.4, 3.5, 3.6 (or PyPy)
 
-### Installation
+## Installation
 
 The R package can be installed by:
 
@@ -68,9 +66,9 @@ project page, or simply use the python package manager from the command prompt:
 pip install sequenza-utils
 ```
 
-## Running sequenza
+# Running sequenza
 
-### Preprocessing of input files
+## Preprocessing of input files
 
 In order to obtain precise mutational and aberration patterns in a tumor sample,
 Sequenza requires a matched normal sample from the same patient. Typically, the
@@ -111,7 +109,7 @@ sequenza−utils bam2seqz -n normal.bam -t tumor.bam --fasta hg19.fa \
 sequenza−utils seqz_binning --seqz out.seqz.gz -w 50 -o out small.seqz.gz
 ```
  
-### Sequenza analysis (in R)
+## Sequenza analysis (in R)
 
 ```{r load}
 library(sequenza)
@@ -121,7 +119,6 @@ In the package is provided a small *seqz* file
 
 ```{r data}
 data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
-data.file
 ```
 
 ```{r cp_data, echo=FALSE, message=FALSE}
@@ -135,7 +132,7 @@ CP <- CP.example
 The main interface consists of 3 functions:
 
  - sequenza.extract: process seqz data, normalization and segmentation
-```{r extract, message=TRUE}
+```{r extract, message=FALSE, warning=FALSE, results="hide"}
 test <- sequenza.extract(data.file, verbose = FALSE)
 ```
 
@@ -151,13 +148,13 @@ sequenza.results(sequenza.extract = test,
     out.dir="TEST")
 ```
 
-## Plots and Results
+# Plots and Results
 
 The function _sequenza.results_ outputs various files in the specified path.
 The result files are either output in pdf of in plain text file, and comprise quality control assessments (eg evaluate GC-correction), visualization of the
 data and results files, such as segmentation and mutation lists
 
-### Result files
+## Result files
 
 Each generated file is briefly explained in the following table
 
@@ -207,7 +204,7 @@ is.num <- sapply(seg.tab, is.numeric)
 seg.tab[is.num] <- lapply(seg.tab[is.num], round, 3)
 ```
 
-### Segments results
+## Segments results
 
 One of the most useful output of the anaylsis is the segmentation file. Few
 lines of the test sample are listed in the table below:
@@ -234,21 +231,21 @@ The columns represents:
   12. **B**: Estimated number of B-alleles (minor allele)
   13. **LPP**: Log-posterior probability of the segment
 
-### Gene wide overview
+## Gene wide overview
 
-#### Allele-specific copy number
+### Allele-specific copy number
 
 ```{r g_view, echo=FALSE, fig.height=5, fig.width=10, fig.align='center'}
 sequenza:::genome.view(seg.tab)
 ```
 
-#### Total copy number
+### Total copy number
 
 ```{r g_view_tot, echo=FALSE, fig.height=5, fig.width=10, fig.align='center'}
 sequenza:::genome.view(seg.tab, info.type = "CNt")
 ```
 
-#### Raw profile
+### Raw profile
 
 ```{r g_view_raw, echo=FALSE, fig.height=5, fig.width=10, fig.align='center'}
 sequenza:::plotRawGenome(test, cellularity = alt_res$cellularity[1],
@@ -256,7 +253,7 @@ sequenza:::plotRawGenome(test, cellularity = alt_res$cellularity[1],
 ```
 
 
-### Grid search maximum likelihood
+## Grid search maximum likelihood
 
 
 ```{r CPplot, echo=TRUE, fig.height=5, fig.width=5, fig.align='center'}
@@ -266,7 +263,7 @@ cp.plot.contours(CP, add = TRUE,
    col = c("lightsalmon", "red"), pch = 20)
 ```
 
-### Chromosome view
+## Chromosome view
 
 Maybe one of the most useful visualization is the _chromosome view_.
 This visualization ease the ispection of the segmentation results, compared to
