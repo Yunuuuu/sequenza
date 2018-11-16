@@ -16,7 +16,7 @@ vignette: >
 > Sequenza: Copy Number Estimation from Tumor Genome Sequencing Data
 
 
-![](https://bytebucket.org/sequenza_tools/icons/raw/324bd43ac4d10546b64b04c38d8c513e8420346d/svg/sequenza_tools/sequenzaalpha_150.svg)
+![](https://bytebucket.org/sequenzatools/icons/raw/324bd43ac4d10546b64b04c38d8c513e8420346d/svg/sequenza_tools/sequenzaalpha_150.svg)
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/sequenza)](https://cran.r-project.org/package=sequenza)
 [![CRAN_Downloads_Badge](http://cranlogs.r-pkg.org/badges/sequenza)](https://cran.r-project.org/package=sequenza)
