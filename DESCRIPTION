@@ -5,10 +5,23 @@ Description: Tools to analyze genomic sequencing data from
  and copy number (allele-specific and total copy number) detection, quantification
  and visualization.
 Version: 2.2.0.9000
-Date: 2017-05-29
-Author: Francesco Favero, Andrea M. Marquard, Tejal Joshi, Aron C. Eklund
-Maintainer: Francesco Favero <favero@cbs.dtu.dk>
-Depends: R (>= 3.0.0)
+Date: 2018-11-27
+Authors@R: c(
+   person("Francesco", "Favero",
+          email = "favero.francesco@gmail.com",
+          role = c("aut", "cre"),
+          comment = c(ORCID = "0000-0003-3684-2659")),
+   person("Andrea", "Marquard", middles = "Marion",
+          role = c("rev"),
+          comment = c(ORCID = "0000-0003-2928-6017")),
+   person("Tejal", "Joshi",
+          role = c("rev"),
+          comment = c(ORCID = "0000-0002-0939-2982")),
+   person("Aron", "Eklund", middle = "Charles",
+          role = c("aut", "ths"),
+          comment = c(ORCID = "0000-0003-0861-1001"))
+  )
+Depends: R (>= 3.2.0)
 Imports: pbapply, squash, iotools, readr, seqminer, copynumber
 Suggests: testthat, knitr, rmarkdown, rmdformats
 License: GPL-3
