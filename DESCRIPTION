@@ -7,17 +7,17 @@ Description: Tools to analyze genomic sequencing data from
 Version: 2.2.0.9000
 Date: 2018-11-27
 Authors@R: c(
-   person("Francesco", "Favero",
+   person(given = "Francesco", family = "Favero",
           email = "favero.francesco@gmail.com",
           role = c("aut", "cre"),
           comment = c(ORCID = "0000-0003-3684-2659")),
-   person("Andrea", "Marquard", middles = "Marion",
+   person(given = "Andrea", family = "Marquard", middle = "Marion",
           role = c("rev"),
           comment = c(ORCID = "0000-0003-2928-6017")),
-   person("Tejal", "Joshi",
+   person(given = "Tejal", family = "Joshi",
           role = c("rev"),
           comment = c(ORCID = "0000-0002-0939-2982")),
-   person("Aron", "Eklund", middle = "Charles",
+   person(given = "Aron", family = "Eklund", middle = "Charles",
           role = c("aut", "ths"),
           comment = c(ORCID = "0000-0003-0861-1001"))
   )
