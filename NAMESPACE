@@ -7,6 +7,7 @@ export(
     cp.plot.contours,
     find.breaks,
     gc.sample.stats,
+    gc.summary.plot,
     get.ci,
     mean_gc,
     mufreq.model.fit,
