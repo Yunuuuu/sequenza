@@ -1,11 +1,15 @@
 \name{gc.sample.stats}
 \alias{gc.sample.stats}
 \alias{gc.summary.plot}
+\alias{mean_gc}
+\alias{median_gc}
 
-\title{Normalize depth ratio values for GC-content bias}
+
+\title{Collect display and correct GC-content related coverage bias}
 
 \description{
-  Detects and bias in the depth ratio values driven by varying GC-content.
+  Collect information and perform statistics of depth of coverage in
+  relation with GC-content.
 }
 
 \usage{
@@ -13,6 +17,8 @@
                  parallel = 2L, verbose = TRUE)
   gc.summary.plot(gc_list, mean.col = 1, median.col = 2,
      scale.subset = 1.5, ...)
+  mean_gc(gc_list)
+  median_gc(gc_list)
 }
 
 \arguments{
@@ -62,15 +68,19 @@ A list with the following elements:
 
 \examples{
 
-  \dontrun{
+\dontrun{
 
 data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
 # read all the chromosomes:
 gc_info <- gc.sample.stats(data.file)
 
+# mean values of depth coverage vs GC content
+
+mean_gc(gc_info$normal)
+
 # plot the information for the tumor and normal samples
 par(mfrow=c(1, 2))
 gc.summary.plot(gc_info$normal, main = "Normal GC stats")
 gc.summary.plot(gc_info$tumor, main = "Tumor GC stats")
-
+}
 }
