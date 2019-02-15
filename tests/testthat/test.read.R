@@ -1,5 +1,5 @@
 context("Test read seqz data")
-seqz_file <- system.file("data", "example.seqz.txt.gz", package = "sequenza")
+seqz_file <- system.file("extdata", "example.seqz.txt.gz", package = "sequenza")
 col_names <- c("chromosome", "position", "base.ref", "depth.normal",
               "depth.tumor", "depth.ratio", "Af", "Bf", "zygosity.normal",
               "GC.percent", "good.reads", "AB.normal", "AB.tumor",
