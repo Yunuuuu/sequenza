@@ -70,7 +70,7 @@ A list with the following elements:
 
 \dontrun{
 
-data.file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
+data.file <-  system.file("extdata", "example.seqz.txt.gz", package = "sequenza")
 # read all the chromosomes:
 gc_info <- gc.sample.stats(data.file)
 

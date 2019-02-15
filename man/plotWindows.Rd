@@ -37,7 +37,7 @@ plotWindows(seqz.window, m.lty = 1, m.lwd = 3, m.col = "black",
 }
 
 \examples{
-    data.file <-  system.file("data", "example.seqz.txt.gz",
+    data.file <-  system.file("extdata", "example.seqz.txt.gz",
         package = "sequenza")
     seqz.data <- read.seqz(data.file)
     # 1Mb windows, each window is overlapping with 1 other adjacent

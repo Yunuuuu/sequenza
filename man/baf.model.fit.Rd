@@ -56,7 +56,7 @@
 \examples{
     \dontrun{
 
-    data.file <-  system.file("data", "example.seqz.txt.gz",
+    data.file <-  system.file("extdata", "example.seqz.txt.gz",
         package = "sequenza")
     # read all the chromosomes:
     seqz.data <- read.seqz(data.file)

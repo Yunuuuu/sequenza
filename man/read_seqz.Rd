@@ -48,7 +48,7 @@
 }
 
 \format{
-    A seqz file is a tab-separated text file with 14 columns and a header row. 
+    A seqz file is a tab-separated text file with 14 columns and a header row.
     The first 3 columns are derived from the original \code{pileup}
     file and contain:
     \describe{
@@ -92,7 +92,7 @@
 \examples{
    \dontrun{
 
-    data_file <-  system.file("data", "example.seqz.txt.gz", package = "sequenza")
+    data_file <-  system.file("extdata", "example.seqz.txt.gz", package = "sequenza")
 
     ## read chromosome 1 from an seqz file.
     seqz_data <- read.seqz(data_file, chr_name = 1)
