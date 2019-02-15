@@ -64,6 +64,7 @@
 
 \examples{
 
+\dontrun{
     data.file <-  system.file("data", "example.seqz.txt.gz",
         package = "sequenza")
     seqz.data <- read.seqz(data.file)
@@ -73,6 +74,7 @@
         positions = seqz.data$position, chromosomes = seqz.data$chromosome,
         window = 1e6, weight = seqz.data$depth.normal, start.coord = 1,
         overlap = 1)
+
     seqz.hom  <- seqz.data$zygosity.normal == 'hom'
     seqz.het  <- seqz.data[!seqz.hom, ]
     # 1Mb windows, each window is overlapping with 1 other adjacent window:
@@ -85,4 +87,5 @@
         good.reads = seqz.het$good.reads, positions = seqz.het$position,
         chromosomes = seqz.het$chromosome, window = 1e6,
         start.coord = 1, overlap = 1, conf = 0.95)
+}
 }
