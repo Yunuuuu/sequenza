@@ -5,7 +5,7 @@ Description: Tools to analyze genomic sequencing data from
  and copy number (allele-specific and total copy number) detection, quantification
  and visualization.
 Version: 3.0.0
-Date: 2019-02-15
+Date: 2019-05-09
 Authors@R: c(
    person(given = "Francesco", family = "Favero",
           email = "favero.francesco@gmail.com",
