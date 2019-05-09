@@ -82,9 +82,8 @@ following files are needed to get started with Sequenza:
 The normal and tumor BAM files are processed together to generate a *seqz* file, which
 is the required input for the analysis.
 It is possible to generate a *seqz* starting from other processed data, such as
-pileup, or from the results from other analyses. The available options are
-described in the [*sequenza-utils*](http://sequenza-utils.readthedocs.io/)
-manual pages.
+pileup, or VCF files. The available options are described in the
+[*sequenza-utils*](http://sequenza-utils.readthedocs.io/) manual pages.
 
 The *sequenza-utils* command provides various tools; here we highlight only the
 basic usage:
@@ -151,8 +150,9 @@ sequenza.results(sequenza.extract = test,
 # Plots and Results
 
 The function _sequenza.results_ outputs various files in the specified path.
-The result files are either output in pdf of in plain text file, and comprise quality control assessments (eg evaluate GC-correction), visualization of the
-data and results files, such as segmentation and mutation lists
+The resulting files are either output in pdf of in plain text. The files include
+quality control assessments (eg evaluate GC-correction), visualization of the
+data and files such as segmentation with copy number calling and mutation lists.
 
 ## Result files
 
@@ -206,8 +206,8 @@ seg.tab[is.num] <- lapply(seg.tab[is.num], round, 3)
 
 ## Segments results
 
-One of the most useful output of the anaylsis is the segmentation file. Few
-lines of the test sample are listed in the table below:
+The segmentation file with the allele-specific copy number calling is one of
+the main result of the analysis. A sample of the file is shown in the table below:
 
 ```{r head_segs, echo=FALSE}
 knitr::kable(head(seg.tab))
@@ -265,16 +265,19 @@ cp.plot.contours(CP, add = TRUE,
 
 ## Chromosome view
 
-Maybe one of the most useful visualization is the _chromosome view_.
-This visualization ease the ispection of the segmentation results, compared to
-binned profile of the raw data.
-In addition provide visualization of the mutation frequency, that can help to
-corroborate the selected model.
+_Chromosome view_ is the visualization that displays chromosome by crhosome, nutations,
+B-allele frequency and depth-ratio.
+The visualization makes it easier to ispect the segmentation results, comparing to
+a binned profile of the raw data.
+It also visualize the copy number calling using the _cellularity_ and _ploidy_ solution,
+making useful to asses if the copy number calling is acurate.
+In addition it provides a visualization of the mutation frequency that can also help to
+corroborate the solution.
 
 ```{r c_view, echo=TRUE, fig.height=6, fig.width=8, fig.align='center'}
 chromosome.view(mut.tab = test$mutations[[1]], baf.windows = test$BAF[[1]],
                 ratio.windows = test$ratio[[1]],  min.N.ratio = 1,
-                segments = seg.tab[seg.tab$chromosome == test$chromosomes[1],],
+                segments = test$segments[[1]],
                 main = test$chromosomes[1],
                 cellularity = 0.89, ploidy = 1.9,
                 avg.depth.ratio = 1)
