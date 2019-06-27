@@ -71,7 +71,7 @@ b_allele_freq <- function(Af, Bf, good.reads, conf = 0.95) {
         dd <- density(c(Bf, Af), weight = c(good.reads, good.reads) /
             (2 * sum(good.reads)))
         points.max <- which(diff(sign(diff(dd$y))) == -2) + 1
-        if (length(points.max) < 1) {
+        if (length(points.max) < 1 | ! which.max(dd$y) %in% points.max) {
             points.max <- which(diff(sign(diff(dd$y))) == -1) + 1
         }
         l.max <- dd$x[points.max]
