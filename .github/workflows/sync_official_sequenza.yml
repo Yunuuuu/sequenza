@@ -1,0 +1,20 @@
+# File: .github/workflows/repo-sync.yml
+on:
+  schedule:
+  - cron:  "23 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        persist-credentials: false
+    - name: repo-sync
+      uses: repo-sync/github-sync@v2
+      with:
+        source_repo: "https://bitbucket.org/sequenzatools/sequenza.git"
+        source_branch: "master"
+        destination_branch: "official"
+        github_token: ${{ secrets.PAT }}
