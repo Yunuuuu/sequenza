@@ -24,6 +24,8 @@ Authors@R: c(
 Depends: R (>= 3.2.0)
 Imports: pbapply, squash, iotools, readr, seqminer, copynumber
 Suggests: testthat, knitr, rmarkdown, rmdformats
+Remotes:
+    Yunuuuu/copynumber
 License: GPL-3
 URL: https://sequenzatools.bitbucket.io, Mailing list:
         https://groups.google.com/forum/#!forum/sequenza-user-group
