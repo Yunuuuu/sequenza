@@ -4,6 +4,8 @@ on:
   - cron:  "23 4 * * *"
   workflow_dispatch:
 
+name: sync_official
+
 jobs:
   repo-sync:
     runs-on: ubuntu-latest
